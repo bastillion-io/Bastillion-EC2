@@ -10,7 +10,7 @@ https://github.com/Netflix/Cloud-Prize/fork_select
 
 We need to know your email address and github id so that we can contact you about your entry, we are using MailChimp to manage this mailing list, and your information will only be used to administer the Netflix Cloud Prize itself.
 
-Please fill in this form at MailChimp http://eepurl.com/wJbIT
+Please fill in this form at MailChimp[http://eepurl.com/wJbIT]
 
 If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com
 
