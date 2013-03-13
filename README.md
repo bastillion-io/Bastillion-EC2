@@ -1,3 +1,5 @@
+https://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_v3.jpg
+
 Cloud-Prize
 ===========
 
