@@ -1,4 +1,19 @@
 http://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_v3.jpg
 
-== Blah
+== Step 1 - Read the Rules in the Wiki pages
+https://github.com/Netflix/Cloud-Prize/wiki
 
+== Step 2 - Fork this repo to your own account
+https://github.com/Netflix/Cloud-Prize/fork_select
+
+== Step 3 - Send us your email address
+
+We need to know your email address and github id so that we can contact you about your entry, we are using MailChimp to manage this mailing list, and your information will only be used to administer the Netflix Cloud Prize itself.
+
+Please fill in this form at MailChimp http://eepurl.com/wJbIT
+
+If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com
+
+Thanks
+
+Adrian Cockcroft 
