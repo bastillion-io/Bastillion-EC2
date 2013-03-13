@@ -1,6 +1,8 @@
 http://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_v3.jpg
 
-= Step 0 - This contest is for software developers, you need to have a github account
+= This contest is for software developers.
+
+= Step 0 - You need your own github account
 
 = Step 1 - Read[https://github.com/Netflix/Cloud-Prize/wiki] the Rules in the Wiki
 
@@ -8,11 +10,9 @@ http://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_
 
 = Step 3 - Send[http://eepurl.com/wJbIT] us your email address
 
-= Step 4 - Modify your copy of the Cloud Prize repo to create your entry
+= Step 4 - Modify your copy of the repo as your Submission
 
-We need to know your email address and github id so that we can contact you about your entry, and your information will only be used to administer the Netflix Cloud Prize itself.
-
-We are collecting information using this MailChimp[http://eepurl.com/wJbIT] form. It will send you an email to verify your address.
+We need to know your email address and github id so that we can contact you about your entry, and your information will only be used to administer the Netflix Cloud Prize itself. We are collecting information using this MailChimp[http://eepurl.com/wJbIT] form. It will send you an email to verify your address.
 
 If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com, make sure you tell us your github id.
 
