@@ -38,7 +38,7 @@ If you win, you'll get US$10,000 cash, US$5000 AWS credits, a trip to Las Vegas 
 
 Q: How do I actually contribute?
 
-A: This repo that you will fork is just a readme. To apply, you add in your submission to your fork, which you derive from all of the other open source software[https://github.com/Netflix/] in the Netflix Github account.  For example, perhaps you have a way to improve the Netflix Graph[https://github.com/Netflix/netflix-graph] with a new data structure.  Write a new Monkey in any language you want.  Rewrite the entire platform in Erlang.  Pretty much and addition or extension will be considered!
+A: This repo that you will fork is just a readme. To apply, you add in your submission to your fork, which you derive from all of the other open source software[https://github.com/Netflix/] in the Netflix Github account.  For example, perhaps you have a way to improve the Netflix Graph[https://github.com/Netflix/netflix-graph] with a new data structure.  Write a new Monkey in any language you want.  Rewrite the entire platform in Erlang.  Pretty much any addition or extension will be considered!
 
 Q: Aren't you just doing this to get a bunch of free work?
 
