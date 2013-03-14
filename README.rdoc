@@ -16,6 +16,24 @@ We need to know your email address and GitHub id so that we can contact you abou
 
 If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com. Make sure you include your GitHub id.
 
-Thanks.
+
+= TL;DR
+
+We want you to build something cool using or modifying our open source software.  You submission will be a patch for one of our open source projects or a standalone program.  Your submission will be judged in these categories:
+
+1. Best example application mash-up
+2. Best new monkey
+3. Best contribution to code quality
+4. Best new feature
+5. Best contribution to operational tools, availability and manageability
+6. Best portability enhancement
+7. Best contribution to performance improvements
+8. Best datastore integration
+9. Best usability enhancement
+10. Judges choice award
+
+If you win, you'll get US$10,000 cash, US$5000 AWS credits, a trip to Las Vegas for two, and fame and notoriety (at least within Netflix Engineering).
+
+Good luck and thanks!
 
 Adrian Cockcroft 
