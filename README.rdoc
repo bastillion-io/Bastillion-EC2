@@ -19,7 +19,7 @@ If you have problems registering with MailChimp, you can contact us via mailto:c
 
 = TL;DR
 
-We want you to build something cool using or modifying our open source software.  You submission will be a patch for one of our open source projects or a standalone program.  Your submission will be judged in these categories:
+We want you to build something cool using or modifying our open source software.  Your submission will be a patch for one of our open source projects or a standalone program.  Your submission will be judged in these categories:
 
 1. Best example application mash-up
 2. Best new monkey
