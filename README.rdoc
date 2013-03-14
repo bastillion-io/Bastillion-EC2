@@ -19,18 +19,18 @@ If you have problems registering with MailChimp, you can contact us via mailto:c
 
 = TL;DR
 
-We want you to build something cool using or modifying our open source software.  Your submission will be a patch for one of our open source projects or a standalone program.  Your submission will be judged in these categories:
+We want you to build something cool using or modifying our open source software.  Your submission will be a standalone program or a patch for one of our open source projects.  Your submission will be judged in these categories:
 
-1. Best example application mash-up
-2. Best new monkey
-3. Best contribution to code quality
-4. Best new feature
-5. Best contribution to operational tools, availability and manageability
-6. Best portability enhancement
-7. Best contribution to performance improvements
-8. Best datastore integration
-9. Best usability enhancement
-10. Judges choice award
+1. Best Example Application Mash-Up
+2. Best New Monkey
+3. Best Contribution to Code Quality
+4. Best New Feature
+5. Best Contribution to Operational Tools, Availability, and Manageability
+6. Best Portability Enhancement
+7. Best Contribution to Performance Improvements
+8. Best Datastore Integration
+9. Best Usability Enhancement
+10. Judges Choice Award
 
 If you win, you'll get US$10,000 cash, US$5000 AWS credits, a trip to Las Vegas for two, a ticket to Amazon's user conference, and fame and notoriety (at least within Netflix Engineering).
 
