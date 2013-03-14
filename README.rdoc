@@ -32,7 +32,7 @@ We want you to build something cool using or modifying our open source software.
 9. Best usability enhancement
 10. Judges choice award
 
-If you win, you'll get US$10,000 cash, US$5000 AWS credits, a trip to Las Vegas for two, and fame and notoriety (at least within Netflix Engineering).
+If you win, you'll get US$10,000 cash, US$5000 AWS credits, a trip to Las Vegas for two, a ticket to Amazon's user conference, and fame and notoriety (at least within Netflix Engineering).
 
 Good luck and thanks!
 
