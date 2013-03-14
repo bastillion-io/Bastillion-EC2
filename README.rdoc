@@ -4,7 +4,7 @@ http://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_
 
 = Step 0 - You need your own GitHub account
 
-= Step 1 - Read[https://github.com/Netflix/Cloud-Prize/wiki] the Rules in the Wiki
+= Step 1 - Read[https://github.com/Netflix/Cloud-Prize/wiki] the rules in the Wiki
 
 = Step 2 - Fork[https://github.com/Netflix/Cloud-Prize/fork_select] this repo to your own GitHub account
 
