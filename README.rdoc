@@ -12,10 +12,10 @@ http://github.com/Netflix/Cloud-Prize/wiki/images/950x250_BNR_CloudPrize_Attend_
 
 = Step 4 - Modify your copy of the repo as your Submission
 
-We need to know your email address and GitHub id so that we can contact you about your entry, and your information will only be used to administer the Netflix Cloud Prize itself. We are collecting information using this MailChimp[http://eepurl.com/wJbIT] form. It will send you an email to verify your address.
+We need to know your email address and GitHub id so that we can contact you about your entry. Your information will only be used to administer the Netflix Cloud Prize itself. We are collecting information using this MailChimp[http://eepurl.com/wJbIT] form. It will send you an email to verify your address.
 
-If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com, make sure you tell us your GitHub id.
+If you have problems registering with MailChimp, you can contact us via mailto:cloudprize@netflix.com. Make sure you include your GitHub id.
 
-Thanks
+Thanks.
 
 Adrian Cockcroft 
