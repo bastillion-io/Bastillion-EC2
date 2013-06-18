@@ -116,13 +116,13 @@
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
-            <s:if test="script!=null">
+            <s:if test="script!=null && script.id!=null">
               <s:hidden name="script.id"/>
             </s:if>
         </s:form>
 
 
-        <s:if test="script!=null">
+        <s:if test="script!=null && script.id!=null">
             <h3>Execute Script on Systems</h3>
         </s:if>
         <s:else>
@@ -131,7 +131,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <s:if test="script!=null">
+            <s:if test="script!=null && script.id!=null">
                 <p>Run <b>
                 <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
                 </p>
@@ -145,8 +145,7 @@
 
 
   	        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
-  	        <s:if test="script!=null">
-
+  	        <s:if test="script!=null && script.id!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
                 <table class="vborder scrollableTable">
@@ -194,7 +193,7 @@
                     </tbody>
                 </table>
 	    </s:form>
-            <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+            <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="select_frm_btn">Execute Script</div>
             </s:if>
             <s:else>
@@ -219,7 +218,7 @@
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
                         <s:hidden name="selectForm"/>
-                        <s:if test="script!=null">
+                        <s:if test="script!=null && script.id!=null">
                             <s:hidden name="script.id"/>
                         </s:if>
                         <tr>
