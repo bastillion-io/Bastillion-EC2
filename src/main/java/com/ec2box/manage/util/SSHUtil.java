@@ -116,7 +116,12 @@ public class SSHUtil {
            EC2Key ec2Key = EC2KeyDB.getEC2KeyByKeyNm( adminId, hostSystemStatus.getHostSystem().getKeyNm(), hostSystemStatus.getHostSystem().getEc2Region());
             //add private key
             if(ec2Key!=null && ec2Key.getId()!=null){
-                jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem", passhrase);
+                if(passhrase!=null && !passhrase.trim().equals("")){
+                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem", passhrase);
+                }else{
+                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem");
+
+                }
             }
 
             //create session

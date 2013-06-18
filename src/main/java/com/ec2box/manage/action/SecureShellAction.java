@@ -294,11 +294,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
             List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(systemSelectId);
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-            //check to see if passphrase has been provided
-            //set use provided passphrase
-            if (pendingSystemStatus!=null) {
-               pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
-            }
+
 
         }
         return SUCCESS;

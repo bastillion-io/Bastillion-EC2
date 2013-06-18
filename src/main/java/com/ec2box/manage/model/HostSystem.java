@@ -25,7 +25,7 @@ public class HostSystem {
     Long adminId;
     String displayNm;
     String instanceId;
-    String user = "root";
+    String user = "ec2-user";
     String host;
     Integer port = 22;
     String keyNm;
