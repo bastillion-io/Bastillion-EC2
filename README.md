@@ -49,7 +49,7 @@ Login with
 Steps:
 
 1. Set your AWS credentials
-2. Import the private key used on your EC2 systems (note: The EC2 server will only show if private key has been imported)
+2. Import the private key used on your EC2 systems (note: The EC2 server will only show if the private key has been imported)
 3. Set the EC2 regions of the residing systems
 4. Start composite-ssh sessions or create and execute a script across multiple sessions
 
