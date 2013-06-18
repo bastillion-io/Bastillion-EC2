@@ -21,11 +21,11 @@ http://www.sqlite.org/download.html
 Java JDK 1.6 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Maven 3 or greater ( Only needed if building from source )
+Maven 3 or greater
 http://maven.apache.org
 
 
-To Build from Source and Run with Maven
+Build and Run
 ------
 Export environment variables
 
