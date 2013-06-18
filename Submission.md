@@ -14,5 +14,5 @@ A web-based ssh terminal to execute commands and scripts on multiple EC2 session
 
 ## Provide Links to Github Repo's for your Submission
 
-https://github.com/skavanagh/Cloud-Prize
+https://github.com/skavanagh/EC2Box
 
