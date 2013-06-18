@@ -25,7 +25,7 @@ public class HostSystem {
     Long adminId;
     String displayNm;
     String instanceId;
-    String user = "ubuntu";
+    String user = "root";
     String host;
     Integer port = 22;
     String keyNm;
