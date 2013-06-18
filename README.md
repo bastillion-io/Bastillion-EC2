@@ -5,6 +5,9 @@ About
 -----
 A web-based ssh terminal to execute commands and scripts on multiple EC2 sessions simultaneously.
 
+Demo
+-----
+http://youtu.be/T4SBisCz91M
 
 Prerequisites
 -------------
