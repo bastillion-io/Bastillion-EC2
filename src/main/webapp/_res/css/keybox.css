@@ -1,0 +1,267 @@
+html, body {
+}
+
+body {
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-family: ArialMT, Arial, sans-serif;
+    font-size: small;
+    background-color: #CCCCCC;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: ArialMT, Arial, sans-serif;
+    font-size: small;
+    color: #4d4d4d;
+}
+
+table td, table th {
+    padding: 5px;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+.vborder {
+    border: 1px solid #CCCCCC;
+}
+
+.tablescroll_head th {
+
+    background-color: #e0e0e0;
+}
+
+.vborder td, .vborder th, .tablescroll_head th {
+    padding: 5px 15px 5px 5px;
+    border: 1px solid #CCCCCC;
+    white-space: nowrap;
+}
+
+
+
+.vborder td a, .vborder th a, .tablescroll_head th a{
+    white-space: nowrap;
+}
+
+.nav {
+    float: left;
+    width: 125px;
+
+}
+
+.nav_item {
+    padding: 8px 5px 8px 0px;
+    font-size: 11px;
+}
+
+.nav a {
+    color: #4d4d4d;
+}
+
+.content {
+    margin: 0px 0px 0px 10px;
+    padding: 0px 15px 15px 15px;
+    float: left;
+    width: 70%;
+    border-left: 1px solid #CCCCCC;
+}
+
+.page {
+    float: left;
+    margin: 10px 10px 10px 10px;
+    padding: 15px 15px 15px 15px;
+    background-color: #ffffff;
+    color: #4d4d4d;
+    width: 95%;
+
+}
+
+.page a {
+    color: #4d4d4d;
+}
+
+label, .label {
+    font-size: small;
+    font-weight: bold;
+    color: #4d4d4d;
+    paddding: 2px 2px 2px 2px;
+}
+
+div.block {
+    overflow: hidden;
+    border: 1px solid #CCCCCC;
+}
+
+div.block label, div.block .inner_block {
+    width: 120px;
+    display: block;
+    float: left;
+    text-align: left;
+    margin: 8px 8px 8px 8px;
+}
+
+div.block .input {
+    float: left;
+    margin: 8px 8px 8px 8px;
+}
+
+.error, .error a {
+    font-weight: bold;
+    color: #cc0000;
+}
+
+.warning {
+    font-weight: bold;
+    color: #b8b60e;
+}
+
+.success {
+    font-weight: bold;
+    color: #008000;
+}
+
+.sort {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/bg.gif")
+}
+
+.asc {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/asc.gif")
+}
+
+.desc {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/desc.gif")
+}
+
+.ui-button {
+    height: 22px;
+}
+
+div.term {
+    margin: 10px;
+    border: 1px solid #CCCCCC;
+}
+
+
+
+div.termwrapper {
+    width: 100%;
+    height: 620px;
+    overflow-x: auto;
+    border: 1px solid #CCCCCC;
+    overflow-y: scroll;
+}
+
+div.termwrapper div {
+}
+
+div.termwrapper div h4 {
+    margin: 8px 0 0 8px;
+}
+
+.top_nav {
+    padding: 0;
+    list-style: none;
+}
+
+.top_nav_item {
+    float: left;
+    padding: 0 15px 0px 0;
+}
+
+.run_cmd_active {
+    background: #4d4d4d;
+}
+
+.run_cmd_active  h4 {
+    color: #FFFFFF;
+}
+
+.run_cmd {
+    border: 1px solid #CCCCCC;
+    float: left;
+    min-width:580px;
+}
+
+.term {
+    background-color: #000000;
+}
+
+
+
+.top_link {
+    float: left;
+    padding: 0 0 10px 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+
+}
+
+#select_all {
+ padding: 0 0 10px 0;
+}
+
+
+.clear {
+    clear: both;
+}
+
+.ui-dialog-titlebar-close  {
+    display:none;
+}
+.errorsBg{
+	background-color:#fdd;
+	color:red;
+	border: 1px solid;
+}
+
+.errorMessage{
+	padding:0px 8px;
+}
+
+.output {
+z-index:100;
+}
+
+
+.terminal {
+  border: #f0f0f0 solid 5px;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+  font-size: 10px;
+  color: #000000;
+  background: #f0f0f0;
+}
+
+
+
+.reverse-video {
+  color: #f0f0f0;
+  background: #4d4d4d;
+}
+
+.checkboxLabel {
+  font-weight: normal;
+}
+
+
+
+.errorMessage, .errorMessage a {
+    color: #cc0000;
+}
+.actionMessage, .actionMessage a {
+  color:#CC0000;
+}
+
+.errorLabel {
+    color: #cc0000;
+}
