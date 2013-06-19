@@ -52,7 +52,7 @@
             <s:textfield name="login.username" label="Username"/>
             <s:password name="login.password" label="Password"/>
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="login_btn" class="login" >Login</div></td>
+                <td><div id="login_btn" class="login" >Login</div></td>
             </tr>
         </s:form>
 

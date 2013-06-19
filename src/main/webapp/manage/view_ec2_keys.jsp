@@ -147,7 +147,7 @@
         <s:actionmessage escape="false"/>
     </s:if>
     <s:else>
-          <p>Create new or import EC2 Keys below</p>
+          <p>Import and register EC2 keys below. An EC2 server will only show after its private key has been imported</p>
 
             <p>
             <s:form action="viewEC2Keys">
@@ -208,7 +208,7 @@
             </div>
             -->
 
-             <div id="import_btn">Import Existing Key</div>
+             <div id="import_btn">Import Private Key</div>
                         <div id="import_dialog" title="Import Existing EC2 Key">
                          <s:actionerror/>
                             <s:form action="importEC2Key" class="save_ec2Key_form_import">

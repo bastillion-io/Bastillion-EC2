@@ -133,14 +133,14 @@
 
             <s:if test="script!=null && script.id!=null">
                 <p>Run <b>
-                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
+                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below <div class="note">(Select on the user field to change the system username)</div>
                 </p>
                 <div id="script_dia" title="View Script">
                     <pre><s:property value="script.script"/></pre>
                 </div>
             </s:if>
             <s:else>
-                <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
+                <p>Select the systems below to generate composite SSH sessions in multiple terminals <div class="note">(Select on the user field to change the system username)</div></p>
             </s:else>
 
 
@@ -222,8 +222,7 @@
                             <s:hidden name="script.id"/>
                         </s:if>
                         <tr>
-                        <td>&nbsp;</td>
-                        <td>
+                        <td colspan="2">
                         <div class="submit_btn">Submit</div>
                         <div class="cancel_btn">Cancel</div>
                         </td>

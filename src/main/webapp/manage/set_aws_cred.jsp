@@ -48,7 +48,7 @@
             <s:textfield name="awsCred.accessKey" label="Access Key" size="35" autocomplete="off"/>
             <s:password name="awsCred.secretKey" label="Secret Key" size="35" autocomplete="off"/>
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="change_cred_btn" class="login" >Set AWS Credentials</div></td>
+                <td><div id="change_cred_btn" class="login" >Set AWS Credentials</div></td>
             </tr>
         </s:form>
 

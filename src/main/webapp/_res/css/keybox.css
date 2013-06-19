@@ -265,3 +265,7 @@ z-index:100;
 .errorLabel {
     color: #cc0000;
 }
+.note {
+   font-style:italic;
+   font-size:smaller;
+}

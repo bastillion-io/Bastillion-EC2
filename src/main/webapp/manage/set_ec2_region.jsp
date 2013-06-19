@@ -53,7 +53,7 @@
         <s:form action="submitEC2Region">
             <s:checkboxlist name="ec2Region"  list="ec2RegionMap" label="EC2 Region" />
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="change_region_btn" class="login" >Set EC2 Region</div></td>
+                <td>  <div id="change_region_btn" class="login" >Set EC2 Region</div></td>
             </tr>
         </s:form>
     </s:else>
