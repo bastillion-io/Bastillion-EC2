@@ -62,5 +62,4 @@ Author
 Sean Kavanagh - sean.p.kavanagh6@gmail.com
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/skavanagh/EC2Box/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/0566eda40886c71548228fe00a8feed9 "githalytics.com")](http://githalytics.com/skavanagh/EC2Box)
