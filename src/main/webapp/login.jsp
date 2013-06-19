@@ -19,12 +19,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-
     <jsp:include page="_res/inc/header.jsp"/>
-
     <script type="text/javascript">
         $(document).ready(function() {
-
 
             $("#login_btn").button().click(function() {
                 $('#loginSubmit').submit();
@@ -55,8 +52,6 @@
                 <td><div id="login_btn" class="login" >Login</div></td>
             </tr>
         </s:form>
-
-
 
     </div>
 </div>
