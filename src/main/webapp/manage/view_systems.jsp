@@ -36,7 +36,7 @@
                 modal: true,
                 open: function(event, ui) {
                     $(".ui-dialog-titlebar-close").show();
-                },
+                }
             });
 
             //open edit dialog
