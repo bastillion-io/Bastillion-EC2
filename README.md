@@ -60,3 +60,7 @@ Steps:
 Author
 ------
 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/skavanagh/EC2Box/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
