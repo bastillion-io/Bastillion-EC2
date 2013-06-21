@@ -30,25 +30,25 @@ $(document).ready(function() {
     $("#set_password_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth: 500,
+        minWidth: 550,
         modal: true
     });
     $("#set_passphrase_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth: 500,
+        minWidth: 550,
         modal: true
    });
     $("#error_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth:500,
+        minWidth:550,
         modal: true
     });
     $("#upload_push_dialog").dialog({
         autoOpen: false,
-        height: 350,
-        minWidth: 700,
+        height: 375,
+        minWidth: 725,
         modal: true,
         open: function(event, ui) {
             $(".ui-dialog-titlebar-close").show();
@@ -335,7 +335,7 @@ $(document).ready(function() {
             </div>
 
             <div id="upload_push_dialog" title="Upload &amp; Push">
-                <iframe id="upload_push_frame" width="600px" height="300px" style="border: none;">
+                <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
 
                 </iframe>
 

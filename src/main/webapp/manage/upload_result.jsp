@@ -30,7 +30,7 @@
             $("#error_dialog").dialog({
                 autoOpen: false,
                 height: 175,
-                width: 400,
+                width: 550,
                 modal: true
             });
 
@@ -39,7 +39,7 @@
                 $('#push').submit();
             });
 
-            $('.scrollableTable').tableScroll({height:150, width:550});
+            $('.scrollableTable').tableScroll({height:150, width:650});
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
             <s:if test="pendingSystemStatus!=null">
             //set scroll
@@ -91,7 +91,7 @@
                             value="hostSystem.displayNm"/></div>
                 </td>
                 <td><s:property value="hostSystem.user"/></td>
-                <td><s:property value="hostSystem.host"/>:<s:property value="hostSystem.port"/></td>
+                <td><s:property value="hostSystem.host"/></td>
 
                 <td>
                    <s:if test="statusCd=='INITIAL'">
