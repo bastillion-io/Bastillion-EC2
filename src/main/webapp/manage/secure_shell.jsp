@@ -25,6 +25,9 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
+
+
+
     $('#dummy').focus();
 
     $("#set_password_dialog").dialog({
@@ -56,6 +59,10 @@ $(document).ready(function() {
         close: function() {
             $("#upload_push_frame").attr("src", "");
         }
+    });
+
+    $(".termwrapper").sortable({
+            helper : 'clone'
     });
 
     //submit add or edit form
@@ -126,12 +133,6 @@ $(document).ready(function() {
 
     });
 
-     var tabindex = 1;
-     $('.run_cmd').each(function() {
-          var $input = $(this);
-          $input.attr("tabindex", tabindex);
-          tabindex++;
-     });
 
 
 
