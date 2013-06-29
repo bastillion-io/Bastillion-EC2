@@ -21,11 +21,10 @@ http://www.sqlite.org/download.html
 Java JDK 1.6 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Maven 3 or greater
+Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
 
-
-Build and Run
+To Build from Source 
 ------
 Export environment variables
 
@@ -39,6 +38,22 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
 
+To Run Bundled with Jetty
+------
+If your not big on the idea of building from source...
+
+Download EC2Box-jetty
+
+https://s3.amazonaws.com/EC2Box/EC2Box-jetty-latest.tar.gz
+
+Export environment variables
+
+     export JAVA_HOME=/path/to/jdk
+     export PATH=$JAVA_HOME/bin:$PATH
+
+Start EC2Box
+
+        ./startEC2Box.sh
 
 Using EC2Box
 ------
