@@ -3,7 +3,7 @@ EC2Box
 
 About
 -----
-A web-based ssh terminal to execute commands and scripts on multiple EC2 sessions simultaneously.
+A web-based ssh terminal to execute commands and make changes to multiple EC2 sessions simultaneously running on Amazon Web Services (AWS).
 
 Demo
 -----
