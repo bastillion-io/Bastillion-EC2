@@ -1,5 +1,3 @@
-<div><a href="https://twitter.com/share" class="twitter-share-button" data-url="https://github.com/skavanagh/EC2Box" data-text="EC2Box" data-via="spkavanagh6" data-size="large" data-count="none">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></div>
 EC2Box
 ======
 
@@ -76,7 +74,10 @@ Steps:
 
 Author
 ------
-Sean Kavanagh - sean.p.kavanagh6@gmail.com
+**Sean Kavanagh** 
+
++ sean.p.kavanagh6@gmail.com
++ https://twitter.com/spkavanagh6
 
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/0566eda40886c71548228fe00a8feed9 "githalytics.com")](http://githalytics.com/skavanagh/EC2Box)
