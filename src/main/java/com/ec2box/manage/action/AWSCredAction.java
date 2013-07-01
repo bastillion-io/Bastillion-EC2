@@ -15,6 +15,9 @@
  */
 package com.ec2box.manage.action;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.util.AdminUtil;
@@ -26,7 +29,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 
 
-public class AWSCredAction extends ActionSupport implements ServletRequestAware  {
+public class AWSCredAction extends ActionSupport implements ServletRequestAware {
 
     HttpServletRequest servletRequest;
     AWSCred awsCred;
@@ -38,24 +41,23 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
             }
     )
     public String setAWSCred() {
-        awsCred= AWSCredDB.getAWSCred(AdminUtil.getAdminId(servletRequest));
+        awsCred = AWSCredDB.getAWSCred(AdminUtil.getAdminId(servletRequest));
         return SUCCESS;
 
     }
 
     @Action(value = "/manage/submitAWSCred",
             results = {
-            @Result(name = "success", location = "/manage/viewEC2Keys.action", type = "redirect"),
-            @Result(name = "input", location = "/manage/set_aws_cred.jsp")
+                    @Result(name = "success", location = "/manage/viewEC2Keys.action", type = "redirect"),
+                    @Result(name = "input", location = "/manage/set_aws_cred.jsp")
             }
     )
 
     public String submitAWSCred() {
-        AWSCredDB.setAWSCred(AdminUtil.getAdminId(servletRequest),awsCred);
+        AWSCredDB.setAWSCred(AdminUtil.getAdminId(servletRequest), awsCred);
         return SUCCESS;
 
     }
-
 
 
     /**
@@ -69,6 +71,15 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
         if (awsCred.getSecretKey() == null ||
                 awsCred.getSecretKey().trim().equals("")) {
             addFieldError("awsCred.secretKey", "Required");
+        }
+        if (!this.hasErrors()) {
+            try {
+                BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
+                AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+                service.describeKeyPairs();
+            } catch (Exception ex) {
+                addActionError("Invalid Credentials");
+            }
         }
     }
 

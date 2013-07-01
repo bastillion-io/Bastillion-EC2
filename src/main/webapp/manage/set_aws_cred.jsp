@@ -44,9 +44,9 @@
         <p>Set or change your Amazon Web Services credentials below</p>
 
         <s:actionerror/>
-        <s:form action="submitAWSCred">
-            <s:textfield name="awsCred.accessKey" label="Access Key" size="35" autocomplete="off"/>
-            <s:password name="awsCred.secretKey" label="Secret Key" size="35" autocomplete="off"/>
+        <s:form action="submitAWSCred" autocomplete="off">
+            <s:textfield name="awsCred.accessKey" label="Access Key" size="35" />
+            <s:password name="awsCred.secretKey" label="Secret Key" size="35" />
             <tr> <td>&nbsp;</td>
                 <td><div id="change_cred_btn" class="login" >Set AWS Credentials</div></td>
             </tr>
