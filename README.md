@@ -42,7 +42,7 @@ To Run Bundled with Jetty
 ------
 If your not big on the idea of building from source...
 
-Download EC2Box-jetty
+Download ec2box-jetty-vXX.XX.tar.gz
 
 https://github.com/skavanagh/EC2Box/releases
 
