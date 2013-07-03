@@ -44,7 +44,7 @@ If your not big on the idea of building from source...
 
 Download EC2Box-jetty
 
-https://s3.amazonaws.com/EC2Box/EC2Box-jetty-latest.tar.gz
+https://github.com/skavanagh/EC2Box/releases
 
 Export environment variables
 
