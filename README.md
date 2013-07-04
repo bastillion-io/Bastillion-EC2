@@ -24,20 +24,6 @@ http://www.oracle.com/technetwork/java/javase/overview/index.html
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
 
-To Build from Source 
-------
-Export environment variables
-
-    export JAVA_HOME=/path/to/jdk
-    export M2_HOME=/path/to/maven
-    export PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
-
-In the directory that contains the pom.xml run
-
-	mvn package jetty:run
-
-**Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
-
 To Run Bundled with Jetty
 ------
 If your not big on the idea of building from source...
@@ -54,6 +40,20 @@ Export environment variables
 Start EC2Box
 
         ./startEC2Box.sh
+
+To Build from Source 
+------
+Export environment variables
+
+    export JAVA_HOME=/path/to/jdk
+    export M2_HOME=/path/to/maven
+    export PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
+
+In the directory that contains the pom.xml run
+
+	mvn package jetty:run
+
+**Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
 
 Using EC2Box
 ------
