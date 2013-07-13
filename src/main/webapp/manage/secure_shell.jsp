@@ -80,32 +80,21 @@ $(document).ready(function() {
     });
 
 
-    //if terminal window toggle active for commands
-    $(".run_cmd").click(function() {
+      //if terminal window toggle active for commands
+      $(".run_cmd").click(function() {
 
-       //check if all terminals are selected
-       var allSelected = true;
-       $(".run_cmd").each(function(index) {
-            if(!$(this).hasClass('run_cmd_active')){
-                allSelected=false;
-            }
-       });
-
-       //if all terminals are selected make only the clicked one active
-       if(allSelected) {
+        //check for cmd-click / ctr-click
+        if(!keys[17] && !keys[91]) {
             $(".run_cmd").removeClass('run_cmd_active');
-            $(this).addClass('run_cmd_active');
+        }
 
-       } else {
-            //de-active or active clicked terminal
-            if ($(this).hasClass('run_cmd_active')) {
-                $(this).removeClass('run_cmd_active')
-            } else {
-                $(this).addClass('run_cmd_active')
-            }
-       }
+        if ($(this).hasClass('run_cmd_active')) {
+            $(this).removeClass('run_cmd_active');
+        } else {
+            $(this).addClass('run_cmd_active')
+        }
 
-    });
+      });
 
     $('#select_all').click(function() {
         $(".run_cmd").addClass('run_cmd_active');
@@ -213,16 +202,19 @@ $(document).ready(function() {
     });
 
 
+    var lock=false;
     setInterval(function() {
-        $.getJSON('getOutputJSON.action', function(data) {
-            var append = false;
-            $.each(data, function(key, val) {
-                if (val.output != '') {
-                   termMap[val.sessionId].write(val.output);
-                }
-            });
-        });
-    }, 500);
+        if(!lock){
+            lock=true;
+            $.getJSON('getOutputJSON.action?t='+new Date().getTime(), function(data) {
+                $.each(data, function(key, val) {
+                    if (val.output != '') {
+                            termMap[val.sessionId].write(val.output);
+                        }
+                    });
+                }).always(function() { lock=false; });
+            }
+        }, 500);
     </s:if>
 
 });
@@ -255,7 +247,7 @@ $(document).ready(function() {
                 <div id="select_all" class="top_link">Select All</div>
                 <div id="upload_push" class="top_link">Upload &amp; Push</div>
                  <div class="top_link" ><a href="/manage/exitTerms.action">Exit Terminals</a></div>
-                 <div class="top_link" style="float:right;"><input type="text" name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
+                 <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
                 <div class="clear"></div>
 
             </s:if>
@@ -362,6 +354,7 @@ $(document).ready(function() {
     </s:else>
 
 </div>
+<div style="float:right;"><input type="text" name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
 
 </body>
 </html>

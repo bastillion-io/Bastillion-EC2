@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.05.01</version>
+    <version>0.05.02</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
 
@@ -78,7 +78,7 @@
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-			                <host>127.0.0.1</host>
+			    <host>127.0.0.1</host>
                             <port>8090</port>
                         </connector>
                     </connectors>

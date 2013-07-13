@@ -28,13 +28,6 @@ import java.sql.Statement;
  * Class to create and close database resources
  */
 public class DBUtils {
-    public static enum JournalMode {
-            DELETE, TRUNCATE, PERSIST, MEMORY, OFF, WAL;
-
-            public String getValue() {
-                return name();
-            }
-        }
 
 
     //system path to the sqlite DB
