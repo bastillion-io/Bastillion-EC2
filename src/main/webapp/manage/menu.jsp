@@ -83,15 +83,7 @@
                  Import the private keys used on your EC2 systems.
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <a href="setEC2Region.action">Set EC2 Region</a>
 
-                </td>
-                <td>
-                 Select the regions to manage.
-                </td>
-            </tr>
 
 
 

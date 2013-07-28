@@ -52,7 +52,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         Long adminId = AdminUtil.getAdminId(servletRequest);
 
 
-        List<String> ec2RegionList = EC2RegionDB.getEC2Regions(adminId);
+        List<String> ec2RegionList = EC2KeyDB.getEC2Regions(adminId);
 
 
         try {
@@ -95,7 +95,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 hostSystem.setUser(existingSystem.getUser());
                             }
 
-
                             hostSystem.setInstanceId(instance.getInstanceId());
                             hostSystem.setHost(instance.getPublicDnsName());
                             hostSystem.setKeyNm(instance.getKeyName());
@@ -129,6 +128,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         if (script != null && script.getId() != null) {
             script = ScriptDB.getScript(script.getId(), adminId);
         }
+
 
         return SUCCESS;
     }

@@ -11,13 +11,6 @@ http://youtu.be/T4SBisCz91M
 
 Prerequisites
 -------------
-SQLite3
-http://www.sqlite.org/download.html
-
-    sudo apt-get install sqlite3 sqlite3-dev 
-
-**Should already be installed in Mac OS X v10.5 or greater
-
 Java JDK 1.6 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
@@ -53,7 +46,7 @@ In the directory that contains the pom.xml run
 
 	mvn package jetty:run
 
-**Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
+**Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
 Using EC2Box
 ------

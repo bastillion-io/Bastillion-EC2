@@ -233,7 +233,7 @@
             </s:if>
             <s:else>
             <div class="actionMessage">
-                <div>Systems not available. Set EC2 regions <a href="setEC2Region.action">here</a></div>
+                <div>Systems not available. Import EC2 Keys <a href="viewEC2Keys.action">here</a></div>
             </div>
             </s:else>
 

@@ -31,9 +31,6 @@
      <div class="nav_item">
         <a href="viewEC2Keys.action">Set EC2 Keys</a>
     </div>
-        <div class="nav_item">
-            <a href="setEC2Region.action">Set EC2 Region</a>
-        </div>
          <div class="nav_item">
             <a href="viewSystems.action">Composite SSH Terms</a>
          </div>

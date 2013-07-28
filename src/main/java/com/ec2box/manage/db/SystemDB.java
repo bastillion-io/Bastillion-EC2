@@ -52,7 +52,7 @@ public class SystemDB {
         if(sortedSet.getOrderByField()!=null && !sortedSet.getOrderByField().trim().equals("")){
             orderBy="order by " + sortedSet.getOrderByField()+ " " + sortedSet.getOrderByDirection();
         }
-        String sql="select s.* from  system s, ec2_region r where s.region=r.region and s.admin_id= ?" +orderBy;
+        String sql="select * from  system where  admin_id= ?" +orderBy;
 
         Connection con=null;
         try {
@@ -176,7 +176,7 @@ public class SystemDB {
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("select * from  system where instance_id=? and admin_id =?");
+            PreparedStatement stmt = con.prepareStatement("select * from  system where instance_id like ? and admin_id =?");
             stmt.setString(1, instanceId);
             stmt.setLong(2, adminId);
             ResultSet rs = stmt.executeQuery();
@@ -317,7 +317,6 @@ public class SystemDB {
             //insert new host systems
             for(HostSystem hostSystem:hostSystemList){
                 insertSystem(con, hostSystem);
-
             }
 
         } catch (Exception e) {

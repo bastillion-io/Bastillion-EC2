@@ -253,4 +253,36 @@ public class EC2KeyDB {
 
 
     }
+    /**
+     * returns the EC2 region set for the administrator
+     *
+     * @param adminId id of the admin user
+     * @return region set for administrator
+     */
+    public static List<String> getEC2Regions(Long adminId) {
+
+        List<String> ec2RegionList = new ArrayList<String>();
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select distinct ec2_region from ec2_keys where admin_id=?");
+            stmt.setLong(1, adminId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ec2RegionList.add(rs.getString("ec2_region"));
+
+            }
+
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+        return ec2RegionList;
+
+    }
 }

@@ -16,8 +16,6 @@
 package com.ec2box.manage.util;
 
 
-import org.sqlite.SQLiteConfig;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -42,11 +40,11 @@ public class DBUtils {
         Connection con = null;
         try {
 
-            SQLiteConfig config = new SQLiteConfig();
-            config.enforceForeignKeys(true);
-            Class.forName("org.sqlite.JDBC");
+            Class.forName("org.h2.Driver");
             // create a database connection
-            con = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH + "/ec2box.db", config.toProperties());
+            String user="ec2box";
+            String password="filepwd 0WJLnwhpA47EepT1A4drVnDn3vYRvJhpZi0sVdvN9SmlbKw";
+            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/ec2box;CIPHER=AES",user,password);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

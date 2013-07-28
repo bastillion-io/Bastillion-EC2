@@ -49,18 +49,17 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             Connection connection = DBUtils.getConn();
             Statement statement = connection.createStatement();
 
-            ResultSet rs = statement.executeQuery("select * from sqlite_master where type='table' and name='admin'");
+            ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'ADMIN' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
-                statement.executeUpdate("create table if not exists admin (id INTEGER PRIMARY KEY AUTOINCREMENT, username string unique not null, password string not null, auth_token string)");
-                statement.executeUpdate("create table if not exists aws_credentials(admin_id INTEGER PRIMARY KEY, access_key string not null, secret_key string not null, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists ec2_keys(id INTEGER PRIMARY KEY AUTOINCREMENT, admin_id INTEGER, key_nm string not null, ec2_region string not null, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists ec2_region(admin_id INTEGER, region string not null, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTOINCREMENT, admin_id INTEGER, display_nm string not null, instance_id string not null, user not null, host string not null, port INTEGER not null, key_nm string, region string not null, state string, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists status (id INTEGER, status_cd string not null default 'INITIAL', foreign key (id) references system(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTOINCREMENT, admin_id INTEGER, display_nm string not null, script string not null, foreign key (admin_id) references admin(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists admin (id INTEGER PRIMARY KEY AUTO_INCREMENT, username varchar unique not null, password varchar not null, auth_token varchar)");
+                statement.executeUpdate("create table if not exists aws_credentials(admin_id INTEGER PRIMARY KEY, access_key varchar not null, secret_key varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists ec2_keys(id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, key_nm varchar not null, ec2_region varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, display_nm varchar not null, instance_id varchar not null, user varchar not null, host varchar not null, port INTEGER not null, key_nm varchar, region varchar not null, state varchar, foreign key (admin_id) references admin(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists status (id INTEGER, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
 
                 //insert default admin user
-                statement.executeUpdate("insert or ignore into admin (username, password) values('admin', '" + EncryptionUtil.hash("changeme") + "')");
+                statement.executeUpdate("insert into admin (username, password) values('admin', '" + EncryptionUtil.hash("changeme") + "')");
 
             }
 
