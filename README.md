@@ -53,7 +53,7 @@ In the directory that contains the pom.xml run
 
 Using EC2Box
 ------
-Open browser to https://<whatever ip>:8443
+Open browser to https://\<whatever ip\>:8443
 
 Login with 
 
