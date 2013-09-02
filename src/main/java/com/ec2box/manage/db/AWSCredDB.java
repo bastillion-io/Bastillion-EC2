@@ -29,9 +29,8 @@ public class AWSCredDB {
     /**
      * check auth token and set amazon credentials
      *
-     * @param adminId admin id
      */
-    public static AWSCred getAWSCred(Long adminId) {
+    public static AWSCred getAWSCred() {
 
         AWSCred awsCred = null;
 
@@ -40,8 +39,7 @@ public class AWSCredDB {
             con = DBUtils.getConn();
 
 
-                PreparedStatement stmt = con.prepareStatement("select * from aws_credentials where admin_id=?");
-                stmt.setLong(1, adminId);
+                PreparedStatement stmt = con.prepareStatement("select * from aws_credentials");
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
@@ -70,25 +68,22 @@ public class AWSCredDB {
     /**
      * check auth token and set amazon credentials
      *
-     * @param adminId admin id
      * @param awsCred AWS access and secret key
      */
-    public static void setAWSCred(Long adminId, AWSCred awsCred) {
+    public static void setAWSCred(AWSCred awsCred) {
 
         //get db connection
         Connection con = DBUtils.getConn();
 
         try {
             //delete
-            PreparedStatement stmt = con.prepareStatement("delete from aws_credentials where admin_id=?");
-            stmt.setLong(1, adminId);
+            PreparedStatement stmt = con.prepareStatement("delete from aws_credentials");
             stmt.execute();
 
             //insert
-            stmt = con.prepareStatement("insert into aws_credentials (admin_id, access_key, secret_key) values(?,?,?)");
-            stmt.setLong(1, adminId);
-            stmt.setString(2, awsCred.getAccessKey());
-            stmt.setString(3, awsCred.getSecretKey());
+            stmt = con.prepareStatement("insert into aws_credentials (access_key, secret_key) values(?,?)");
+            stmt.setString(1, awsCred.getAccessKey());
+            stmt.setString(2, awsCred.getSecretKey());
             stmt.execute();
 
             DBUtils.closeStmt(stmt);

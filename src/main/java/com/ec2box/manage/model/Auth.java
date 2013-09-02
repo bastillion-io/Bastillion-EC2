@@ -18,13 +18,16 @@ package com.ec2box.manage.model;
 /**
  * Value object that contains login information
  */
-public class Login {
+public class Auth {
+    public static final String ADMINISTRATOR="A";
+    public static final String MANAGER="M";
     Long id;
     String username;
     String password;
     String passwordConfirm;
     String prevPassword;
     String authToken;
+    String userType=ADMINISTRATOR;
 
     public String getUsername() {
         return username;
@@ -72,5 +75,13 @@ public class Login {
 
     public void setPrevPassword(String prevPassword) {
         this.prevPassword = prevPassword;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 }

@@ -15,25 +15,32 @@
  */
 package com.ec2box.manage.model;
 
-public class EC2Client {
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Value object that contains a list of user sessions and the date in which the session began
+ */
+public class UserSchSessions {
+
+    Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
+    Date startTime=new Date();
 
 
-    String endPoint;
-    String keyName;
-
-    public String getEndPoint() {
-        return endPoint;
+    public Map<Long, SchSession> getSchSessionMap() {
+        return schSessionMap;
     }
 
-    public void setEndPoint(String endPoint) {
-        this.endPoint = endPoint;
+    public void setSchSessionMap(Map<Long, SchSession> schSessionMap) {
+        this.schSessionMap = schSessionMap;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 }

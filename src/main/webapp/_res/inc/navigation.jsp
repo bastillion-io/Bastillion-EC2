@@ -15,30 +15,41 @@
      * limitations under the License.
      */
 %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <div class="nav">
 
     <div style="float: left;margin-top: 5px;margin-left: -10px"><img
             src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
 
     <h3>
-        <a href="menu.jsp">EC2Box</a>
+        <a href="/admin/menu.action">EC2Box</a>
     </h3>
+    <s:if test="%{#session.userType==\"M\"}">
 
      <div class="nav_item">
-            <a href="setAWSCred.action">Set AWS Credentials</a>
+            <a href="/manage/setAWSCred.action">Set AWS Credentials</a>
      </div>
 
      <div class="nav_item">
-        <a href="viewEC2Keys.action">Set EC2 Keys</a>
+        <a href="/manage/viewEC2Keys.action">Set EC2 Keys</a>
     </div>
-         <div class="nav_item">
-            <a href="viewSystems.action">Composite SSH Terms</a>
-         </div>
-         <div class="nav_item">
-            <a href="viewScripts.action">Composite Scripts</a>
-          </div>
+    </s:if>
     <div class="nav_item">
-        <a href="setPassword.action">Change Password</a>
+        <a href="/admin/viewSystems.action">Composite SSH Terms</a>
+    </div>
+    <div class="nav_item">
+        <a href="/admin/viewScripts.action">Composite Scripts</a>
+    </div>
+    <s:if test="%{#session.userType==\"M\"}">
+    <div class="nav_item">
+        <a href="/manage/viewUsers.action">Instance Administrators</a>
+    </div>
+    <div class="nav_item">
+        <a href="/manage/viewSessions.action">Audit Sessions</a>
+    </div>
+    </s:if>
+    <div class="nav_item">
+        <a href="/admin/setPassword.action">Change Password</a>
     </div>
     <div class="nav_item">
         <a href="../logout.action">Logout</a>

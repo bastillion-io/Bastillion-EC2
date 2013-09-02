@@ -15,27 +15,24 @@
  */
 package com.ec2box.common.filter;
 
-import com.ec2box.manage.db.AdminDB;
-import com.ec2box.manage.util.CookieUtil;
-import com.ec2box.manage.util.EncryptionUtil;
+import com.ec2box.common.util.AuthUtil;
+import com.ec2box.manage.db.AuthDB;
+import com.ec2box.manage.model.Auth;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Filter determines if admin user is authenticated
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/manage/*"},
-        dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE})
+
 public class AuthFilter implements Filter {
 
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) throws ServletException{
 
     }
 
@@ -54,56 +51,64 @@ public class AuthFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
 
 
+        HttpServletRequest servletRequest = (HttpServletRequest) req;
+        HttpServletResponse servletResponse = (HttpServletResponse) resp;
         boolean isAdmin = false;
 
 
         //read auth token
-        String authToken = CookieUtil.get((HttpServletRequest) req, "authToken");
+        String authToken = AuthUtil.getAuthToken(servletRequest.getSession());
 
         //check if exists
         if (authToken != null && !authToken.trim().equals("")) {
-            //decrypt auth token
-            authToken = EncryptionUtil.decrypt(authToken);
-            //check if valid admin auth token
-            isAdmin = AdminDB.isAdmin(authToken);
 
 
-            //check to see if user has timed out
-            String timeStr = CookieUtil.get((HttpServletRequest) req, "timeout");
-            SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
-            try {
-                if (timeStr != null && !timeStr.trim().equals("")) {
-                    Date cookieTimeout = sdf.parse(timeStr);
-                    Date currentTime = new Date();
+            String userType = AuthDB.isAuthorized(authToken);
+            if (userType != null) {
+                String uri = servletRequest.getRequestURI();
+                if (Auth.MANAGER.equals(userType)) {
+                    isAdmin = true;
+                } else if (uri.matches("^\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
+                    isAdmin = true;
+                }
+                servletRequest.getSession().setAttribute("userType", userType);
 
-                    //if current time > timeout then redirect to login page
-                    if (cookieTimeout == null || currentTime.after(cookieTimeout)) {
-                        isAdmin = false;
+                //check to see if user has timed out
+                String timeStr = AuthUtil.getTimeout(servletRequest.getSession());
+                try {
+                    if (timeStr != null && !timeStr.trim().equals("")) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
+                        Date cookieTimeout = sdf.parse(timeStr);
+                        Date currentTime = new Date();
+
+                        //if current time > timeout then redirect to login page
+                        if (cookieTimeout == null || currentTime.after(cookieTimeout)) {
+                            isAdmin = false;
+                        } else {
+                            AuthUtil.setTimeout(servletRequest.getSession());
+                        }
                     } else {
-                        //set new timeout cookie for 15 min
-                        Calendar timeout = Calendar.getInstance();
-                        timeout.add(Calendar.MINUTE, 15);
-                        CookieUtil.add((HttpServletResponse) resp, "timeout", sdf.format(timeout.getTime()));
+                        isAdmin = false;
                     }
-                } else {
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                     isAdmin = false;
                 }
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                isAdmin = false;
             }
         }
 
 
-
         //if not admin redirect to login page
         if (!isAdmin) {
-            CookieUtil.deleteAll((HttpServletRequest) req, (HttpServletResponse) resp);
-            ((HttpServletResponse) resp).sendRedirect(((HttpServletRequest) req).getContextPath() + "/login.action");
+            AuthUtil.deleteAllSession(servletRequest.getSession());
+            servletResponse.sendRedirect((servletRequest.getContextPath() + "/login.action"));
+        } else {
+            chain.doFilter(req, resp);
         }
-        chain.doFilter(req, resp);
     }
+
+
 
 
 }

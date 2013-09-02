@@ -16,16 +16,15 @@
 package com.ec2box.manage.model;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Output from ssh session
  */
 public class SessionOutput {
     Long sessionId;
-    String output;
-    List<Character> outputChars = new ArrayList<Character>();
+    Long userId;
+    Long hostSystemId;
+    String output="";
+
 
 
     public Long getSessionId() {
@@ -36,6 +35,23 @@ public class SessionOutput {
         this.sessionId = sessionId;
     }
 
+    public Long getUserId() {
+
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getHostSystemId() {
+        return hostSystemId;
+    }
+
+    public void setHostSystemId(Long hostSystemId) {
+        this.hostSystemId = hostSystemId;
+    }
+
     public String getOutput() {
         return output;
     }
@@ -43,14 +59,4 @@ public class SessionOutput {
     public void setOutput(String output) {
         this.output = output;
     }
-
-    public List<Character> getOutputChars() {
-        return outputChars;
-    }
-
-    public void setOutputChars(List<Character> outputChars) {
-        this.outputChars = outputChars;
-    }
-
-
 }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.05.04</version>
+    <version>0.06.00</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
 
@@ -33,10 +33,9 @@
             <version>0.1.49</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-            <classifier>jdk15</classifier>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -49,6 +48,11 @@
     		<artifactId>commons-fileupload</artifactId>
     		<version>1.2.2</version>
 	</dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.8.3</version>
+        </dependency>
 
         <!-- provided dependencies-->
         <dependency>
@@ -56,6 +60,7 @@
             <artifactId>javax.servlet</artifactId>
             <version>3.0.0.v201112011016</version>
         </dependency>
+
 
     </dependencies>
 
@@ -73,13 +78,15 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-		<version>8.1.12.v20130726</version>
+		        <version>8.1.12.v20130726</version>
                 <configuration>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <connectors>
-                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-			    <host>127.0.0.1</host>
-                            <port>8090</port>
+                        <connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
+                            <port>8443</port>
+                            <keystore>src/test/resources/keystore</keystore>
+                            <keyPassword>ec2b0x1234</keyPassword>
+                            <password>ec2b0x1234</password>
                         </connector>
                     </connectors>
                 </configuration>

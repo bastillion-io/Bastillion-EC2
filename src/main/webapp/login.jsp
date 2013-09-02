@@ -45,9 +45,9 @@
     <div class="content" style="border-left:none;">
 
         <s:actionerror/>
-        <s:form action="loginSubmit">
-            <s:textfield name="login.username" label="Username"/>
-            <s:password name="login.password" label="Password"/>
+        <s:form action="loginSubmit" autocomplete="off">
+            <s:textfield name="auth.username" label="Username" autocomplete="off"/>
+            <s:password name="auth.password" label="Password" autocomplete="off"/>
             <tr> <td>&nbsp;</td>
                 <td><div id="login_btn" class="login" >Login</div></td>
             </tr>

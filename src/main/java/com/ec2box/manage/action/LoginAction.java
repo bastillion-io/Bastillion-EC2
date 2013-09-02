@@ -15,29 +15,24 @@
  */
 package com.ec2box.manage.action;
 
-import com.ec2box.manage.db.AdminDB;
-import com.ec2box.manage.model.Login;
-import com.ec2box.manage.util.CookieUtil;
-import com.ec2box.manage.util.EncryptionUtil;
+import com.ec2box.common.util.AuthUtil;
+import com.ec2box.manage.db.AuthDB;
+import com.ec2box.manage.model.Auth;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 
 /**
  * Action to login to ec2box
  */
-public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+public class LoginAction extends ActionSupport implements ServletRequestAware {
 
-    HttpServletResponse servletResponse;
-    HttpServletRequest servletRequest;
-    Login login;
+   HttpServletRequest servletRequest;
+    Auth auth;
 
     @Action(value = "/login",
             results = {
@@ -49,32 +44,38 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         return SUCCESS;
     }
 
+    @Action(value = "/admin/menu",
+            results = {
+                    @Result(name = "success", location = "/admin/menu.jsp")
+            }
+    )
+    public String menu() {
+
+        return SUCCESS;
+    }
+
 
     @Action(value = "/loginSubmit",
             results = {
                     @Result(name = "input", location = "/login.jsp"),
-                    @Result(name = "change_password", location = "/manage/setPassword.action", type = "redirect"),
-                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
+                    @Result(name = "change_password", location = "/admin/setPassword.action", type = "redirect"),
+                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
     )
     public String loginSubmit() {
         String retVal = SUCCESS;
 
-        String authToken = AdminDB.loginAdmin(login);
+        String authToken = AuthDB.loginAdmin(auth);
         if (authToken != null) {
-            CookieUtil.add(servletResponse, "authToken", EncryptionUtil.encrypt(authToken));
-
-            //set timeout cookie
-            SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
-            Calendar timeout = Calendar.getInstance();
-            timeout.add(Calendar.MINUTE, 15);
-            CookieUtil.add(servletResponse, "timeout", sdf.format(timeout.getTime()));
+            AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
+            AuthUtil.setUserId(servletRequest.getSession(), AuthDB.getUserIdByAuthToken(authToken));
+            AuthUtil.setTimeout(servletRequest.getSession());
 
         } else {
             addActionError("Invalid username and password combination");
             retVal = INPUT;
         }
-        if (retVal == SUCCESS && "changeme".equals(login.getPassword())) {
+        if (retVal == SUCCESS && "changeme".equals(auth.getPassword())) {
             retVal = "change_password";
         }
 
@@ -87,13 +88,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String logout() {
-        CookieUtil.deleteAll(servletRequest, servletResponse);
+        AuthUtil.deleteAllSession(servletRequest.getSession());
         return SUCCESS;
     }
 
-    @Action(value = "/manage/setPassword",
+    @Action(value = "/admin/setPassword",
             results = {
-                    @Result(name = "success", location = "/manage/set_password.jsp")
+                    @Result(name = "success", location = "/admin/set_password.jsp")
             }
     )
     public String setPassword() {
@@ -101,19 +102,19 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         return SUCCESS;
     }
 
-    @Action(value = "/passwordSubmit",
+    @Action(value = "/admin/passwordSubmit",
             results = {
-                    @Result(name = "input", location = "/manage/set_password.jsp"),
-                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
+                    @Result(name = "input", location = "/admin/set_password.jsp"),
+                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
     )
     public String passwordSubmit() {
         String retVal = SUCCESS;
 
-        if (login.getPassword().equals(login.getPasswordConfirm())) {
-            login.setAuthToken(EncryptionUtil.decrypt(CookieUtil.get(servletRequest, "authToken")));
+        if (auth.getPassword().equals(auth.getPasswordConfirm())) {
+            auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
 
-            if (!AdminDB.updatePassword(login)) {
+            if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
                 retVal = INPUT;
             }
@@ -132,13 +133,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
      * Validates fields for login submit
      */
     public void validateLoginSubmit() {
-        if (login.getUsername() == null ||
-                login.getUsername().trim().equals("")) {
-            addFieldError("login.username", "Required");
+        if (auth.getUsername() == null ||
+                auth.getUsername().trim().equals("")) {
+            addFieldError("auth.username", "Required");
         }
-        if (login.getPassword() == null ||
-                login.getPassword().trim().equals("")) {
-            addFieldError("login.password", "Required");
+        if (auth.getPassword() == null ||
+                auth.getPassword().trim().equals("")) {
+            addFieldError("auth.password", "Required");
         }
 
 
@@ -149,37 +150,28 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
      * Validates fields for password submit
      */
     public void validatePasswordSubmit() {
-        if (login.getPassword() == null ||
-                login.getPassword().trim().equals("")) {
-            addFieldError("login.password", "Required");
+        if (auth.getPassword() == null ||
+                auth.getPassword().trim().equals("")) {
+            addFieldError("auth.password", "Required");
         }
-        if (login.getPasswordConfirm() == null ||
-                login.getPasswordConfirm().trim().equals("")) {
-            addFieldError("login.passwordConfirm", "Required");
+        if (auth.getPasswordConfirm() == null ||
+                auth.getPasswordConfirm().trim().equals("")) {
+            addFieldError("auth.passwordConfirm", "Required");
         }
-        if (login.getPrevPassword() == null ||
-                login.getPrevPassword().trim().equals("")) {
-            addFieldError("login.prevPassword", "Required");
+        if (auth.getPrevPassword() == null ||
+                auth.getPrevPassword().trim().equals("")) {
+            addFieldError("auth.prevPassword", "Required");
         }
 
 
     }
 
-    public Login getLogin() {
-        return login;
+    public Auth getAuth() {
+        return auth;
     }
 
-    public void setLogin(Login login) {
-        this.login = login;
-    }
-
-
-    public HttpServletResponse getServletResponse() {
-        return servletResponse;
-    }
-
-    public void setServletResponse(HttpServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
+    public void setAuth(Auth auth) {
+        this.auth = auth;
     }
 
     public HttpServletRequest getServletRequest() {

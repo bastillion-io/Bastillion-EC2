@@ -15,6 +15,7 @@
  */
 package com.ec2box.common.db;
 
+import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
 
@@ -26,8 +27,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
- * Initial startup task.  Creates an SQLite DB and generates
- * the system public/private key pair if none exists
+ * Initial startup task.  Creates an H2 DB.
  */
 @WebServlet(name = "DBInitServlet",
         urlPatterns = {"/config"},
@@ -35,7 +35,7 @@ import java.sql.Statement;
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
     /**
-     * task init method that created DB and generated public/private keys
+     * task init method that created DB
      *
      * @param config task config
      * @throws ServletException
@@ -49,17 +49,20 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             Connection connection = DBUtils.getConn();
             Statement statement = connection.createStatement();
 
-            ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'ADMIN' and table_schema='PUBLIC'");
+            ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
-                statement.executeUpdate("create table if not exists admin (id INTEGER PRIMARY KEY AUTO_INCREMENT, username varchar unique not null, password varchar not null, auth_token varchar)");
-                statement.executeUpdate("create table if not exists aws_credentials(admin_id INTEGER PRIMARY KEY, access_key varchar not null, secret_key varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists ec2_keys(id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, key_nm varchar not null, ec2_region varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, display_nm varchar not null, instance_id varchar not null, user varchar not null, host varchar not null, port INTEGER not null, key_nm varchar, region varchar not null, state varchar, foreign key (admin_id) references admin(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists status (id INTEGER, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, admin_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (admin_id) references admin(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, user_type varchar not null default '" + Auth.ADMINISTRATOR + "')");
+                statement.executeUpdate("create table if not exists aws_credentials (access_key varchar not null, secret_key varchar not null)");
+                statement.executeUpdate("create table if not exists ec2_keys (id INTEGER PRIMARY KEY AUTO_INCREMENT, key_nm varchar not null, ec2_region varchar not null)");
+                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar, instance_id varchar not null, user varchar not null, host varchar not null, port INTEGER not null, key_nm varchar, region varchar not null, state varchar)");
+                statement.executeUpdate("create table if not exists status (id INTEGER, user_id INTEGER, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade, foreign key (user_id) references users(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (user_id) references users(id) on delete cascade)");
+
+                statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, session_tm timestamp default CURRENT_TIMESTAMP, foreign key (user_id) references users(id) on delete cascade )");
+                statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, system_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, foreign key (session_id) references session_log(id) on delete cascade, foreign key (system_id) references system(id) on delete cascade)");
 
                 //insert default admin user
-                statement.executeUpdate("insert into admin (username, password) values('admin', '" + EncryptionUtil.hash("changeme") + "')");
+                statement.executeUpdate("insert into users (username, password, user_type) values('admin', '" + EncryptionUtil.hash("changeme") + "','"+ Auth.MANAGER+"')");
 
             }
 

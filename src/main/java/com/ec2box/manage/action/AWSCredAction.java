@@ -20,18 +20,19 @@ import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.model.AWSCred;
-import com.ec2box.manage.util.AdminUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.SessionAware;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
+/**
+ * Action to set aws credentials
+ */
+public class AWSCredAction extends ActionSupport implements SessionAware {
 
-public class AWSCredAction extends ActionSupport implements ServletRequestAware {
-
-    HttpServletRequest servletRequest;
+    Map<String, Object> session;
     AWSCred awsCred;
 
 
@@ -41,7 +42,7 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
             }
     )
     public String setAWSCred() {
-        awsCred = AWSCredDB.getAWSCred(AdminUtil.getAdminId(servletRequest));
+        awsCred = AWSCredDB.getAWSCred();
         return SUCCESS;
 
     }
@@ -54,7 +55,7 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
     )
 
     public String submitAWSCred() {
-        AWSCredDB.setAWSCred(AdminUtil.getAdminId(servletRequest), awsCred);
+        AWSCredDB.setAWSCred(awsCred);
         return SUCCESS;
 
     }
@@ -74,6 +75,7 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
         }
         if (!this.hasErrors()) {
             try {
+                //check if credential are valid
                 BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
                 AmazonEC2 service = new AmazonEC2Client(awsCredentials);
                 service.describeKeyPairs();
@@ -92,11 +94,11 @@ public class AWSCredAction extends ActionSupport implements ServletRequestAware 
         this.awsCred = awsCred;
     }
 
-    public HttpServletRequest getServletRequest() {
-        return servletRequest;
+    public Map<String, Object> getSession() {
+        return session;
     }
 
-    public void setServletRequest(HttpServletRequest servletRequest) {
-        this.servletRequest = servletRequest;
+    public void setSession(Map<String, Object> session) {
+        this.session = session;
     }
 }

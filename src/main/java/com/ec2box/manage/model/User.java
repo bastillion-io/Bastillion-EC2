@@ -15,43 +15,49 @@
  */
 package com.ec2box.manage.model;
 
+
 /**
- * Value object that contains information on private key
+ * Value object that contains user information
  */
-public class EC2Key {
-    Long id;
-    String keyNm;
-    String privateKey=null;
-    String ec2Region;
+public class User extends Auth {
+    String firstNm;
+    String lastNm;
+    String email;
+    boolean checked=false;
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
+
+    public boolean getChecked() {
+        return checked;
     }
 
-    public String getKeyNm() {
-        return keyNm;
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 
-    public void setKeyNm(String keyNm) {
-        this.keyNm = keyNm;
+    public String getFirstNm() {
+        return firstNm;
     }
 
-    public String getPrivateKey() {
-        return privateKey;
+    public void setFirstNm(String firstNm) {
+        this.firstNm = firstNm;
     }
 
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
+    public String getLastNm() {
+        return lastNm;
     }
 
-    public String getEc2Region() {
-        return ec2Region;
+    public void setLastNm(String lastNm) {
+        this.lastNm = lastNm;
     }
 
-    public void setEc2Region(String ec2Region) {
-        this.ec2Region = ec2Region;
+    public String getEmail() {
+        return email;
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+
 }

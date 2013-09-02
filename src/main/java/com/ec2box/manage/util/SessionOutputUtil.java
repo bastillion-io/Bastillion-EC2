@@ -16,58 +16,82 @@
 package com.ec2box.manage.util;
 
 import com.ec2box.manage.model.SessionOutput;
+import com.ec2box.manage.model.UserSessionsOutput;
+import com.ec2box.manage.task.TerminalLogTask;
+import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-
+/**
+ * Utility to is used to store the output for a session until the ajax call that brings it to the screen
+ */
 public class SessionOutputUtil {
 
-    private static Map<Long, SessionOutput> sessionOutputMap = new LinkedHashMap<Long, SessionOutput>();
+
+    private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
 
 
     /**
-     * adds a new output
+     * removes session for user
      *
-     * @param sessionOutput session output object
+     * @param userId user id
      */
-    public static void addOutput(SessionOutput sessionOutput) {
-
-        if (sessionOutput != null) {
-            synchronized (sessionOutputMap) {
-                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
-            }
-        }
+    public static void removeUserSession(Long userId) {
+        userSessionsOutputMap.remove(userId);
 
     }
 
     /**
-     * remove output
+     * removes session output for host system
      *
-     * @param sessionOutput session output object
+     * @param userId user id
+     * @param hostSystemId host system id
      */
-    public static void removeOutput(SessionOutput sessionOutput) {
+    public static void removeOutput(Long userId, Long hostSystemId) {
 
-
-        if (sessionOutput != null) {
-            synchronized (sessionOutputMap) {
-                sessionOutputMap.remove(sessionOutput.getSessionId());
-            }
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        if (userSessionsOutput != null) {
+            userSessionsOutput.getSessionOutputMap().remove(hostSystemId);
         }
-
     }
 
     /**
      * adds a new output
      *
+     * @param userId user id
      * @param sessionOutput session output object
      */
-    public static void addCharToOutput(SessionOutput sessionOutput, char c) {
+    public static void addOutput(Long userId, SessionOutput sessionOutput) {
+
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        if (userSessionsOutput == null) {
+            userSessionsOutputMap.put(userId, new UserSessionsOutput());
+            userSessionsOutput = userSessionsOutputMap.get(userId);
+        }
+        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getHostSystemId(), sessionOutput);
 
 
-        if (sessionOutput != null) {
-            sessionOutput.getOutputChars().add(c);
-            synchronized (sessionOutputMap) {
-                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
+    }
+
+
+    /**
+     * adds a new output
+     *
+     * @param userId       user id
+     * @param hostSystemId host system id
+     * @param c            character
+     */
+    public static void addCharToOutput(Long userId, Long hostSystemId, char c) {
+
+
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        if (userSessionsOutput != null) {
+            SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(hostSystemId);
+            if (sessionOutput != null) {
+                sessionOutput.setOutput(sessionOutput.getOutput() + Character.toString(c));
             }
         }
 
@@ -77,31 +101,37 @@ public class SessionOutputUtil {
     /**
      * returns list of output lines
      *
+     * @param userId user id
      * @return sessionId session id object
      */
-    public static List<SessionOutput> getOutput() {
+    public static List<SessionOutput> getOutput(Long userId) {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
-        synchronized (sessionOutputMap) {
-            for (Long outputId : sessionOutputMap.keySet()) {
-                SessionOutput sessionOutput = sessionOutputMap.get(outputId);
+
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        if (userSessionsOutput != null) {
+
+
+            for (Long key : userSessionsOutput.getSessionOutputMap().keySet()) {
 
                 //get output chars and set to output
-                StringBuilder output = new StringBuilder(sessionOutput.getOutputChars().size());
-                for (Character ch : sessionOutput.getOutputChars()) {
-                    output.append(ch);
+                try {
+                    SessionOutput sessionOutput = (SessionOutput) BeanUtils.cloneBean(userSessionsOutput.getSessionOutputMap().get(key));
+
+                    outputList.add(sessionOutput);
+
+                    ExecutorService executor = Executors.newCachedThreadPool();
+                    executor.execute(new TerminalLogTask(sessionOutput));
+
+                    userSessionsOutput.getSessionOutputMap().get(key).setOutput("");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-                //sessionOutput.setOutput(output.toString().replaceAll("\\[.*?m|\\[.*?m",""));
-                sessionOutput.setOutput(output.toString());
-                sessionOutput.setOutputChars(new ArrayList<Character>());
-
-                outputList.add(sessionOutput);
-
-                //put back with new char array
-                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
 
             }
+
         }
+
 
         return outputList;
     }

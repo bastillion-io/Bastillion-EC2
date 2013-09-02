@@ -20,7 +20,7 @@ package com.ec2box.manage.model;
  */
 public class Script {
     Long id;
-    Long adminId;
+    Long userId;
     String script="#!/bin/bash\n\n";
     String displayNm;
 
@@ -48,11 +48,11 @@ public class Script {
         this.displayNm = displayNm;
     }
 
-    public Long getAdminId() {
-        return adminId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setAdminId(Long adminId) {
-        this.adminId = adminId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

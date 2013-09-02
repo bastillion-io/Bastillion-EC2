@@ -61,10 +61,11 @@
             </thead>
 
             <tbody>
+             <s:if test="%{#session.userType==\"M\"}">
             <tr>
 
                 <td>
-                    <a href="setAWSCred.action">Set AWS Credentials</a>
+                    <a href="/manage/setAWSCred.action">Set AWS Credentials</a>
 
                 </td>
 
@@ -76,20 +77,20 @@
             </tr>
             <tr>
                 <td>
-                    <a href="viewEC2Keys.action">Set EC2 Keys</a>
+                    <a href="/manage/viewEC2Keys.action">Set EC2 Keys</a>
 
                 </td>
                 <td>
                  Import the private keys used on your EC2 systems.
                 </td>
             </tr>
-
+            </s:if>
 
 
 
             <tr>
                 <td>
-                  <a href="viewSystems.action">Composite SSH Terms</a>
+                  <a href="/admin/viewSystems.action">Composite SSH Terms</a>
 
                 </td>
                 <td>
@@ -99,20 +100,38 @@
 
             <tr>
                 <td>
-                   <a href="viewScripts.action">Composite Scripts</a>
+                   <a href="/admin/viewScripts.action">Composite Scripts</a>
 
                 </td>
                 <td>
                     Create scripts to be executed on selected systems simultaneously through a web-terminal
                 </td>
             </tr>
+             <s:if test="%{#session.userType==\"M\"}">
+            <tr>
+                <td>
+                  <a href="/manage/viewUsers.action">Instance Administrators</a>
+                </td>
+                <td>
+                   Add accounts for instance administrators
+                </td>
+            </tr>
+	        <tr>
+                <td>
+                  <a href="/manage/viewSessions.action">Audit Sessions</a>
+                </td>
+                <td>
+                  Audit administrator's sessions and terminal history
+                </td>
+            </tr>
+            </s:if>
 
               <tr>
                 <td>
-                  <a href="setPassword.action">Change Password</a>
+                  <a href="/admin/setPassword.action">Change Password</a>
                 </td>
                 <td>
-                    Change administrative login to application
+                    Change administrative login
                 </td>
             </tr>
 

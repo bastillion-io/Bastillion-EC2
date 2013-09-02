@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ec2box.manage.util;
+package com.ec2box.manage.task;
 
-import com.ec2box.manage.db.AdminDB;
-import com.ec2box.manage.model.Login;
+import com.ec2box.manage.db.SessionAuditDB;
+import com.ec2box.manage.model.SessionOutput;
 
-import javax.servlet.http.HttpServletRequest;
-
-
-public class AdminUtil {
-    public static Long getAdminId(HttpServletRequest servletRequest) {
-
-        Long adminId = null;
-        String authToken = EncryptionUtil.decrypt(CookieUtil.get(servletRequest, "authToken"));
-        Login login = AdminDB.getAdminLogin(authToken);
-        if (login != null) {
-            adminId = login.getId();
-        }
+/**
+ * Task to insert terminal logs for session auditing
+ */
+public class TerminalLogTask implements Runnable {
 
 
-        return adminId;
+    SessionOutput sessionOutput=null;
+    public TerminalLogTask(SessionOutput sessionOutput) {
+
+        this.sessionOutput=sessionOutput;
     }
+
+    public void run() {
+
+        SessionAuditDB.insertTerminalLog(sessionOutput);
+
+
+
+    }
+
 }

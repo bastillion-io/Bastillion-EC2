@@ -35,13 +35,12 @@ public class EC2KeyDB {
     public static final String SORT_BY_EC2_REGION="ec2_region";
 
     /**
-     * returns private key information for admin user
+     * returns private key information for user
      *
-     * @param adminId  id of the admin user
      * @param sortedSet object that defines sort order
      * @return sorted identity list
      */
-    public static SortedSet getEC2KeySet(Long adminId,  SortedSet sortedSet) {
+    public static SortedSet getEC2KeySet( SortedSet sortedSet) {
 
         List<EC2Key> ec2KeyList = new ArrayList<EC2Key>();
 
@@ -55,13 +54,11 @@ public class EC2KeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where admin_id=? "+ orderBy);
-            stmt.setLong(1, adminId);
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys "+ orderBy);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setAdminId(rs.getLong("admin_id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
                 ec2KeyList.add(ec2Key);
@@ -87,29 +84,26 @@ public class EC2KeyDB {
 
 
     /**
-     * returns private key information for admin user
+     * returns private key information for user
      *
-     * @param adminId  id of the admin user
      * @param keyNm key name
      * @param ec2Region ec2 region
      * @return key information
      */
-    public static EC2Key getEC2KeyByKeyNm(Long adminId, String keyNm, String ec2Region) {
+    public static EC2Key getEC2KeyByKeyNm(String keyNm, String ec2Region) {
 
         EC2Key ec2Key = null;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where admin_id=? and key_nm like ? and ec2_region like ?");
-            stmt.setLong(1, adminId);
-            stmt.setString(2, keyNm);
-            stmt.setString(3, ec2Region);
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where key_nm like ? and ec2_region like ?");
+            stmt.setString(1, keyNm);
+            stmt.setString(2, ec2Region);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setAdminId(rs.getLong("admin_id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
             }
@@ -128,26 +122,23 @@ public class EC2KeyDB {
 
 
     /**
-     * returns private keys information for region and admin user
+     * returns private keys information for region and user
      *
-     * @param adminId  id of the admin user
      * @param ec2Region ec2 region
      * @return key information
      */
-    public static List<EC2Key> getEC2KeyByRegion(Long adminId, String ec2Region) {
+    public static List<EC2Key> getEC2KeyByRegion(String ec2Region) {
         List<EC2Key> ec2KeyList = new ArrayList<EC2Key>();
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where admin_id=? and ec2_region like ?");
-            stmt.setLong(1, adminId);
-            stmt.setString(2, ec2Region);
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where ec2_region like ?");
+            stmt.setString(1, ec2Region);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setAdminId(rs.getLong("admin_id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
                 ec2KeyList.add(ec2Key);
@@ -166,22 +157,20 @@ public class EC2KeyDB {
     }
 
     /**
-     * inserts private key information for admin user
+     * inserts private key information for user
      *
-     * @param adminId  id of the admin user
      * @param ec2Key private key information
      */
-    public static Long insertEC2Key(Long adminId, EC2Key ec2Key) {
+    public static Long insertEC2Key(EC2Key ec2Key) {
 
         Connection con = null;
         Long ec2KeyId=null;
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (admin_id, key_nm, ec2_region) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            stmt.setLong(1, adminId);
-            stmt.setString(2, ec2Key.getKeyNm());
-            stmt.setString(3, ec2Key.getEc2Region());
+            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (key_nm, ec2_region) values (?,?)", Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, ec2Key.getKeyNm());
+            stmt.setString(2, ec2Key.getEc2Region());
             stmt.execute();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs != null && rs.next()) {
@@ -204,22 +193,21 @@ public class EC2KeyDB {
 
 
     /**
-     * saves private key information for admin user
+     * saves private key information for user
      *
-     * @param adminId  id of the admin user
      * @param ec2Key private key information
      */
-    public static Long saveEC2Key(Long adminId, EC2Key ec2Key) {
+    public static Long saveEC2Key(EC2Key ec2Key) {
 
         Long ec2KeyId=null;
 
         //get id for key if exists
-        EC2Key ec2KeyTmp = getEC2KeyByKeyNm(adminId,ec2Key.getKeyNm(), ec2Key.getEc2Region());
+        EC2Key ec2KeyTmp = getEC2KeyByKeyNm(ec2Key.getKeyNm(), ec2Key.getEc2Region());
         if(ec2KeyTmp!=null){
             ec2KeyId=ec2KeyTmp.getId();
         //else insert if it doesn't exist
         }else{
-            ec2KeyId=insertEC2Key(adminId,ec2Key);
+            ec2KeyId=insertEC2Key(ec2Key);
         }
         ec2KeyTmp=null;
 
@@ -232,7 +220,7 @@ public class EC2KeyDB {
 
 
     /**
-     * deletes private key information for admin user
+     * deletes private key information for user
      *
      * @param identityId db generated id for private key
      */
@@ -254,20 +242,18 @@ public class EC2KeyDB {
 
     }
     /**
-     * returns the EC2 region set for the administrator
+     * returns the EC2 region
      *
-     * @param adminId id of the admin user
-     * @return region set for administrator
+     * @return region set
      */
-    public static List<String> getEC2Regions(Long adminId) {
+    public static List<String> getEC2Regions() {
 
         List<String> ec2RegionList = new ArrayList<String>();
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select distinct ec2_region from ec2_keys where admin_id=?");
-            stmt.setLong(1, adminId);
+            PreparedStatement stmt = con.prepareStatement("select distinct ec2_region from ec2_keys");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 ec2RegionList.add(rs.getString("ec2_region"));

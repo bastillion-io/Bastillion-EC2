@@ -28,7 +28,7 @@ import java.sql.Statement;
 public class DBUtils {
 
 
-    //system path to the sqlite DB
+    //system path to the H2 DB
     private static String DB_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
 
     /**

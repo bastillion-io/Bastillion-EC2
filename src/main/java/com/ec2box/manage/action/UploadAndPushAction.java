@@ -15,21 +15,27 @@
  */
 package com.ec2box.manage.action;
 
+import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.SystemStatusDB;
+import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.model.SchSession;
-import com.ec2box.manage.model.SystemStatus;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UploadAndPushAction extends ActionSupport {
+/**
+ * This action uploads files to selected EC2 instances
+ */
+public class UploadAndPushAction extends ActionSupport implements  ServletRequestAware {
 
 
     File upload;
@@ -37,42 +43,45 @@ public class UploadAndPushAction extends ActionSupport {
     String uploadFileName;
     List<Long> idList = new ArrayList<Long>();
     String pushDir = "~";
-    List<SystemStatus> systemStatusList;
-    SystemStatus pendingSystemStatus;
-    SystemStatus currentSystemStatus;
+    List<HostSystem> systemStatusList;
+    HostSystem pendingSystemStatus;
+    HostSystem currentSystemStatus;
+    HttpServletRequest servletRequest;
 
     public static String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
 
 
-    @Action(value = "/manage/setUpload",
+    @Action(value = "/admin/setUpload",
             results = {
-                    @Result(name = "success", location = "/manage/upload.jsp")
+                    @Result(name = "success", location = "/admin/upload.jsp")
             }
     )
     public String setUpload() throws Exception {
-        SystemStatusDB.setInitialSystemStatus(idList);
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        SystemStatusDB.setInitialSystemStatus(idList,userId);
         return SUCCESS;
 
     }
 
 
-    @Action(value = "/manage/upload",
+    @Action(value = "/admin/upload",
             results = {
-                    @Result(name = "input", location = "/manage/upload.jsp"),
-                    @Result(name = "success", location = "/manage/upload_result.jsp")
+                    @Result(name = "input", location = "/admin/upload.jsp"),
+                    @Result(name = "success", location = "/admin/upload_result.jsp")
             }
     )
     public String upload() {
 
 
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
         try {
             File destination = new File(UPLOAD_PATH, uploadFileName);
             FileUtils.copyFile(upload, destination);
 
 
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-            systemStatusList = SystemStatusDB.getAllSystemStatus();
+            systemStatusList = SystemStatusDB.getAllSystemStatus(userId);
 
 
         } catch (Exception e) {
@@ -83,28 +92,29 @@ public class UploadAndPushAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "/manage/push",
+    @Action(value = "/admin/push",
             results = {
-                    @Result(name = "success", location = "/manage/upload_result.jsp")
+                    @Result(name = "success", location = "/admin/upload_result.jsp")
             }
     )
     public String push() {
 
 
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         try {
 
             //get next pending system
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
             if (pendingSystemStatus != null) {
                 //get session for system
-                SchSession session = SecureShellAction.getSchSessionMap().get(pendingSystemStatus.getId());
+                SchSession session = SecureShellAction.getUserSchSessionMap().get(userId).getSchSessionMap().get(pendingSystemStatus.getId());
                 //push upload to system
                 currentSystemStatus = SSHUtil.pushUpload(pendingSystemStatus, session.getSession(), UPLOAD_PATH + "/" + uploadFileName, pushDir + "/" + uploadFileName);
 
                 //update system status
-                SystemStatusDB.updateSystemStatus(currentSystemStatus);
+                SystemStatusDB.updateSystemStatus(currentSystemStatus,userId);
 
-                pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
             }
 
@@ -114,7 +124,7 @@ public class UploadAndPushAction extends ActionSupport {
                 FileUtils.deleteQuietly(delFile);
 
             }
-            systemStatusList = SystemStatusDB.getAllSystemStatus();
+            systemStatusList = SystemStatusDB.getAllSystemStatus(userId);
 
 
         } catch (Exception e) {
@@ -180,27 +190,35 @@ public class UploadAndPushAction extends ActionSupport {
         this.idList = idList;
     }
 
-    public List<SystemStatus> getSystemStatusList() {
+    public List<HostSystem> getSystemStatusList() {
         return systemStatusList;
     }
 
-    public void setSystemStatusList(List<SystemStatus> systemStatusList) {
+    public void setSystemStatusList(List<HostSystem> systemStatusList) {
         this.systemStatusList = systemStatusList;
     }
 
-    public SystemStatus getPendingSystemStatus() {
+    public HostSystem getPendingSystemStatus() {
         return pendingSystemStatus;
     }
 
-    public void setPendingSystemStatus(SystemStatus pendingSystemStatus) {
+    public void setPendingSystemStatus(HostSystem pendingSystemStatus) {
         this.pendingSystemStatus = pendingSystemStatus;
     }
 
-    public SystemStatus getCurrentSystemStatus() {
+    public HostSystem getCurrentSystemStatus() {
         return currentSystemStatus;
     }
 
-    public void setCurrentSystemStatus(SystemStatus currentSystemStatus) {
+    public void setCurrentSystemStatus(HostSystem currentSystemStatus) {
         this.currentSystemStatus = currentSystemStatus;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
     }
 }

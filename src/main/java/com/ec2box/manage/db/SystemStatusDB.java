@@ -16,7 +16,6 @@
 package com.ec2box.manage.db;
 
 import com.ec2box.manage.model.HostSystem;
-import com.ec2box.manage.model.SystemStatus;
 import com.ec2box.manage.util.DBUtils;
 
 import java.sql.Connection;
@@ -27,47 +26,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO used to generate a list of public keys and systems associated
- * with them based on system profiles and users assigned to the profiles.
+ * DAO used to keep track of the status when uploading files or connectiong to instances to systems
  */
 public class SystemStatusDB {
-
-
-
-
-
-
-
-
 
     /**
      * set the initial status for selected systems
      *
      * @param systemSelectIds systems ids to set initial status
+     * @param userId user id
      */
-    public static List<SystemStatus> setInitialSystemStatus(List<Long> systemSelectIds) {
+    public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId) {
         Connection con = null;
-        List<SystemStatus> systemStatusList = new ArrayList<SystemStatus>();
         try {
             con = DBUtils.getConn();
 
             //deletes all old systems
-            deleteAllSystemStatus(con);
+            deleteAllSystemStatus(con, userId);
 
 
             for (Long hostSystemId : systemSelectIds) {
 
-                HostSystem hostSystem= SystemDB.getSystem(con, hostSystemId);
-
-                SystemStatus systemStatus = new SystemStatus();
-                systemStatus.setId(hostSystem.getId());
-                systemStatus.setStatusCd(SystemStatus.INITIAL_STATUS);
+                HostSystem hostSystem= new HostSystem();
+                hostSystem.setId(hostSystemId);
+                hostSystem.setStatusCd(HostSystem.INITIAL_STATUS);
 
                 //insert new status
-                insertSystemStatus(con, systemStatus);
+                insertSystemStatus(con, hostSystem, userId);
 
-                //get update status list
-                systemStatusList = getAllSystemStatus(con);
 
             }
 
@@ -75,19 +61,20 @@ public class SystemStatusDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemStatusList;
     }
 
     /**
      * deletes all records from status table
      *
      * @param con DB connection object
+     * @param userId user id
      */
-    private static void deleteAllSystemStatus(Connection con) {
+    private static void deleteAllSystemStatus(Connection con, Long userId) {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("delete from status");
+            PreparedStatement stmt = con.prepareStatement("delete from status where user_id=?");
+            stmt.setLong(1,userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -99,110 +86,118 @@ public class SystemStatusDB {
 
 
     /**
-     * inserts into the status table to keep track of key placement status
-     *
-     * @param con                DB connection object
-     * @param systemStatus systems for authorized_keys replacement
-     */
-    private static void insertSystemStatus(Connection con, SystemStatus systemStatus) {
-
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("insert into status (id,status_cd) values (?,?)");
-            stmt.setLong(1, systemStatus.getId());
-            stmt.setString(2, systemStatus.getStatusCd());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    /**
-     * updates the status table to keep track of key placement status
-     *
-     * @param systemStatus systems for authorized_keys replacement
-     */
-    public static void updateSystemStatus(SystemStatus systemStatus) {
-
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-
-            updateSystemStatus(con, systemStatus);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-
-    }
-
-
-    /**
-     * updates the status table to keep track of key placement status
-     *
-     * @param con                DB connection
-     * @param systemStatus systems for authorized_keys replacement
-     */
-    public static void updateSystemStatus(Connection con, SystemStatus systemStatus) {
-
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("update status set status_cd=? where id=?");
-            stmt.setString(1, systemStatus.getStatusCd());
-            stmt.setLong(2, systemStatus.getId());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    /**
-     * returns all key placement statuses
-     */
-    public static List<SystemStatus> getAllSystemStatus() {
-
-        List<SystemStatus> systemStatusList = new ArrayList<SystemStatus>();
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            systemStatusList = getAllSystemStatus(con);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-        return systemStatusList;
-
-    }
-
-    /**
-     * returns all key placement statuses
+     * inserts into the status table to keep track of status
      *
      * @param con DB connection object
+     * @param hostSystem systems
+     * @param userId user id
+     *
      */
-    private static List<SystemStatus> getAllSystemStatus(Connection con) {
+    private static void insertSystemStatus(Connection con, HostSystem hostSystem, Long userId) {
 
-        List<SystemStatus> systemStatusList = new ArrayList<SystemStatus>();
         try {
 
-            PreparedStatement stmt = con.prepareStatement("select * from status");
+            PreparedStatement stmt = con.prepareStatement("insert into status (id, status_cd, user_id) values (?,?,?)");
+            stmt.setLong(1, hostSystem.getId());
+            stmt.setString(2, hostSystem.getStatusCd());
+            stmt.setLong(3, userId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * updates the status table to keep track of status
+     *
+     * @param hostSystem systems
+     * @param userId user id
+     */
+    public static void updateSystemStatus(HostSystem hostSystem, Long userId) {
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+
+            updateSystemStatus(con, hostSystem, userId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+    }
+
+
+    /**
+     * updates the status table to keep track of system status
+     *
+     * @param con DB connection
+     * @param hostSystem systems
+     * @param userId user id
+     */
+    public static void updateSystemStatus(Connection con, HostSystem hostSystem, Long userId) {
+
+        try {
+
+            PreparedStatement stmt = con.prepareStatement("update status set status_cd=? where id=? and user_id=?");
+            stmt.setString(1, hostSystem.getStatusCd());
+            stmt.setLong(2, hostSystem.getId());
+            stmt.setLong(3, userId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * returns all statuses
+     *
+     * @param userId user id
+     */
+    public static List<HostSystem> getAllSystemStatus(Long userId) {
+
+        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            hostSystemList = getAllSystemStatus(con, userId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        return hostSystemList;
+
+    }
+
+    /**
+     * returns all statuses
+     *
+     * @param con DB connection object
+     * @param userId user id
+     */
+    private static List<HostSystem> getAllSystemStatus(Connection con, Long userId) {
+
+        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        try {
+
+            PreparedStatement stmt = con.prepareStatement("select * from status where user_id=? order by id asc");
+            stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                SystemStatus systemStatus = new SystemStatus();
-                systemStatus.setId(rs.getLong("id"));
-                systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
-                systemStatusList.add(systemStatus);
+                HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystemList.add(hostSystem);
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -210,32 +205,32 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return systemStatusList;
+        return hostSystemList;
 
     }
 
 
     /**
-     * returns key placement status of system
+     * returns status of system
      *
      * @param systemId system id
+     * @param userId user id
      */
-    public static SystemStatus getSystemStatus(Long systemId) {
+    public static HostSystem getSystemStatus(Long systemId, Long userId) {
 
         Connection con = null;
-        SystemStatus systemStatus = null;
+        HostSystem hostSystem= null;
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("select * from status where id=?");
+            PreparedStatement stmt = con.prepareStatement("select * from status where id=? and user_id=?");
             stmt.setLong(1, systemId);
+            stmt.setLong(2, userId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                systemStatus = new SystemStatus();
-                systemStatus.setId(rs.getLong("id"));
-                systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
+                hostSystem= SystemDB.getSystem(con, rs.getLong("id"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -244,34 +239,34 @@ public class SystemStatusDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemStatus;
+        return hostSystem;
 
 
     }
 
 
     /**
-     * returns the first system that authorized keys has not been tried
+     * returns the first system that has not been tried
      *
-     * @return systemStatus systems for authorized_keys replacement
+     * @param userId user id
+     * @return systemStatus systems
      */
-    public static SystemStatus getNextPendingSystem() {
+    public static HostSystem getNextPendingSystem(Long userId) {
 
-        SystemStatus systemStatus = null;
+        HostSystem hostSystem= null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like ? or status_cd like ? or status_cd like ?");
-            stmt.setString(1,SystemStatus.INITIAL_STATUS);
-            stmt.setString(2,SystemStatus.AUTH_FAIL_STATUS);
-            stmt.setString(3,SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            PreparedStatement stmt = con.prepareStatement("select * from status where (status_cd like ? or status_cd like ? or status_cd like ?) and user_id=? order by id asc");
+            stmt.setString(1,HostSystem.INITIAL_STATUS);
+            stmt.setString(2,HostSystem.AUTH_FAIL_STATUS);
+            stmt.setString(3,HostSystem.PUBLIC_KEY_FAIL_STATUS);
+            stmt.setLong(4,userId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                systemStatus = new SystemStatus();
-                systemStatus.setId(rs.getLong("id"));
-                systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
+                hostSystem=SystemDB.getSystem(con, rs.getLong("id"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -280,7 +275,7 @@ public class SystemStatusDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemStatus;
+        return hostSystem;
 
     }
 

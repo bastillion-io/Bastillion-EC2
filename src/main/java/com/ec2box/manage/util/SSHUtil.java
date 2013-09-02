@@ -15,12 +15,13 @@
  */
 package com.ec2box.manage.util;
 
+import com.ec2box.manage.model.HostSystem;
+import com.ec2box.manage.model.UserSchSessions;
 import com.jcraft.jsch.*;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.db.SystemStatusDB;
 import com.ec2box.manage.model.EC2Key;
 import com.ec2box.manage.model.SchSession;
-import com.ec2box.manage.model.SystemStatus;
 import com.ec2box.manage.task.SessionOutputTask;
 
 import java.io.*;
@@ -46,16 +47,16 @@ public class SSHUtil {
     /**
      * distributes uploaded item to system defined
      *
-     * @param hostSystemStatus object contains host system information
+     * @param hostSystem object contains host system information
      * @param session          an established SSH session
      * @param source           source file
      * @param destination      destination file
      * @return status uploaded file
      */
-    public static SystemStatus pushUpload(SystemStatus hostSystemStatus, Session session, String source, String destination) {
+    public static HostSystem pushUpload(HostSystem hostSystem, Session session, String source, String destination) {
 
 
-        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
         Channel channel = null;
         ChannelSftp c = null;
 
@@ -77,8 +78,8 @@ public class SSHUtil {
 
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
-            hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+            hostSystem.setErrorMsg(e.getMessage());
+            hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
         }
         //exit
         if (c != null) {
@@ -89,7 +90,7 @@ public class SSHUtil {
             channel.disconnect();
         }
 
-        return hostSystemStatus;
+        return hostSystem;
 
 
     }
@@ -97,23 +98,25 @@ public class SSHUtil {
 
     /**
      * open new ssh session on host system
-      * @param adminId
-     * @param passhrase
-     * @param password
-     * @param hostSystemStatus
-     * @param schSessionMap
-     * @return status of key distribution
+     *
+     * @param passhrase key passphrase for instance
+     * @param password password for instance
+     * @param userId user id
+     * @param sessionId session id
+     * @param hostSystem host system
+     * @param userSessionMap user session map
+     * @return status of systems
      */
-    public static SystemStatus openSSHTermOnSystem(Long adminId, String passhrase, String password, SystemStatus hostSystemStatus, Map<Long, SchSession> schSessionMap) {
+    public static HostSystem openSSHTermOnSystem(String passhrase, String password, Long userId, Long sessionId, HostSystem hostSystem,  Map<Long, UserSchSessions> userSessionMap) {
 
         JSch jsch = new JSch();
 
-        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 
         SchSession schSession = null;
 
         try {
-           EC2Key ec2Key = EC2KeyDB.getEC2KeyByKeyNm( adminId, hostSystemStatus.getHostSystem().getKeyNm(), hostSystemStatus.getHostSystem().getEc2Region());
+           EC2Key ec2Key = EC2KeyDB.getEC2KeyByKeyNm(hostSystem.getKeyNm(), hostSystem.getEc2Region());
             //add private key
             if(ec2Key!=null && ec2Key.getId()!=null){
                 if(passhrase!=null && !passhrase.trim().equals("")){
@@ -125,7 +128,7 @@ public class SSHUtil {
             }
 
             //create session
-            Session session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
+            Session session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
 
 
             //set password if it exists
@@ -142,8 +145,7 @@ public class SSHUtil {
             InputStream outFromChannel = channel.getInputStream();
 
             ExecutorService executor = Executors.newCachedThreadPool();
-
-            executor.execute(new SessionOutputTask(hostSystemStatus.getHostSystem().getId(), outFromChannel));
+            executor.execute(new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel));
 
 
             OutputStream inputToChannel = channel.getOutputStream();
@@ -158,31 +160,49 @@ public class SSHUtil {
             schSession.setCommander(commander);
             schSession.setInputToChannel(inputToChannel);
             schSession.setOutFromChannel(outFromChannel);
-            schSession.setHostSystem(hostSystemStatus.getHostSystem());
+            schSession.setHostSystem(hostSystem);
 
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
+            hostSystem.setErrorMsg(e.getMessage());
             if (e.getMessage().toLowerCase().contains("userauth fail")) {
-                hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
             } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
-                hostSystemStatus.setStatusCd(SystemStatus.AUTH_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
             } else {
-                hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
             }
         }
 
+
         //add session to map
-        if (hostSystemStatus.getStatusCd().equals(SystemStatus.SUCCESS_STATUS)) {
-            schSessionMap.put(hostSystemStatus.getHostSystem().getId(), schSession);
+        if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
+            //get the server maps for user
+            UserSchSessions userSchSessions = userSessionMap.get(userId);
+
+            //if no user session create a new one
+            if (userSchSessions == null) {
+                userSchSessions = new UserSchSessions();
+            }
+            Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+
+            //add server information
+            schSessionMap.put(hostSystem.getId(), schSession);
+            userSchSessions.setSchSessionMap(schSessionMap);
+            //add back to map
+            userSessionMap.put(userId, userSchSessions);
         }
 
-        SystemStatusDB.updateSystemStatus(hostSystemStatus);
+        SystemStatusDB.updateSystemStatus(hostSystem,userId);
 
-        return hostSystemStatus;
+        return hostSystem;
     }
 
-
+    /**
+     * Stores private key for ec2 instances on filesystem
+     * @param keyName key name
+     * @param keyValue key value
+     */
     public static void storePrivateKey(String keyName, String keyValue) {
         try {
 
@@ -210,6 +230,10 @@ public class SSHUtil {
 
     }
 
+    /**
+     * deletes private key from filesystem
+     * @param keyName key name
+     */
     public static void deletePrivateKey(String keyName) {
         try {
             File keyFile = new File(KEY_PATH + "/" + keyName + ".pem");

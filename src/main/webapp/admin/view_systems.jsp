@@ -105,7 +105,7 @@
         </script>
     </s:if>
 
-    <title>EC2Box - Manage Systems</title>
+    <title>EC2Box - Manage Instances</title>
 </head>
 <body>
 
@@ -123,7 +123,7 @@
 
 
         <s:if test="script!=null && script.id!=null">
-            <h3>Execute Script on Systems</h3>
+            <h3>Execute Script on Instances</h3>
         </s:if>
         <s:else>
             <h3>Composite SSH Terminals</h3>
@@ -133,14 +133,14 @@
 
             <s:if test="script!=null && script.id!=null">
                 <p>Run <b>
-                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below <div class="note">(Select on the user field to change the system username)</div>
+                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected instances below <div class="note">(Select on the user field to change the instance username)</div>
                 </p>
                 <div id="script_dia" title="View Script">
                     <pre><s:property value="script.script"/></pre>
                 </div>
             </s:if>
             <s:else>
-                <p>Select the systems below to generate composite SSH sessions in multiple terminals <div class="note">(Select on the user field to change the system username)</div></p>
+                <p>Select the instances below to generate composite SSH sessions in multiple terminals <div class="note">(Select on the user field to change the instance username)</div></p>
             </s:else>
 
 
@@ -217,6 +217,7 @@
                         <s:hidden name="hostSystem.instanceId" value="%{instanceId}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
+                        <s:hidden name="instanceIdList"/>
                         <s:hidden name="selectForm"/>
                         <s:if test="script!=null && script.id!=null">
                             <s:hidden name="script.id"/>
@@ -233,7 +234,12 @@
             </s:if>
             <s:else>
             <div class="actionMessage">
-                <div>Systems not available. Import EC2 Keys <a href="viewEC2Keys.action">here</a></div>
+                <div>Instances not available.
+                <s:if test="%{#session.userType==\"M\"}">
+                 Import EC2 Keys <a href="/manage/viewEC2Keys.action">here</a>
+                </s:if>
+
+                </div>
             </div>
             </s:else>
 

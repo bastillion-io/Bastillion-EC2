@@ -26,26 +26,23 @@ import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.EC2Key;
 import com.ec2box.manage.model.SortedSet;
-import com.ec2box.manage.util.AdminUtil;
 import com.ec2box.manage.util.SSHUtil;
+import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONSerializer;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
-
-public class EC2KeyAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+/**
+ * Action to import private key for EC2 instances
+ */
+public class EC2KeyAction extends ActionSupport implements ServletResponseAware {
 
     EC2Key ec2Key;
     SortedSet sortedSet = new SortedSet();
-    HttpServletRequest servletRequest;
     HttpServletResponse servletResponse;
     static Map<String, String> ec2RegionMap = AppConfigLkup.getMapProperties("ec2Regions");
 
@@ -57,12 +54,11 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
     )
     public String viewEC2Keys() {
 
-        Long adminId = AdminUtil.getAdminId(servletRequest);
 
-        AWSCred awsCred = AWSCredDB.getAWSCred(adminId);
+        AWSCred awsCred = AWSCredDB.getAWSCred();
         //check to see if aws creds have been set
         if (awsCred != null) {
-            sortedSet = EC2KeyDB.getEC2KeySet(adminId, sortedSet);
+            sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
         } else {
             addActionMessage("EC2 Keys not available. Set AWS credentials <a href=\"setAWSCred.action\">here</a>");
         }
@@ -79,9 +75,8 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
     )
     public String getKeyPairJSON() {
 
-        Long adminId = AdminUtil.getAdminId(servletRequest);
 
-        AWSCred awsCred = AWSCredDB.getAWSCred(adminId);
+        AWSCred awsCred = AWSCredDB.getAWSCred();
 
         //set  AWS credentials for service
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -94,10 +89,9 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
         DescribeKeyPairsResult describeKeyPairsResult = service.describeKeyPairs(describeKeyPairsRequest);
 
         List<KeyPairInfo> keyPairInfoList = describeKeyPairsResult.getKeyPairs();
-
-        JSONArray json = (JSONArray) JSONSerializer.toJSON(keyPairInfoList);
+        String json = new Gson().toJson(keyPairInfoList);
         try {
-            servletResponse.getOutputStream().write(json.toString().getBytes());
+            servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -115,11 +109,10 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
 
         String retVal = SUCCESS;
 
-        Long adminId = AdminUtil.getAdminId(servletRequest);
         try {
 
             //get AWS credentials from DB
-            AWSCred awsCred = AWSCredDB.getAWSCred(adminId);
+            AWSCred awsCred = AWSCredDB.getAWSCred();
 
             //set  AWS credentials for service
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -142,7 +135,7 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
             ec2Key.setPrivateKey(privateKey);
 
             //add to db
-            Long keyId = EC2KeyDB.saveEC2Key(adminId, ec2Key);
+            Long keyId = EC2KeyDB.saveEC2Key(ec2Key);
 
             //store private key
             SSHUtil.storePrivateKey(keyId.toString(), ec2Key.getPrivateKey().trim());
@@ -165,11 +158,10 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
 
 
         String retVal = SUCCESS;
-        Long adminId = AdminUtil.getAdminId(servletRequest);
 
         try {
             //get AWS credentials from DB
-            AWSCred awsCred = AWSCredDB.getAWSCred(adminId);
+            AWSCred awsCred = AWSCredDB.getAWSCred();
 
             //set  AWS credentials for service
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -188,7 +180,7 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
 
             if (describeKeyPairsResult != null && describeKeyPairsResult.getKeyPairs().size() > 0) {
                 //add to db
-                Long keyId = EC2KeyDB.saveEC2Key(adminId, ec2Key);
+                Long keyId = EC2KeyDB.saveEC2Key(ec2Key);
                 SSHUtil.storePrivateKey(keyId.toString(), ec2Key.getPrivateKey().trim());
             } else {
                 addActionError("Imported key does not exist on AWS");
@@ -243,7 +235,7 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
         }
         if(hasErrors()){
 
-            sortedSet = EC2KeyDB.getEC2KeySet(AdminUtil.getAdminId(servletRequest), sortedSet);
+            sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
         }
     }
 
@@ -262,7 +254,7 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
         }
         if(hasErrors()){
 
-            sortedSet = EC2KeyDB.getEC2KeySet(AdminUtil.getAdminId(servletRequest), sortedSet);
+            sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
         }
 
     }
@@ -273,14 +265,6 @@ public class EC2KeyAction extends ActionSupport implements ServletRequestAware, 
 
     public void setSortedSet(SortedSet sortedSet) {
         this.sortedSet = sortedSet;
-    }
-
-    public HttpServletRequest getServletRequest() {
-        return servletRequest;
-    }
-
-    public void setServletRequest(HttpServletRequest servletRequest) {
-        this.servletRequest = servletRequest;
     }
 
     public Map getEc2RegionMap() {

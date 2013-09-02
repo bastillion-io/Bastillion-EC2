@@ -3,11 +3,14 @@ EC2Box
 
 About
 -----
-A web-based ssh terminal to execute commands and make changes to multiple EC2 sessions simultaneously running on Amazon Web Services (AWS).
+A web-based ssh console to execute commands and manage multiple EC2 instances simultaneously running on Amazon Web
+Services (AWS). EC2Box allows you to share terminal commands and upload files to all your EC2 instances. Once the
+sessions have been opened you can select a single EC2 instance or any combination to run your commands.  Also,
+additional instance administrators can be added and their terminal sessions and history can be audited.
 
 Demo
 -----
-http://youtu.be/T4SBisCz91M
+http://youtu.be/QcvMDjBb4SY
 
 Prerequisites
 -------------
@@ -50,7 +53,7 @@ In the directory that contains the pom.xml run
 
 Using EC2Box
 ------
-Open browser to http://localhost:8090
+Open browser to https://<whatever ip>:8443
 
 Login with 
 
@@ -61,9 +64,9 @@ Steps:
 
 1. Set your AWS credentials
 2. Import the private key used on your EC2 systems (note: The EC2 server will only show if the private key has been imported)
-3. Set the EC2 regions of the residing systems
-4. Start composite-ssh sessions or create and execute a script across multiple sessions
-
+3. Start composite-ssh sessions or create and execute a script across multiple sessions
+4. Add instance administrator accounts
+5. Audit sessions for instance administrators
 
 Author
 ------

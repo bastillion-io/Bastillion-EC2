@@ -16,10 +16,10 @@
 package com.ec2box.manage.action;
 
 
+import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.ScriptDB;
 import com.ec2box.manage.model.Script;
 import com.ec2box.manage.model.SortedSet;
-import com.ec2box.manage.util.AdminUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -36,27 +36,28 @@ public class ScriptAction extends ActionSupport implements ServletRequestAware {
     Script script=new Script();
     HttpServletRequest servletRequest;
 
-    @Action(value = "/manage/viewScripts",
+
+    @Action(value = "/admin/viewScripts",
             results = {
-                    @Result(name = "success", location = "/manage/view_scripts.jsp")
+                    @Result(name = "success", location = "/admin/view_scripts.jsp")
             }
     )
     public String viewScripts() {
-        sortedSet = ScriptDB.getScriptSet(sortedSet,AdminUtil.getAdminId(servletRequest));
+        sortedSet = ScriptDB.getScriptSet(sortedSet, AuthUtil.getUserId(servletRequest.getSession()));
 
         return SUCCESS;
     }
 
 
-    @Action(value = "/manage/saveScript",
+    @Action(value = "/admin/saveScript",
             results = {
-                    @Result(name = "input", location = "/manage/view_scripts.jsp"),
-                    @Result(name = "success", location = "/manage/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
+                    @Result(name = "input", location = "/admin/view_scripts.jsp"),
+                    @Result(name = "success", location = "/admin/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
             }
     )
     public String saveScript() {
 
-        script.setAdminId(AdminUtil.getAdminId(servletRequest));
+        script.setUserId(AuthUtil.getUserId(servletRequest.getSession()));
         if (script.getId() != null) {
             ScriptDB.updateScript(script);
         } else {
@@ -65,15 +66,15 @@ public class ScriptAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 
-    @Action(value = "/manage/deleteScript",
+    @Action(value = "/admin/deleteScript",
             results = {
-                    @Result(name = "success", location = "/manage/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
+                    @Result(name = "success", location = "/admin/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
             }
     )
     public String deleteScript() {
 
         if (script.getId() != null) {
-            ScriptDB.deleteScript(script.getId(),AdminUtil.getAdminId(servletRequest));
+            ScriptDB.deleteScript(script.getId(),AuthUtil.getUserId(servletRequest.getSession()));
         }
         return SUCCESS;
     }
@@ -98,7 +99,7 @@ public class ScriptAction extends ActionSupport implements ServletRequestAware {
         }
 
         if (!this.getFieldErrors().isEmpty()) {
-            sortedSet = ScriptDB.getScriptSet(sortedSet,AdminUtil.getAdminId(servletRequest));
+            sortedSet = ScriptDB.getScriptSet(sortedSet,AuthUtil.getUserId(servletRequest.getSession()));
         }
 
     }

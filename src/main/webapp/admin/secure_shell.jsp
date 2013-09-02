@@ -116,7 +116,7 @@ $(document).ready(function() {
             idListStr = idListStr + '&idList=' + entry;
         });
 
-        $("#upload_push_frame").attr("src", "/manage/setUpload.action" + idListStr);
+        $("#upload_push_frame").attr("src", "setUpload.action" + idListStr);
         $("#upload_push_dialog").dialog("open");
 
 
@@ -162,7 +162,8 @@ $(document).ready(function() {
             });
 
             if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]){
-                $.ajax({ url: 'runCmd.action?command=' +String.fromCharCode(keyCode) + idListStr});
+                var cmdStr=String.fromCharCode(keyCode).replace("+","%2b");
+                $.ajax({ url: '/terms/runCmd.action?command=' +cmdStr+ idListStr});
             }
 
         });
@@ -170,13 +171,22 @@ $(document).ready(function() {
         $(document).keydown(function (e) {
             var keyCode= (e.keyCode)? e.keyCode: e.charCode;
             keys[keyCode]=true;
+            //27 - ESC
+            //37 - LEFT
+            //38 - UP
+            //39 - RIGHT
+            //40 - DOWN
+            //13 - ENTER
+            //8 - BS
+            //9 - TAB
+            //17 - CTRL
             if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] ||  keys[13] || keys[8] || keys[9] || keys[17]) {
                     var idListStr = '';
                     $(".run_cmd_active").each(function(index) {
                         var id = $(this).attr("id").replace("run_cmd_", "");
                         idListStr = idListStr + '&idList=' + id;
                     });
-                    $.ajax({ url: 'runCmd.action?keyCode=' + keyCode + idListStr});
+                    $.ajax({ url: '/terms/runCmd.action?keyCode=' + keyCode + idListStr});
                 }
 
         });
@@ -206,10 +216,10 @@ $(document).ready(function() {
     setInterval(function() {
         if(!lock){
             lock=true;
-            $.getJSON('getOutputJSON.action?t='+new Date().getTime(), function(data) {
+            $.getJSON('/terms/getOutputJSON.action?t='+new Date().getTime(), function(data) {
                 $.each(data, function(key, val) {
                     if (val.output != '') {
-                            termMap[val.sessionId].write(val.output);
+                            termMap[val.hostSystemId].write(val.output);
                         }
                     });
                 }).always(function() { lock=false; });
@@ -238,7 +248,7 @@ $(document).ready(function() {
 
 <div class="page">
 
-    <s:if test="(schSessionMap!= null && !schSessionMap.isEmpty()) || pendingSystemStatus!=null">
+    <s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
         <div class="content">
 
             <s:if test="pendingSystemStatus==null">
@@ -246,20 +256,19 @@ $(document).ready(function() {
 
                 <div id="select_all" class="top_link">Select All</div>
                 <div id="upload_push" class="top_link">Upload &amp; Push</div>
-                 <div class="top_link" ><a href="/manage/exitTerms.action">Exit Terminals</a></div>
+                 <div class="top_link" ><a href="exitTerms.action">Exit Terminals</a></div>
                  <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
                 <div class="clear"></div>
 
             </s:if>
             <div class="termwrapper">
-                <s:iterator value="schSessionMap">
-                    <div id="run_cmd_<s:property value="key"/>" class="run_cmd_active run_cmd">
+                <s:iterator value="systemList">
+                    <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
-                        <h4><s:property value="value.hostSystem.displayLabel"/></h4>
-
+                        <h4><s:property value="displayLabel"/></h4>
 
                         <div id="term" class="term">
-                            <div id="output_<s:property value="key"/>" class="output"></div>
+                            <div id="output_<s:property value="id"/>" class="output"></div>
                         </div>
 
                     </div>
@@ -270,7 +279,7 @@ $(document).ready(function() {
             <div id="set_password_dialog" title="Enter Password">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-                <p>Enter password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
+                <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
 
                 </p>
                 <s:form id="password_frm" action="createTerms">
@@ -290,7 +299,7 @@ $(document).ready(function() {
 
             <div id="set_passphrase_dialog" title="Enter Passphrase">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
-                 <p>Enter passphrase for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/></p>
+                 <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
                 <s:form id="passphrase_frm" action="createTerms">
                     <s:hidden name="pendingSystemStatus.id"/>
                     <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
@@ -310,7 +319,7 @@ $(document).ready(function() {
             <div id="error_dialog" title="Error">
                 <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
 
-                <p>System: <s:property value="currentSystemStatus.hostSystem.displayLabel"/>
+                <p>System: <s:property value="currentSystemStatus.displayLabel"/>
 
                 </p>
 

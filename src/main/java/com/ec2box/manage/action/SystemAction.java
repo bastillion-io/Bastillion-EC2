@@ -20,9 +20,9 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
+import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
-import com.ec2box.manage.util.AdminUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -41,23 +41,24 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HostSystem hostSystem = new HostSystem();
     Script script = null;
     HttpServletRequest servletRequest;
+    List<String> instanceIdList = new ArrayList<String>();
 
-    @Action(value = "/manage/viewSystems",
+    @Action(value = "/admin/viewSystems",
             results = {
-                    @Result(name = "success", location = "/manage/view_systems.jsp")
+                    @Result(name = "success", location = "/admin/view_systems.jsp")
             }
     )
     public String viewSystems() {
 
-        Long adminId = AdminUtil.getAdminId(servletRequest);
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
 
 
-        List<String> ec2RegionList = EC2KeyDB.getEC2Regions(adminId);
+        List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
 
 
         try {
             //get AWS credentials from DB
-            AWSCred awsCred = AWSCredDB.getAWSCred(adminId);
+            AWSCred awsCred = AWSCredDB.getAWSCred();
 
             if (awsCred != null) {
                 //set  AWS credentials for service
@@ -74,7 +75,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                     //only return systems that have keys set
                     List<String> keyValues = new ArrayList<String>();
-                    for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(adminId, ec2Region)) {
+                    for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region)) {
                         keyValues.add(ec2Key.getKeyNm());
                     }
                     Filter filter = new Filter("key-name", keyValues);
@@ -83,36 +84,45 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                     DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
 
                     List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+
                     for (Reservation res : describeInstancesResult.getReservations()) {
                         for (Instance instance : res.getInstances()) {
 
                             HostSystem hostSystem = new HostSystem();
-
-                            //check to see if system exists
-                            HostSystem existingSystem = SystemDB.getSystem(instance.getInstanceId(), adminId);
-                            //set user if existing system
-                            if (existingSystem != null) {
-                                hostSystem.setUser(existingSystem.getUser());
-                            }
-
                             hostSystem.setInstanceId(instance.getInstanceId());
                             hostSystem.setHost(instance.getPublicDnsName());
                             hostSystem.setKeyNm(instance.getKeyName());
                             hostSystem.setEc2Region(ec2Region);
                             hostSystem.setState(instance.getState().getName());
-                            hostSystem.setAdminId(adminId);
-
                             for (Tag tag : instance.getTags()) {
                                 if ("Name".equals(tag.getKey())) {
                                     hostSystem.setDisplayNm(tag.getValue());
                                 }
                             }
+
+                            //check to see if system exists
+                            HostSystem existingSystem = SystemDB.getSystem(instance.getInstanceId());
+                            //set user if existing system
+                            if (existingSystem != null) {
+                                hostSystem.setUser(existingSystem.getUser());
+                                //if system is in terminated state there is no public DNS name
+                                //so we need to set it from the existing record so we have an audit trail
+                                if(instance.getPublicDnsName()==null || instance.getPublicDnsName().trim().equals("")){
+                                    hostSystem.setHost(existingSystem.getHost());
+                                }
+                            }
+
+                            instanceIdList.add(hostSystem.getInstanceId());
                             hostSystemList.add(hostSystem);
                         }
                     }
 
                     //set ec2 systems
-                    SystemDB.setSystems(hostSystemList, ec2Region, adminId);
+                    SystemDB.setSystems(hostSystemList);
+
+                    sortedSet = SystemDB.getSystemSet(sortedSet, instanceIdList);
+
+
 
                 }
             }
@@ -124,42 +134,31 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         }
 
 
-        sortedSet = SystemDB.getSystemSet(sortedSet, adminId);
+
+
         if (script != null && script.getId() != null) {
-            script = ScriptDB.getScript(script.getId(), adminId);
+            script = ScriptDB.getScript(script.getId(),userId);
         }
 
 
         return SUCCESS;
     }
 
-    @Action(value = "/manage/saveSystem",
+    @Action(value = "/admin/saveSystem",
             results = {
-                    @Result(name = "input", location = "/manage/view_systems.jsp"),
-                    @Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}&script.id=${script.id}", type = "redirect")
+                    @Result(name = "input", location = "/admin/view_systems.jsp"),
+                    @Result(name = "success", location = "/admin/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}&script.id=${script.id}", type = "redirect")
             }
     )
     public String saveSystem() {
 
         if (hostSystem.getId() != null) {
-            hostSystem.setAdminId(AdminUtil.getAdminId(servletRequest));
             SystemDB.updateSystem(hostSystem);
         }
         return SUCCESS;
     }
 
-    @Action(value = "/manage/deleteSystem",
-            results = {
-                    @Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
-            }
-    )
-    public String deleteSystem() {
 
-        if (hostSystem.getId() != null) {
-            SystemDB.deleteSystem(hostSystem.getId(), AdminUtil.getAdminId(servletRequest));
-        }
-        return SUCCESS;
-    }
 
     /**
      * Validates all fields for adding a host system
@@ -174,7 +173,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
         if (!this.getFieldErrors().isEmpty()) {
 
-            sortedSet = SystemDB.getSystemSet(sortedSet, AdminUtil.getAdminId(servletRequest));
+            sortedSet = SystemDB.getSystemSet(sortedSet, instanceIdList);
         }
 
     }
@@ -210,5 +209,13 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+    }
+
+    public List<String> getInstanceIdList() {
+        return instanceIdList;
+    }
+
+    public void setInstanceIdList(List<String> instanceIdList) {
+        this.instanceIdList = instanceIdList;
     }
 }
