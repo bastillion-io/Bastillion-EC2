@@ -42,9 +42,7 @@ public class SessionOutputTask implements Runnable {
 
     public void run() {
         BufferedReader br = new BufferedReader(new InputStreamReader(outFromChannel));
-
         try {
-
             int value = 0;
 
             SessionOutput sessionOutput = new SessionOutput();
@@ -60,8 +58,6 @@ public class SessionOutputTask implements Runnable {
                 SessionOutputUtil.addCharToOutput(userId,hostSystemId, c);
 
             }
-            //sleep for 5 sec before removing output object so that leftover output is displayed
-            Thread.sleep(5000);
             SessionOutputUtil.removeOutput(userId,hostSystemId);
 
         } catch (Exception ex) {

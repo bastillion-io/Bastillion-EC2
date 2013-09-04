@@ -26,7 +26,6 @@ import com.ec2box.manage.task.SessionOutputTask;
 
 import java.io.*;
 import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -144,8 +143,9 @@ public class SSHUtil {
 
             InputStream outFromChannel = channel.getInputStream();
 
-            ExecutorService executor = Executors.newCachedThreadPool();
-            executor.execute(new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel));
+            Runnable run=new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel);
+            Thread thread = new Thread(run);
+            thread.start();
 
 
             OutputStream inputToChannel = channel.getOutputStream();

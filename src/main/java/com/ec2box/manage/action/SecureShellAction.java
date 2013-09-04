@@ -17,8 +17,10 @@ package com.ec2box.manage.action;
 
 import com.ec2box.common.util.AppConfigLkup;
 import com.ec2box.common.util.AuthUtil;
+import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.db.ScriptDB;
 import com.ec2box.manage.db.SessionAuditDB;
+import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.SessionOutputUtil;
 import com.ec2box.manage.db.SystemStatusDB;
 import com.ec2box.manage.model.*;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -168,7 +171,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }else{
+            AuthUtil.deleteAllSession(servletRequest.getSession());
         }
+
         return null;
     }
 
@@ -178,17 +184,24 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     @Action(value = "/terms/getOutputJSON"
     )
     public String getOutputJSON() {
-        Long userId = AuthUtil.getUserId(servletRequest.getSession());
-
+        Connection con = DBUtils.getConn();
+        //this checks to see if session is valid
+        Long userId = AuthDB.getUserIdByAuthToken(con, AuthUtil.getAuthToken(servletRequest.getSession()));
         if (userId != null) {
+            //update timeout
+            AuthUtil.setTimeout(servletRequest.getSession());
+            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, userId);
+            String json = new Gson().toJson(outputList);
             try {
-                List<SessionOutput> outputList = SessionOutputUtil.getOutput(userId);
-                String json=new Gson().toJson(outputList);
                 servletResponse.getOutputStream().write(json.getBytes());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }else{
+            AuthUtil.deleteAllSession(servletRequest.getSession());
         }
+
+        DBUtils.closeConn(con);
         return null;
     }
 

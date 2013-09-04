@@ -15,15 +15,14 @@
  */
 package com.ec2box.manage.util;
 
+import com.ec2box.manage.db.SessionAuditDB;
 import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.UserSessionsOutput;
-import com.ec2box.manage.task.TerminalLogTask;
 import org.apache.commons.beanutils.BeanUtils;
 
+import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Utility to is used to store the output for a session until the ajax call that brings it to the screen
@@ -40,6 +39,10 @@ public class SessionOutputUtil {
      * @param userId user id
      */
     public static void removeUserSession(Long userId) {
+        UserSessionsOutput userSessionsOutput =userSessionsOutputMap.get(userId);
+        if(userSessionsOutput!=null){
+            userSessionsOutput.getSessionOutputMap().clear();
+        }
         userSessionsOutputMap.remove(userId);
 
     }
@@ -104,7 +107,7 @@ public class SessionOutputUtil {
      * @param userId user id
      * @return sessionId session id object
      */
-    public static List<SessionOutput> getOutput(Long userId) {
+    public static List<SessionOutput> getOutput(Connection con,Long userId) {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
 
@@ -120,8 +123,7 @@ public class SessionOutputUtil {
 
                     outputList.add(sessionOutput);
 
-                    ExecutorService executor = Executors.newCachedThreadPool();
-                    executor.execute(new TerminalLogTask(sessionOutput));
+                    SessionAuditDB.insertTerminalLog(con, sessionOutput);
 
                     userSessionsOutput.getSessionOutputMap().get(key).setOutput("");
                 } catch (Exception ex) {

@@ -22,6 +22,7 @@ import com.ec2box.manage.model.SessionAudit;
 import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -59,7 +60,7 @@ public class SessionAuditDB {
 
 
             //take today's date and subtract how many days to keep history
-            Calendar cal= Calendar.getInstance();
+            Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, (-1 * Integer.parseInt(AppConfigLkup.getProperty("deleteAuditLogAfter")))); //subtract
             java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
 
@@ -79,6 +80,7 @@ public class SessionAuditDB {
 
     /**
      * returns sessions based on sort order defined
+     *
      * @param sortedSet object that defines sort order
      * @return session list
      */
@@ -155,7 +157,7 @@ public class SessionAuditDB {
     /**
      * insert new session record for user
      *
-     * @param con DB connection
+     * @param con    DB connection
      * @param userId user id
      * @return session id
      */
@@ -207,7 +209,7 @@ public class SessionAuditDB {
     /**
      * insert new terminal history for user
      *
-     * @param con DB connection
+     * @param con           DB connection
      * @param sessionOutput output from session terminals
      * @return session id
      */
@@ -215,14 +217,15 @@ public class SessionAuditDB {
 
         try {
 
-            //insert
-            PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, system_id, output) values(?,?,?)");
-            stmt.setLong(1, sessionOutput.getSessionId());
-            stmt.setLong(2, sessionOutput.getHostSystemId());
-            stmt.setString(3, sessionOutput.getOutput());
-            stmt.execute();
-
-            DBUtils.closeStmt(stmt);
+            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getHostSystemId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
+                //insert
+                PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, system_id, output) values(?,?,?)");
+                stmt.setLong(1, sessionOutput.getSessionId());
+                stmt.setLong(2, sessionOutput.getHostSystemId());
+                stmt.setString(3, sessionOutput.getOutput());
+                stmt.execute();
+                DBUtils.closeStmt(stmt);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,7 +237,7 @@ public class SessionAuditDB {
     /**
      * returns terminal logs for user session for host system
      *
-     * @param sessionId session id
+     * @param sessionId    session id
      * @param hostSystemId host system id
      * @return session output for session
      */
@@ -261,7 +264,7 @@ public class SessionAuditDB {
     /**
      * returns terminal logs for user session for host system
      *
-     * @param sessionId session id
+     * @param sessionId    session id
      * @param hostSystemId host system id
      * @return session output for session
      */
@@ -308,7 +311,7 @@ public class SessionAuditDB {
     /**
      * returns terminal logs for user session for host system
      *
-     * @param con DB connection
+     * @param con       DB connection
      * @param sessionId session id
      * @return session output for session
      */
