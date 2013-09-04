@@ -41,7 +41,7 @@ public class AuthDB {
             Connection con = null;
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where auth_token=?");
+                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 
@@ -78,7 +78,7 @@ public class AuthDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from users where username=? and password=?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=?");
             stmt.setString(1, auth.getUsername());
             stmt.setString(2, EncryptionUtil.hash(auth.getPassword()));
             ResultSet rs = stmt.executeQuery();
@@ -123,7 +123,7 @@ public class AuthDB {
 
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from  users where auth_token=?");
+                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 
@@ -217,7 +217,7 @@ public class AuthDB {
 
         Long userId=null;
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from users where auth_token like ?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token like ?");
             stmt.setString(1, authToken);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -271,7 +271,7 @@ public class AuthDB {
 
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where auth_token=?");
+                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 

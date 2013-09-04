@@ -104,7 +104,7 @@
         </script>
     </s:if>
 
-    <title>KeyBox - Manage Instance Administrators</title>
+    <title>EC2Box - Manage Instance Administrators</title>
 
 </head>
 <body>
