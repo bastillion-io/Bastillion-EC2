@@ -2,7 +2,7 @@
 
 Lets try for ....
 
-"Best New Monkey", "Best Usability Enhancement", and "Best Contribution to Operational Tools, Availability, and Manageability"
+"Best New Monkey", "Best Usability Enhancement", or "Best Contribution to Operational Tools, Availability, and Manageability"
 
 A lot of times with clustered instances, administrators do their best to keep them the same.  And even doing system
 level patching on non-clustered instances, administrators will likely be running the same patches. So why not give them
