@@ -77,6 +77,7 @@
 
             <h3>Audit Sessions</h3>
 
+                <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
                 <p>Select a session to audit below</p>
 
@@ -114,6 +115,10 @@
                     </tbody>
                 </table>
 
+                </s:if>
+                <s:else>
+                    <p class="error">No session audits available</p>
+                </s:else>
     </div>
 </div>
 

@@ -65,7 +65,7 @@
             <tr>
 
                 <td>
-                    <a href="/manage/setAWSCred.action">Set AWS Credentials</a>
+                    <a href="../manage/setAWSCred.action">Set AWS Credentials</a>
 
                 </td>
 
@@ -77,7 +77,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="/manage/viewEC2Keys.action">Set EC2 Keys</a>
+                    <a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>
 
                 </td>
                 <td>
@@ -90,7 +90,7 @@
 
             <tr>
                 <td>
-                  <a href="/admin/viewSystems.action">Composite SSH Terms</a>
+                  <a href="../admin/viewSystems.action">Composite SSH Terms</a>
 
                 </td>
                 <td>
@@ -100,7 +100,7 @@
 
             <tr>
                 <td>
-                   <a href="/admin/viewScripts.action">Composite Scripts</a>
+                   <a href="../admin/viewScripts.action">Composite Scripts</a>
 
                 </td>
                 <td>
@@ -110,7 +110,7 @@
              <s:if test="%{#session.userType==\"M\"}">
             <tr>
                 <td>
-                  <a href="/manage/viewUsers.action">Instance Administrators</a>
+                  <a href="../manage/viewUsers.action">Instance Administrators</a>
                 </td>
                 <td>
                    Add accounts for instance administrators
@@ -118,7 +118,7 @@
             </tr>
 	        <tr>
                 <td>
-                  <a href="/manage/viewSessions.action">Audit Sessions</a>
+                  <a href="../manage/viewSessions.action">Audit Sessions</a>
                 </td>
                 <td>
                   Audit administrator's sessions and terminal history
@@ -128,7 +128,7 @@
 
               <tr>
                 <td>
-                  <a href="/admin/setPassword.action">Change Password</a>
+                  <a href="../admin/setPassword.action">Change Password</a>
                 </td>
                 <td>
                     Change administrative login

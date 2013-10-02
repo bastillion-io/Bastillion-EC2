@@ -236,7 +236,7 @@
             <div class="actionMessage">
                 <div>Instances not available.
                 <s:if test="%{#session.userType==\"M\"}">
-                 Import EC2 Keys <a href="/manage/viewEC2Keys.action">here</a>
+                 Import EC2 Keys <a href="../manage/viewEC2Keys.action">here</a>
                 </s:if>
 
                 </div>

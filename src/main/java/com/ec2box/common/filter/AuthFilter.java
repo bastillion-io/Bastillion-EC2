@@ -68,10 +68,10 @@ public class AuthFilter implements Filter {
                 String uri = servletRequest.getRequestURI();
                 if (Auth.MANAGER.equals(userType)) {
                     isAdmin = true;
-                } else if (uri.matches("^\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
+                } else if (uri.matches(".*\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
                     isAdmin = true;
                 }
-                servletRequest.getSession().setAttribute("userType", userType);
+                AuthUtil.setUserType(servletRequest.getSession(), userType);
 
                 //check to see if user has timed out
                 String timeStr = AuthUtil.getTimeout(servletRequest.getSession());

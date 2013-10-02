@@ -98,7 +98,7 @@ public class SSHUtil {
     /**
      * open new ssh session on host system
      *
-     * @param passhrase key passphrase for instance
+     * @param passphrase key passphrase for instance
      * @param password password for instance
      * @param userId user id
      * @param sessionId session id
@@ -106,7 +106,7 @@ public class SSHUtil {
      * @param userSessionMap user session map
      * @return status of systems
      */
-    public static HostSystem openSSHTermOnSystem(String passhrase, String password, Long userId, Long sessionId, HostSystem hostSystem,  Map<Long, UserSchSessions> userSessionMap) {
+    public static HostSystem openSSHTermOnSystem(String passphrase, String password, Long userId, Long sessionId, HostSystem hostSystem,  Map<Long, UserSchSessions> userSessionMap) {
 
         JSch jsch = new JSch();
 
@@ -118,8 +118,8 @@ public class SSHUtil {
            EC2Key ec2Key = EC2KeyDB.getEC2KeyByKeyNm(hostSystem.getKeyNm(), hostSystem.getEc2Region());
             //add private key
             if(ec2Key!=null && ec2Key.getId()!=null){
-                if(passhrase!=null && !passhrase.trim().equals("")){
-                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem", passhrase);
+                if(passphrase!=null && !passphrase.trim().equals("")){
+                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem", passphrase);
                 }else{
                     jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem");
 

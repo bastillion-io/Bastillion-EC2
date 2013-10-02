@@ -84,7 +84,7 @@ $(document).ready(function() {
       $(".run_cmd").click(function() {
 
         //check for cmd-click / ctr-click
-        if(!keys[17] && !keys[91]) {
+	if(!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
             $(".run_cmd").removeClass('run_cmd_active');
         }
 
@@ -163,7 +163,7 @@ $(document).ready(function() {
 
             if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]){
                 var cmdStr=String.fromCharCode(keyCode).replace("+","%2b");
-                $.ajax({ url: '/terms/runCmd.action?command=' +cmdStr+ idListStr});
+                $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr+ idListStr});
             }
 
         });
@@ -186,7 +186,7 @@ $(document).ready(function() {
                         var id = $(this).attr("id").replace("run_cmd_", "");
                         idListStr = idListStr + '&idList=' + id;
                     });
-                    $.ajax({ url: '/terms/runCmd.action?keyCode=' + keyCode + idListStr});
+                    $.ajax({ url: '../terms/runCmd.action?keyCode=' + keyCode + idListStr});
                 }
 
         });
@@ -199,6 +199,20 @@ $(document).ready(function() {
 
         $(document).click(function (e) {
             $('#dummy').focus();
+        });
+
+        //get cmd text from paste
+        $("#dummy").bind('paste', function(e) {
+            $('#dummy').val('');
+            setTimeout(function() {
+                    var idListStr = '';
+                    $(".run_cmd_active").each(function(index) {
+                            var id = $(this).attr("id").replace("run_cmd_", "");
+                            idListStr = idListStr + '&idList=' + id;
+                    });
+                    var cmdStr=escape($('#dummy').val()).replace("+","%2b");
+                    $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr + idListStr});
+            }, 100);
         });
 
 
@@ -216,7 +230,7 @@ $(document).ready(function() {
     setInterval(function() {
         if(!lock){
             lock=true;
-            $.getJSON('/terms/getOutputJSON.action?t='+new Date().getTime(), function(data) {
+            $.getJSON('../terms/getOutputJSON.action?t='+new Date().getTime(), function(data) {
                 $.each(data, function(key, val) {
                     if (val.output != '') {
                             termMap[val.hostSystemId].write(val.output);
@@ -363,7 +377,7 @@ $(document).ready(function() {
     </s:else>
 
 </div>
-<div style="float:right;"><input type="text" name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
+<div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
 <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
 
 </body>
