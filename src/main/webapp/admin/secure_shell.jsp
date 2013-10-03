@@ -161,7 +161,7 @@ $(document).ready(function() {
                 idListStr = idListStr + '&idList=' + id;
             });
 
-            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]){
+            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]  && !keys[91] && !keys[93] && !keys[224]){
                 var cmdStr=String.fromCharCode(keyCode).replace("+","%2b");
                 $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr+ idListStr});
             }
