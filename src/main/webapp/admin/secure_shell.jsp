@@ -162,7 +162,7 @@ $(document).ready(function() {
             });
 
             if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]  && !keys[91] && !keys[93] && !keys[224]){
-                var cmdStr=String.fromCharCode(keyCode).replace("+","%2b");
+                var cmdStr=String.fromCharCode(keyCode).replace(/\+/g,"%2b");
                 $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr+ idListStr});
             }
 
@@ -210,7 +210,7 @@ $(document).ready(function() {
                             var id = $(this).attr("id").replace("run_cmd_", "");
                             idListStr = idListStr + '&idList=' + id;
                     });
-                    var cmdStr=escape($('#dummy').val()).replace("+","%2b");
+                    var cmdStr=escape($('#dummy').val()).replace(/\+/g,"%2b");
                     $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr + idListStr});
             }, 100);
         });
