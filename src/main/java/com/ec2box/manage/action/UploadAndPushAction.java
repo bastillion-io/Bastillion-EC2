@@ -23,6 +23,8 @@ import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.AgeFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -30,6 +32,8 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -122,6 +126,22 @@ public class UploadAndPushAction extends ActionSupport implements  ServletReques
             if (pendingSystemStatus == null) {
                 File delFile = new File(UPLOAD_PATH, uploadFileName);
                 FileUtils.deleteQuietly(delFile);
+
+                //delete all expired files in upload path
+                File delDir = new File(UPLOAD_PATH);
+                if (delDir.isDirectory()) {
+
+                    //set expire time to delete all files older than 48 hrs
+                    Calendar expireTime = Calendar.getInstance();
+                    expireTime.add(Calendar.HOUR, - 48);
+
+                    Iterator<File> filesToDelete = FileUtils.iterateFiles(delDir, new AgeFileFilter(expireTime.getTime()), TrueFileFilter.TRUE);
+                    while(filesToDelete.hasNext()) {
+                        delFile=filesToDelete.next();
+                        delFile.delete();
+                    }
+
+                }
 
             }
             systemStatusList = SystemStatusDB.getAllSystemStatus(userId);

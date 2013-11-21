@@ -18,6 +18,8 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.EC2Key;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+import com.ec2box.manage.util.EncryptionUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -106,6 +108,7 @@ public class EC2KeyDB {
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
             }
 
             DBUtils.closeStmt(stmt);
@@ -168,9 +171,10 @@ public class EC2KeyDB {
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (key_nm, ec2_region) values (?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (key_nm, ec2_region, private_key) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, ec2Key.getKeyNm());
             stmt.setString(2, ec2Key.getEc2Region());
+            stmt.setString(3, EncryptionUtil.encrypt(ec2Key.getPrivateKey().trim()));
             stmt.execute();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs != null && rs.next()) {

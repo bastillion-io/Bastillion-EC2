@@ -119,10 +119,9 @@ public class SSHUtil {
             //add private key
             if(ec2Key!=null && ec2Key.getId()!=null){
                 if(passphrase!=null && !passphrase.trim().equals("")){
-                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem", passphrase);
+                    jsch.addIdentity(ec2Key.getId().toString(), ec2Key.getPrivateKey().trim().getBytes(), null , passphrase.getBytes());
                 }else{
-                    jsch.addIdentity(KEY_PATH + "/" + ec2Key.getId()+".pem");
-
+                    jsch.addIdentity(ec2Key.getId().toString(), ec2Key.getPrivateKey().trim().getBytes(), null , null);
                 }
             }
 
@@ -198,50 +197,5 @@ public class SSHUtil {
         return hostSystem;
     }
 
-    /**
-     * Stores private key for ec2 instances on filesystem
-     * @param keyName key name
-     * @param keyValue key value
-     */
-    public static void storePrivateKey(String keyName, String keyValue) {
-        try {
-
-
-            //create key file
-            File keyFile = new File(KEY_PATH + "/" + keyName + ".pem");
-            PrintWriter keyFileWriter = new PrintWriter(keyFile);
-            keyFileWriter.print(keyValue);
-            keyFileWriter.close();
-
-
-            //set file permissions to 600
-            keyFile.setReadable(false, false);
-            keyFile.setReadable(true, true);
-
-            keyFile.setWritable(false, false);
-            keyFile.setWritable(true, true);
-
-            keyFile.setExecutable(false, false);
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    /**
-     * deletes private key from filesystem
-     * @param keyName key name
-     */
-    public static void deletePrivateKey(String keyName) {
-        try {
-            File keyFile = new File(KEY_PATH + "/" + keyName + ".pem");
-            keyFile.delete();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-    }
 
 }

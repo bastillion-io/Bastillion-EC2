@@ -135,10 +135,8 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
             ec2Key.setPrivateKey(privateKey);
 
             //add to db
-            Long keyId = EC2KeyDB.saveEC2Key(ec2Key);
+            EC2KeyDB.saveEC2Key(ec2Key);
 
-            //store private key
-            SSHUtil.storePrivateKey(keyId.toString(), ec2Key.getPrivateKey().trim());
         } catch (AmazonServiceException ex) {
             addActionError(ex.getMessage());
             retVal = INPUT;
@@ -180,8 +178,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
             if (describeKeyPairsResult != null && describeKeyPairsResult.getKeyPairs().size() > 0) {
                 //add to db
-                Long keyId = EC2KeyDB.saveEC2Key(ec2Key);
-                SSHUtil.storePrivateKey(keyId.toString(), ec2Key.getPrivateKey().trim());
+                EC2KeyDB.saveEC2Key(ec2Key);
             } else {
                 addActionError("Imported key does not exist on AWS");
                 retVal = INPUT;
@@ -207,7 +204,6 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public String deleteEC2Key() {
 
         EC2KeyDB.deleteEC2Key(ec2Key.getId());
-        SSHUtil.deletePrivateKey(ec2Key.getId().toString());
 
 
         return SUCCESS;

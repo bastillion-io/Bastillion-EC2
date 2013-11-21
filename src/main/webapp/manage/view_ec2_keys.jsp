@@ -47,7 +47,7 @@
 
         $(document).ready(function() {
 
-
+            $.ajaxSetup({ cache: false });
 
             $("#add_dialog").dialog({
                 autoOpen: false,

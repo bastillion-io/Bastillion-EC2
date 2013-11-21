@@ -37,6 +37,11 @@ Start EC2Box
 
         ./startEC2Box.sh
 
+How to Configure SSL in Jetty
+(it is a good idea to add or generate your own unique certificate)
+
+http://wiki.eclipse.org/Jetty/Howto/Configure_SSL
+
 To Build from Source 
 ------
 Export environment variables

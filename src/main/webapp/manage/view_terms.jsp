@@ -25,6 +25,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
+    $.ajaxSetup({ cache: false });
+
     $(".termwrapper").sortable({
             helper : 'clone'
     });
