@@ -17,7 +17,6 @@ package com.ec2box.manage.util;
 
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -28,8 +27,7 @@ import java.sql.Statement;
 public class DBUtils {
 
 
-    //system path to the H2 DB
-    private static String DB_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
+
 
     /**
      * returns DB connection
@@ -39,12 +37,7 @@ public class DBUtils {
     public static Connection getConn() {
         Connection con = null;
         try {
-
-            Class.forName("org.h2.Driver");
-            // create a database connection
-            String user="ec2box";
-            String password="filepwd 0WJLnwhpA47EepT1A4drVnDn3vYRvJhpZi0sVdvN9SmlbKw";
-            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/ec2box;CIPHER=AES",user,password);
+            con=DSPool.getDataSource().getConnection();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
