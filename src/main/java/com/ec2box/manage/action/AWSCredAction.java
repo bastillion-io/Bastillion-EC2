@@ -20,6 +20,7 @@ import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.model.AWSCred;
+import com.ec2box.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -30,41 +31,53 @@ import java.util.Map;
 /**
  * Action to set aws credentials
  */
-public class AWSCredAction extends ActionSupport implements SessionAware {
+public class AWSCredAction extends ActionSupport {
 
-    Map<String, Object> session;
     AWSCred awsCred;
+    SortedSet sortedSet= new SortedSet();
 
 
-    @Action(value = "/manage/setAWSCred",
+    @Action(value = "/manage/viewAWSCred",
             results = {
-                    @Result(name = "success", location = "/manage/set_aws_cred.jsp")
+                    @Result(name = "success", location = "/manage/view_aws_cred.jsp")
             }
     )
-    public String setAWSCred() {
-        awsCred = AWSCredDB.getAWSCred();
+    public String viewAWSCred() {
+        sortedSet = AWSCredDB.getAWSCredSet(sortedSet);
         return SUCCESS;
 
     }
 
-    @Action(value = "/manage/submitAWSCred",
+    @Action(value = "/manage/saveAWSCred",
             results = {
-                    @Result(name = "success", location = "/manage/viewEC2Keys.action", type = "redirect"),
-                    @Result(name = "input", location = "/manage/set_aws_cred.jsp")
+                    @Result(name = "success", location = "/manage/viewAWSCred.action", type="redirect"),
+                    @Result(name = "input", location = "/manage/view_aws_cred.jsp")
             }
     )
 
-    public String submitAWSCred() {
-        AWSCredDB.setAWSCred(awsCred);
+    public String saveAWSCred() {
+        AWSCredDB.saveAWSCred(awsCred);
         return SUCCESS;
 
     }
 
+
+    @Action(value = "/manage/deleteAWSCred",
+            results = {
+                    @Result(name = "success", location = "/manage/viewAWSCred.action", type="redirect")
+            }
+    )
+
+    public String deleteAWSCred() {
+        AWSCredDB.deleteAWSCred(awsCred.getId());
+        return SUCCESS;
+
+    }
 
     /**
      * Validates fields for credential submit
      */
-    public void validateSubmitAWSCred() {
+    public void validateSaveAWSCred() {
         if (awsCred.getAccessKey() == null ||
                 awsCred.getAccessKey().trim().equals("")) {
             addFieldError("awsCred.accessKey", "Required");
@@ -78,10 +91,14 @@ public class AWSCredAction extends ActionSupport implements SessionAware {
                 //check if credential are valid
                 BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
                 AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+
                 service.describeKeyPairs();
             } catch (Exception ex) {
                 addActionError("Invalid Credentials");
             }
+        }
+        if(this.hasActionErrors() || this.hasErrors()){
+            sortedSet = AWSCredDB.getAWSCredSet(sortedSet);
         }
     }
 
@@ -94,11 +111,11 @@ public class AWSCredAction extends ActionSupport implements SessionAware {
         this.awsCred = awsCred;
     }
 
-    public Map<String, Object> getSession() {
-        return session;
+    public SortedSet getSortedSet() {
+        return sortedSet;
     }
 
-    public void setSession(Map<String, Object> session) {
-        this.session = session;
+    public void setSortedSet(SortedSet sortedSet) {
+        this.sortedSet = sortedSet;
     }
 }

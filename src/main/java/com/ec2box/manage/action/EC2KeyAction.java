@@ -45,6 +45,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     SortedSet sortedSet = new SortedSet();
     HttpServletResponse servletResponse;
     static Map<String, String> ec2RegionMap = AppConfigLkup.getMapProperties("ec2Regions");
+    List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
 
 
     @Action(value = "/manage/viewEC2Keys",
@@ -55,14 +56,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public String viewEC2Keys() {
 
 
-        AWSCred awsCred = AWSCredDB.getAWSCred();
-        //check to see if aws creds have been set
-        if (awsCred != null) {
-            sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
-        } else {
-            addActionMessage("EC2 Keys not available. Set AWS credentials <a href=\"setAWSCred.action\">here</a>");
-        }
-
+        sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
 
         return SUCCESS;
 
@@ -76,7 +70,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public String getKeyPairJSON() {
 
 
-        AWSCred awsCred = AWSCredDB.getAWSCred();
+        AWSCred awsCred = AWSCredDB.getAWSCred(ec2Key.getAwsCredId());
 
         //set  AWS credentials for service
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -112,7 +106,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
         try {
 
             //get AWS credentials from DB
-            AWSCred awsCred = AWSCredDB.getAWSCred();
+            AWSCred awsCred = AWSCredDB.getAWSCred(ec2Key.getAwsCredId());
 
             //set  AWS credentials for service
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -159,7 +153,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
         try {
             //get AWS credentials from DB
-            AWSCred awsCred = AWSCredDB.getAWSCred();
+            AWSCred awsCred = AWSCredDB.getAWSCred(ec2Key.getAwsCredId());
 
             //set  AWS credentials for service
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
@@ -216,7 +210,9 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
      */
     public void validateImportEC2Key() {
 
-
+        if (ec2Key.getAwsCredId() == null ) {
+            addFieldError("ec2Key.awsCredId", "Required");
+        }
         if (ec2Key.getEc2Region() == null ||
                 ec2Key.getEc2Region().trim().equals("")) {
             addFieldError("ec2Key.ec2Region", "Required");
@@ -241,11 +237,11 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
      */
     public void validateSubmitEC2Key() {
         if (ec2Key.getEc2Region() == null ||
-                ec2Key.getEc2Region().trim().equals("")) {
+            ec2Key.getEc2Region().trim().equals("")) {
             addFieldError("ec2Key.ec2Region", "Required");
         }
         if (ec2Key.getKeyNm() == null ||
-                ec2Key.getKeyNm().trim().equals("")) {
+            ec2Key.getKeyNm().trim().equals("")) {
             addFieldError("ec2Key.keyNm", "Required");
         }
         if(hasErrors()){
@@ -286,4 +282,13 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public void setServletResponse(HttpServletResponse servletResponse) {
         this.servletResponse = servletResponse;
     }
+
+    public List<AWSCred> getAwsCredList() {
+        return awsCredList;
+    }
+
+    public void setAwsCredList(List<AWSCred> awsCredList) {
+        this.awsCredList = awsCredList;
+    }
+
 }

@@ -27,7 +27,7 @@
 
 
         function populateKeyNames() {
-            $.getJSON('getKeyPairJSON.action?ec2Key.ec2Region='+$("#importEC2Key_ec2Key_ec2Region").val(), function(result) {
+            $.getJSON('getKeyPairJSON.action?ec2Key.awsCredId='+$("#importEC2Key_ec2Key_awsCredId").val()+'&ec2Key.ec2Region='+$("#importEC2Key_ec2Key_ec2Region").val(), function(result) {
 
               $("#importEC2Key_ec2Key_keyNm option").remove();
                 var options = $("#importEC2Key_ec2Key_keyNm");
@@ -143,8 +143,10 @@
 
             <h3>Manage EC2 Keys</h3>
 
-    <s:if test="hasActionMessages()">
-        <s:actionmessage escape="false"/>
+     <s:if test="awsCredList.isEmpty()">
+        <div class="actionMessage">
+         EC2 Keys not available. Set AWS credentials <a href="viewAWSCred.action">here</a>
+        </div>
     </s:if>
     <s:else>
           <p>Import and register EC2 keys below. An EC2 server will only show after its private key has been imported</p>
@@ -163,6 +165,9 @@
 
                         <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_KEY_NM"/>" class="sort">Key Name</th>
                         <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_EC2_REGION"/>" class="sort">EC2 Region</th>
+                        <s:if test="awsCredList.size()>1">
+                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_ACCESS_KEY"/>" class="sort">Access Key</th>
+                        </s:if>
                         <th>&nbsp;</th>
                     </tr>
                     </thead>
@@ -176,6 +181,9 @@
                         <s:set var="ec2Region" value="%{ec2Region}"/>
                         <s:property value="%{ec2RegionMap.get(#ec2Region)}"/>
                         </td>
+                        <s:if test="awsCredList.size()>1">
+                        <td><s:property value="accessKey"/></td>
+                        </s:if>
                             <td>
                                 <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
                                     Delete
@@ -188,33 +196,22 @@
                 </table>
         </s:if>
 
-        <!--
-            <div id="add_btn">Create New Key</div>
-            <div id="add_dialog" title="Create New Key">
-             <s:actionerror/>
-                <s:form action="submitEC2Key" class="save_ec2Key_form_add">
-                    <s:select name="ec2Key.ec2Region"  list="ec2RegionMap" label="EC2 Region" headerKey="" headerValue="-Select-" />
-                    <s:textfield name="ec2Key.keyNm" label="Key Name" size="15"/>
-                    <s:hidden name="sortedSet.orderByDirection"/>
-                    <s:hidden name="sortedSet.orderByField"/>
-                    <tr>
-                    <td>&nbsp;</td>
-                    <td>
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
-                    </td>
-                    </tr>
-                </s:form>
-            </div>
-            -->
+
 
              <div id="import_btn">Import Private Key</div>
                         <div id="import_dialog" title="Import Existing EC2 Key">
                          <s:actionerror/>
                             <s:form action="importEC2Key" class="save_ec2Key_form_import">
+                                <s:if test="awsCredList.size()==1">
+                                    <s:hidden name="ec2Key.awsCredId" value="%{awsCredList.get(0).getId()}"/>
+                                </s:if>
+                                <s:else>
+                                    <s:select name="ec2Key.awsCredId" list="awsCredList" listKey="id" listValue="accessKey" label="Access Key" />
+                                </s:else>
                                 <s:select name="ec2Key.ec2Region"  list="ec2RegionMap" label="EC2 Region" headerKey="" headerValue="-Select-" onchange="populateKeyNames();" />
                                 <s:select name="ec2Key.keyNm" label="Key Name" list="#{'':'-Select Region Above-'}"/>
                                 <s:textarea name="ec2Key.privateKey" label="Private Key Value"  rows="15" cols="35" wrap="off"/>
+
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                                 <tr>

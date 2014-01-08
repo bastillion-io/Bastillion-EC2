@@ -27,7 +27,7 @@
     <s:if test="%{#session.userType==\"M\"}">
 
      <div class="nav_item">
-            <a href="../manage/setAWSCred.action">Set AWS Credentials</a>
+            <a href="../manage/viewAWSCred.action">Set AWS Credentials</a>
      </div>
 
      <div class="nav_item">

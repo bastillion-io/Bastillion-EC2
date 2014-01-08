@@ -14,8 +14,14 @@ http://youtu.be/QcvMDjBb4SY
 
 Prerequisites
 -------------
-Java JDK 1.6 or greater
+Java JDK 1.7 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
+
+Browser with Web Sockets support
+http://caniuse.com/websockets
+
+**Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org

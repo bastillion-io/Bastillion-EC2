@@ -34,6 +34,7 @@ public class SystemDB {
     public static final String SORT_BY_NAME = "display_nm";
     public static final String SORT_BY_USER = "user";
     public static final String SORT_BY_HOST = "host";
+    public static final String SORT_BY_PORT = "port";
     public static final String SORT_BY_INSTANCE_ID = "instance_id";
     public static final String SORT_BY_REGION = "region";
     public static final String SORT_BY_STATE = "state";
@@ -78,7 +79,7 @@ public class SystemDB {
                     hostSystem.setUser(rs.getString("user"));
                     hostSystem.setHost(rs.getString("host"));
                     hostSystem.setPort(rs.getInt("port"));
-                    hostSystem.setKeyNm(rs.getString("key_nm"));
+                    hostSystem.setKeyId(rs.getLong("key_id"));
                     hostSystem.setEc2Region(rs.getString("region"));
                     hostSystem.setState(rs.getString("state"));
                     hostSystemList.add(hostSystem);
@@ -153,7 +154,7 @@ public class SystemDB {
                 hostSystem.setUser(rs.getString("user"));
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
-                hostSystem.setKeyNm(rs.getString("key_nm"));
+                hostSystem.setKeyId(rs.getLong("key_id"));
                 hostSystem.setEc2Region(rs.getString("region"));
                 hostSystem.setState(rs.getString("state"));
             }
@@ -221,7 +222,7 @@ public class SystemDB {
                 hostSystem.setUser(rs.getString("user"));
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
-                hostSystem.setKeyNm(rs.getString("key_nm"));
+                hostSystem.setKeyId(rs.getLong("key_id"));
                 hostSystem.setEc2Region(rs.getString("region"));
                 hostSystem.setState(rs.getString("state"));
             }
@@ -247,13 +248,13 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_nm, region, state) values (?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state) values (?,?,?,?,?,?,?,?)");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getInstanceId());
-            stmt.setString(6, hostSystem.getKeyNm());
+            stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
             stmt.execute();
@@ -300,13 +301,13 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_nm=?, region=?, state=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getInstanceId());
-            stmt.setString(6, hostSystem.getKeyNm());
+            stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
             stmt.setLong(9, hostSystem.getId());
@@ -339,6 +340,7 @@ public class SystemDB {
                 } else {
                     hostSystem.setId(hostSystemTmp.getId());
                     hostSystem.setUser(hostSystemTmp.getUser());
+                    hostSystem.setPort(hostSystemTmp.getPort());
                     updateSystem(con, hostSystem);
                 }
             }

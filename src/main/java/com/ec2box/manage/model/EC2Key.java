@@ -23,6 +23,8 @@ public class EC2Key {
     String keyNm;
     String privateKey=null;
     String ec2Region;
+    Long awsCredId;
+    String accessKey;
 
     public Long getId() {
         return id;
@@ -54,4 +56,14 @@ public class EC2Key {
     public void setEc2Region(String ec2Region) {
         this.ec2Region = ec2Region;
     }
+
+    public Long getAwsCredId() {
+        return awsCredId;
+    }
+
+    public void setAwsCredId(Long awsCredId) { this.awsCredId = awsCredId; }
+
+    public String getAccessKey() { return accessKey; }
+
+    public void setAccessKey(String accessKey) { this.accessKey = accessKey; }
 }

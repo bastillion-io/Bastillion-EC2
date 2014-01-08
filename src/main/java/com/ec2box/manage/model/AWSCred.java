@@ -21,8 +21,13 @@ package com.ec2box.manage.model;
 public class AWSCred {
 
 
+    Long id;
     String accessKey;
     String secretKey;
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getAccessKey() {
         return accessKey;

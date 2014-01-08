@@ -15,14 +15,11 @@
  */
 package com.ec2box.manage.util;
 
-import com.ec2box.manage.model.HostSystem;
-import com.ec2box.manage.model.UserSchSessions;
+import com.ec2box.manage.model.*;
+import com.ec2box.manage.task.SecureShellTask;
 import com.jcraft.jsch.*;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.db.SystemStatusDB;
-import com.ec2box.manage.model.EC2Key;
-import com.ec2box.manage.model.SchSession;
-import com.ec2box.manage.task.SessionOutputTask;
 
 import java.io.*;
 import java.util.Map;
@@ -115,7 +112,7 @@ public class SSHUtil {
         SchSession schSession = null;
 
         try {
-           EC2Key ec2Key = EC2KeyDB.getEC2KeyByKeyNm(hostSystem.getKeyNm(), hostSystem.getEc2Region());
+           EC2Key ec2Key = EC2KeyDB.getEC2Key(hostSystem.getKeyId());
             //add private key
             if(ec2Key!=null && ec2Key.getId()!=null){
                 if(passphrase!=null && !passphrase.trim().equals("")){
@@ -142,7 +139,13 @@ public class SSHUtil {
 
             InputStream outFromChannel = channel.getInputStream();
 
-            Runnable run=new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel);
+
+            SessionOutput sessionOutput = new SessionOutput();
+            sessionOutput.setSessionId(sessionId);
+            sessionOutput.setHostSystemId(hostSystem.getId());
+            sessionOutput.setUserId(userId);
+
+            Runnable run=new SecureShellTask(sessionOutput, outFromChannel);
             Thread thread = new Thread(run);
             thread.start();
 
@@ -177,7 +180,7 @@ public class SSHUtil {
         //add session to map
         if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
             //get the server maps for user
-            UserSchSessions userSchSessions = userSessionMap.get(userId);
+            UserSchSessions userSchSessions = userSessionMap.get(sessionId);
 
             //if no user session create a new one
             if (userSchSessions == null) {
@@ -189,7 +192,7 @@ public class SSHUtil {
             schSessionMap.put(hostSystem.getId(), schSession);
             userSchSessions.setSchSessionMap(schSessionMap);
             //add back to map
-            userSessionMap.put(userId, userSchSessions);
+            userSessionMap.put(sessionId, userSchSessions);
         }
 
         SystemStatusDB.updateSystemStatus(hostSystem,userId);

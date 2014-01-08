@@ -35,6 +35,7 @@ public class EC2KeyDB {
 
     public static final String SORT_BY_KEY_NM="key_nm";
     public static final String SORT_BY_EC2_REGION="ec2_region";
+    public static final String SORT_BY_ACCESS_KEY="access_key";
 
     /**
      * returns private key information for user
@@ -56,13 +57,15 @@ public class EC2KeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys "+ orderBy);
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys, aws_credentials where ec2_keys.aws_cred_id=aws_credentials.id "+ orderBy);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+                ec2Key.setAccessKey(rs.getString("access_key"));
                 ec2KeyList.add(ec2Key);
             }
 
@@ -86,29 +89,29 @@ public class EC2KeyDB {
 
 
     /**
-     * returns private key information for user
+     * returns private keys information
      *
-     * @param keyNm key name
-     * @param ec2Region ec2 region
+     * @param ec2KeyId ec2 key id
      * @return key information
      */
-    public static EC2Key getEC2KeyByKeyNm(String keyNm, String ec2Region) {
-
-        EC2Key ec2Key = null;
+    public static EC2Key getEC2Key(Long ec2KeyId) {
+        EC2Key ec2Key=null;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where key_nm like ? and ec2_region like ?");
-            stmt.setString(1, keyNm);
-            stmt.setString(2, ec2Region);
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where id = ?");
+            stmt.setLong(1, ec2KeyId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            if(rs.next()) {
                 ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
                 ec2Key.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
+
+
             }
 
             DBUtils.closeStmt(stmt);
@@ -127,23 +130,65 @@ public class EC2KeyDB {
     /**
      * returns private keys information for region and user
      *
+     * @param keyNm
      * @param ec2Region ec2 region
+     * @param awsCredId aws cred id
      * @return key information
      */
-    public static List<EC2Key> getEC2KeyByRegion(String ec2Region) {
+    public static EC2Key getEC2KeyByNmRegion(String keyNm, String ec2Region, Long awsCredId) {
+        EC2Key ec2Key=null;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where key_nm like ? and ec2_region like ? and aws_cred_id=?");
+            stmt.setString(1, keyNm);
+            stmt.setString(2, ec2Region);
+            stmt.setLong(3, awsCredId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                ec2Key = new EC2Key();
+                ec2Key.setId(rs.getLong("id"));
+                ec2Key.setKeyNm(rs.getString("key_nm"));
+                ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+            }
+
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+        return ec2Key;
+
+    }
+
+    /**
+     * returns private keys information for region and user
+     *
+     * @param ec2Region ec2 region
+     * @param awsCredId aws cred id
+     * @return key information
+     */
+    public static List<EC2Key> getEC2KeyByRegion(String ec2Region, Long awsCredId) {
         List<EC2Key> ec2KeyList = new ArrayList<EC2Key>();
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where ec2_region like ?");
+            PreparedStatement stmt = con.prepareStatement("select * from ec2_keys where ec2_region like ? and aws_cred_id=?");
             stmt.setString(1, ec2Region);
+            stmt.setLong(2, awsCredId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString("key_nm"));
                 ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
                 ec2KeyList.add(ec2Key);
             }
 
@@ -171,10 +216,11 @@ public class EC2KeyDB {
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (key_nm, ec2_region, private_key) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = con.prepareStatement("insert into ec2_keys (key_nm, ec2_region, private_key, aws_cred_id) values (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, ec2Key.getKeyNm());
             stmt.setString(2, ec2Key.getEc2Region());
             stmt.setString(3, EncryptionUtil.encrypt(ec2Key.getPrivateKey().trim()));
+            stmt.setLong(4, ec2Key.getAwsCredId());
             stmt.execute();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs != null && rs.next()) {
@@ -192,6 +238,34 @@ public class EC2KeyDB {
 
     }
 
+    /**
+     * updates private key information for user
+     *
+     * @param ec2Key private key information
+     */
+    public static void updateEC2Key(EC2Key ec2Key) {
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+
+            PreparedStatement stmt = con.prepareStatement("update ec2_keys set key_nm=?, ec2_region=?, private_key=?, aws_cred_id=? where id=?");
+            stmt.setString(1, ec2Key.getKeyNm());
+            stmt.setString(2, ec2Key.getEc2Region());
+            stmt.setString(3, EncryptionUtil.encrypt(ec2Key.getPrivateKey().trim()));
+            stmt.setLong(4, ec2Key.getAwsCredId());
+            stmt.setLong(5, ec2Key.getId());
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+    }
+
 
 
 
@@ -201,21 +275,20 @@ public class EC2KeyDB {
      *
      * @param ec2Key private key information
      */
-    public static Long saveEC2Key(EC2Key ec2Key) {
+    public static void saveEC2Key(EC2Key ec2Key) {
 
-        Long ec2KeyId=null;
 
         //get id for key if exists
-        EC2Key ec2KeyTmp = getEC2KeyByKeyNm(ec2Key.getKeyNm(), ec2Key.getEc2Region());
+        EC2Key ec2KeyTmp = getEC2KeyByNmRegion(ec2Key.getKeyNm(), ec2Key.getEc2Region(), ec2Key.getAwsCredId());
         if(ec2KeyTmp!=null){
-            ec2KeyId=ec2KeyTmp.getId();
+            ec2Key.setId(ec2KeyTmp.getId());
+            updateEC2Key(ec2Key);
         //else insert if it doesn't exist
         }else{
-            ec2KeyId=insertEC2Key(ec2Key);
+            insertEC2Key(ec2Key);
         }
-        ec2KeyTmp=null;
 
-        return ec2KeyId;
+
 
 
     }

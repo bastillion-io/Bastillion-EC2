@@ -57,7 +57,7 @@ public class UserDB {
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
-           stmt.setString(1, User.ADMINISTRATOR);
+            stmt.setString(1, User.ADMINISTRATOR);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

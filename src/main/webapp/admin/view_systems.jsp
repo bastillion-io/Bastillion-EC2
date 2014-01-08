@@ -25,7 +25,7 @@
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 200,
+                height: 250,
                 width: 500,
                 modal: true
             });
@@ -133,14 +133,14 @@
 
             <s:if test="script!=null && script.id!=null">
                 <p>Run <b>
-                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected instances below <div class="note">(Select on the user field to change the instance username)</div>
+                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected instances below <div class="note">(Select on the user field to change the instance username and other properties)</div>
                 </p>
                 <div id="script_dia" title="View Script">
                     <pre><s:property value="script.script"/></pre>
                 </div>
             </s:if>
             <s:else>
-                <p>Select the instances below to generate composite SSH sessions in multiple terminals <div class="note">(Select on the user field to change the instance username)</div></p>
+                <p>Select the instances below to generate composite SSH sessions in multiple terminals <div class="note">(Select on the user field to change the instance username and other properties)</div></p>
             </s:else>
 
 
@@ -159,6 +159,7 @@
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_ID"/>" class="sort">Instance Id</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_PORT"/>" class="sort">Port</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_STATE"/>" class="sort">State</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_REGION"/>" class="sort">Region</th>
                     </tr>
@@ -179,11 +180,16 @@
                             <td><s:property value="instanceId"/></td>
                             <td>
 
-                            <a id="edit_btn_<s:property value="id"/>" title="Change User" class="edit_btn" href="#">
+                            <a id="edit_btn_<s:property value="id"/>" title="Update System Properties" class="edit_btn" href="#">
                             <s:property value="user"/>
                             </a>
                             </td>
                             <td><s:property value="host"/></td>
+                            <td>
+                                <a id="edit_btn_<s:property value="id"/>" title="Update System Properties" class="edit_btn" href="#">
+                                    <s:property value="port"/>
+                                </a>
+                            </td>
                             <td><s:property value="state"/></td>
                             <td><s:property value="ec2Region"/></td>
 
@@ -202,15 +208,26 @@
 
             <s:iterator var="system" value="sortedSet.itemList" status="stat">
 
-                <div id="edit_dialog_<s:property value="id"/>" title="Set User" class="edit_dialog">
+                <div id="edit_dialog_<s:property value="id"/>" title="Set Properties" class="edit_dialog">
                 <p><s:property value="displayLabel"/></p>
                     <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
                         <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
+
+
+                        <tr>
+                            <td class="tdLabel">
+                                <label class="label">Host</label>
+                            </td>
+                            <td>
+                                <s:property value="host"/>
+                             </td>
+                            </tr>
+                        <s:textfield name="hostSystem.port"  value="%{port}" label="Port" size="2"/>
+
+                        <s:hidden name="hostSystem.id" value="%{id}"/>
                         <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
                         <s:hidden name="hostSystem.host" value="%{host}"/>
-                        <s:hidden name="hostSystem.port" value="%{port}"/>
-                        <s:hidden name="hostSystem.id" value="%{id}"/>
-                        <s:hidden name="hostSystem.keyNm" value="%{keyNm}"/>
+                        <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
                         <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
                         <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
                         <s:hidden name="hostSystem.state" value="%{state}"/>
@@ -223,13 +240,16 @@
                             <s:hidden name="script.id"/>
                         </s:if>
                         <tr>
-                        <td colspan="2">
+                        <td>
+                        </td><td>
                         <div class="submit_btn">Submit</div>
                         <div class="cancel_btn">Cancel</div>
                         </td>
                         </tr>
                     </s:form>
                 </div>
+
+
             </s:iterator>
             </s:if>
             <s:else>

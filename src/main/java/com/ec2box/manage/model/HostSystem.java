@@ -25,30 +25,29 @@ import java.util.List;
 public class HostSystem {
 
 
-    public static final String INITIAL_STATUS="INITIAL";
-    public static final String AUTH_FAIL_STATUS="AUTHFAIL";
-    public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
-    public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
-    public static final String SUCCESS_STATUS="SUCCESS";
+    public static final String INITIAL_STATUS = "INITIAL";
+    public static final String AUTH_FAIL_STATUS = "AUTHFAIL";
+    public static final String PUBLIC_KEY_FAIL_STATUS = "KEYAUTHFAIL";
+    public static final String GENERIC_FAIL_STATUS = "GENERICFAIL";
+    public static final String SUCCESS_STATUS = "SUCCESS";
 
 
     Long id;
-    String displayNm="";
+    String displayNm = "";
     String instanceId;
     String user = AppConfigLkup.getProperty("defaultSystemUser");
     String host;
-    Integer port = 22;
-    String keyNm;
+    Integer port = Integer.parseInt(AppConfigLkup.getProperty("defaultSystemPort"));
+    Long keyId;
     String displayLabel;
     String ec2Region;
     String state;
-    boolean checked=false;
+    boolean checked = false;
 
-    String statusCd=INITIAL_STATUS;
+    String statusCd = INITIAL_STATUS;
     String errorMsg;
 
 
-    String authorizedKeys="~/.ssh/authorized_keys";
     List<String> publicKeyList;
 
     public Long getId() {
@@ -93,21 +92,16 @@ public class HostSystem {
     }
 
 
-
     public String getDisplayLabel() {
-        return getDisplayNm() +" - ( "+ getHost() +" )";
+        if (this.displayNm != null && !this.displayNm.trim().equals(""))
+            return getDisplayNm() + " - ( " + getHost() + " )";
+        else {
+            return getHost();
+        }
     }
 
     public void setDisplayLabel(String displayLabel) {
         this.displayLabel = displayLabel;
-    }
-
-    public String getAuthorizedKeys() {
-        return authorizedKeys;
-    }
-
-    public void setAuthorizedKeys(String authorizedKeys) {
-        this.authorizedKeys = authorizedKeys;
     }
 
     public Integer getPort() {
@@ -132,14 +126,6 @@ public class HostSystem {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
-    }
-
-    public String getKeyNm() {
-        return keyNm;
-    }
-
-    public void setKeyNm(String keyNm) {
-        this.keyNm = keyNm;
     }
 
     public String getEc2Region() {
@@ -172,5 +158,13 @@ public class HostSystem {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public Long getKeyId() {
+        return keyId;
+    }
+
+    public void setKeyId(Long keyId) {
+        this.keyId = keyId;
     }
 }

@@ -65,7 +65,7 @@
             <tr>
 
                 <td>
-                    <a href="../manage/setAWSCred.action">Set AWS Credentials</a>
+                    <a href="../manage/viewAWSCred.action">Set AWS Credentials</a>
 
                 </td>
 
