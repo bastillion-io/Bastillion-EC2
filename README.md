@@ -3,10 +3,12 @@ EC2Box
 
 About
 -----
-A web-based ssh console to execute commands and manage multiple EC2 instances simultaneously running on Amazon Web
-Services (AWS). EC2Box allows you to share terminal commands and upload files to all your EC2 instances. Once the
-sessions have been opened you can select a single EC2 instance or any combination to run your commands.  Also,
-additional instance administrators can be added and their terminal sessions and history can be audited.
+A web-based ssh console to execute commands and manage multiple EC2 instances
+simultaneously running on Amazon Web Services (AWS). EC2Box allows you to share
+terminal commands and upload files to all your EC2 instances. Once the sessions
+have been opened you can select a single EC2 instance or any combination to run
+your commands.  Also, additional instance administrators can be added and their
+terminal sessions and history can be audited.  
 
 Demo
 -----

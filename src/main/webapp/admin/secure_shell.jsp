@@ -132,7 +132,7 @@ $(document).ready(function () {
     </s:elseif>
     <s:else>
     <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!='GENERICFAIL'">
-        $("#composite_terms_frm").submit();
+    $("#composite_terms_frm").submit();
     </s:if>
     </s:else>
     </s:elseif>
@@ -248,6 +248,10 @@ $(document).ready(function () {
         });
 
     };
+
+    setInterval(function () {
+        connection.send('');
+    }, 500);
     </s:if>
 
 });
