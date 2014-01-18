@@ -10,6 +10,19 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
+Screenshots
+-----------
+
+![Setting Keys](https://freecode.com/screenshots/fb/c3/fbc393368a65ec9e6b56df1ab95f2ee7_medium.png)
+
+![Select Instances](https://freecode.com/screenshots/1a/34/1a347a66e4e7bb561679ac4816ee73ae_medium.png)
+
+![Terminals](https://freecode.com/screenshots/82/d2/82d25a1c6f7e066fb6d459c779287f05_medium.png)
+
+![More Terminals](https://freecode.com/screenshots/1c/f7/1cf7dfb5eaad5662ef2952072f97465b_medium.png)
+
+![Upload Files](https://freecode.com/screenshots/96/d4/96d4f9e502e8692874b7b95c13bd6666_medium.png)
+
 Demo
 -----
 http://youtu.be/QcvMDjBb4SY
