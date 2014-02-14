@@ -64,10 +64,9 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
 
             <s:form action="viewSessions" theme="simple">
@@ -82,7 +81,7 @@
                 <p>Select a session to audit below</p>
 
 
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
                     <tr>
 
@@ -105,7 +104,7 @@
                             <td><s:property value="user.firstNm"/></td>
                             <td><s:date name="sessionTm"/></td>
                             <td>
-                            <div id="terminals_btn_<s:property value='id'/>" class="terminals_btn">Audit</div>
+                            <div id="terminals_btn_<s:property value='id'/>" class="btn btn-primary terminals_btn">Audit</div>
                             </td>
 
 
@@ -120,7 +119,6 @@
                     <p class="error">No session audits available</p>
                 </s:else>
     </div>
-</div>
 
 </body>
 </html>

@@ -1,19 +1,19 @@
 <%
-/**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+    /**
+     * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     * http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
@@ -30,7 +30,7 @@
             $("#error_dialog").dialog({
                 autoOpen: false,
                 height: 175,
-                width: 550,
+                width: 400,
                 modal: true
             });
 
@@ -56,6 +56,11 @@
 
         });
     </script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
 
 
 </head>
@@ -67,7 +72,7 @@
 
 
 <s:if test="systemStatusList!= null && !systemStatusList.isEmpty()">
-    <table class="vborder scrollableTable">
+    <table class="table-striped scrollableTable">
         <thead>
 
         <tr>
@@ -94,21 +99,21 @@
                 <td><s:property value="host"/></td>
 
                 <td>
-                   <s:if test="statusCd=='INITIAL'">
-                    <div class="warning">Not Started</div>
-                   </s:if>
-                   <s:elseif test="statusCd=='AUTHFAIL'">
-                    <div class="warning">Authentication Failed</div>
-                   </s:elseif>
-                   <s:elseif test="statusCd=='KEYAUTHFAIL'">
-                    <div class="warning">Passphrase Authentication Failed</div>
-                   </s:elseif>
-                   <s:elseif test="statusCd=='GENERICFAIL'">
-                    <div class="error">Failed</div>
-                   </s:elseif>
-                   <s:elseif test="statusCd=='SUCCESS'">
-                    <div class="success">Success</div>
-                   </s:elseif>
+                    <s:if test="statusCd=='INITIAL'">
+                        <div class="warning">Not Started</div>
+                    </s:if>
+                    <s:elseif test="statusCd=='AUTHFAIL'">
+                        <div class="warning">Authentication Failed</div>
+                    </s:elseif>
+                    <s:elseif test="statusCd=='KEYAUTHFAIL'">
+                        <div class="warning">Passphrase Authentication Failed</div>
+                    </s:elseif>
+                    <s:elseif test="statusCd=='GENERICFAIL'">
+                        <div class="error">Failed</div>
+                    </s:elseif>
+                    <s:elseif test="statusCd=='SUCCESS'">
+                        <div class="success">Success</div>
+                    </s:elseif>
                 </td>
 
             </tr>
@@ -134,7 +139,7 @@
     </p>
 
 
-    <div class="submit_btn">OK</div>
+    <div class="btn btn-default submit_btn">OK</div>
 </div>
 
 </body>

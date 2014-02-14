@@ -49,24 +49,14 @@
 
             $.ajaxSetup({ cache: false });
 
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 200,
-                width: 400,
-                modal: true
-            });
 
             $("#import_dialog").dialog({
                 autoOpen: false,
-                height: 425,
+                height: 500,
                 width: 600,
                 modal: true
             });
 
-            //open add dialog
-            $("#add_btn").button().click(function() {
-                $("#add_dialog").dialog("open");
-            });
             //open import dialog
            $("#import_btn").button().click(function() {
                 $("#import_dialog").dialog("open");
@@ -82,7 +72,6 @@
             });
             //close all forms
             $(".cancel_btn").button().click(function() {
-                $("#add_dialog").dialog("close");
                 $("#import_dialog").dialog("close");
             });
 
@@ -120,9 +109,6 @@
                     <s:if test="ec2Key.privateKey!=null">
                     $("#import_dialog").dialog("open");
                     </s:if>
-                    <s:else>
-                    $("#add_dialog").dialog("open");
-                    </s:else>
 
 
                 });
@@ -136,16 +122,17 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
             <h3>Manage EC2 Keys</h3>
 
      <s:if test="awsCredList.isEmpty()">
         <div class="actionMessage">
+            <p class="error">
          EC2 Keys not available. Set AWS credentials <a href="viewAWSCred.action">here</a>
+            </p>
         </div>
     </s:if>
     <s:else>
@@ -159,7 +146,7 @@
             </p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
                     <tr>
 
@@ -185,7 +172,7 @@
                         <td><s:property value="accessKey"/></td>
                         </s:if>
                             <td>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
                                     Delete
                                 </div>
                                 <div style="clear:both"></div>
@@ -198,7 +185,7 @@
 
 
 
-             <div id="import_btn">Import Private Key</div>
+             <div id="import_btn"  class="btn btn-primary">Import Private Key</div>
                         <div id="import_dialog" title="Import Existing EC2 Key">
                          <s:actionerror/>
                             <s:form action="importEC2Key" class="save_ec2Key_form_import">
@@ -217,8 +204,8 @@
                                 <tr>
                                 <td>&nbsp;</td>
                                 <td>
-                                <div class="submit_btn">Submit</div>
-                                <div class="cancel_btn">Cancel</div>
+                                <div class="btn btn-primary submit_btn">Submit</div>
+                                <div class="btn btn-primary cancel_btn">Cancel</div>
                                 </td>
                                 </tr>
                             </s:form>
@@ -227,6 +214,5 @@
     </s:else>
 
     </div>
-</div>
 </body>
 </html>

@@ -109,10 +109,9 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
@@ -148,7 +147,7 @@
   	        <s:if test="script!=null && script.id!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable" style="width:100%">
                     <thead>
                     <tr>
                             <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
@@ -200,10 +199,10 @@
                 </table>
 	    </s:form>
             <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <div class="select_frm_btn">Execute Script</div>
+                <div class="btn btn-primary select_frm_btn">Execute Script</div>
             </s:if>
             <s:else>
-                <div class="select_frm_btn">Create SSH Terminals</div>
+                <div class="btn btn-primary select_frm_btn">Create SSH Terminals</div>
             </s:else>
 
             <s:iterator var="system" value="sortedSet.itemList" status="stat">
@@ -242,8 +241,8 @@
                         <tr>
                         <td>
                         </td><td>
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-primary submit_btn">Submit</div>
+                        <div class="btn btn-primary cancel_btn">Cancel</div>
                         </td>
                         </tr>
                     </s:form>
@@ -254,17 +253,16 @@
             </s:if>
             <s:else>
             <div class="actionMessage">
-                <div>Instances not available.
+                <p class="error">Instances not available.
                 <s:if test="%{#session.userType==\"M\"}">
+
                  Import EC2 Keys <a href="../manage/viewEC2Keys.action">here</a>
                 </s:if>
-
-                </div>
+                </p>
             </div>
             </s:else>
 
     </div>
-</div>
 
 </body>
 </html>

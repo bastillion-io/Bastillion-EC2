@@ -92,10 +92,9 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewAWSCred">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
@@ -105,7 +104,7 @@
         <p>Add / Delete your AWS credentials below</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <table class="vborder scrollableTable">
+            <table class="table-striped scrollableTable">
                 <thead>
 
                 <tr>
@@ -121,7 +120,7 @@
                     <tr>
                         <td><s:property value="accessKey"/></td>
                         <td>
-                            <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                            <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
                                 Delete
                             </div>
                             <div style="clear:both"></div>
@@ -136,7 +135,7 @@
 
 
 
-        <div id="add_btn">Add AWS Credentials</div>
+        <div id="add_btn" class="btn btn-primary">Add AWS Credentials</div>
         <div id="add_dialog" title="Add AWS Credentials">
             <s:actionerror/>
             <s:form action="saveAWSCred" class="save_aws_form_add" autocomplete="off">
@@ -147,8 +146,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td>
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-primary submit_btn">Submit</div>
+                        <div class="btn btn-primary cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -159,6 +158,5 @@
 
 
     </div>
-</div>
 </body>
 </html>

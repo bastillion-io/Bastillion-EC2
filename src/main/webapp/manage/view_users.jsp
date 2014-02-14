@@ -109,10 +109,9 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewUsers">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
@@ -123,7 +122,7 @@
         <p>Add / Delete Instance Administrators below</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable" style="min-width: 80%">
                     <thead>
 
                     <tr>
@@ -150,10 +149,10 @@
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
                             <td>
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-primary edit_btn" style="float:left">
                                     Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
                                     Delete
                                 </div>
                                 <div style="clear:both"></div>
@@ -168,7 +167,7 @@
 
 
 
-            <div id="add_btn">Add Administrator</div>
+            <div id="add_btn" class="btn btn-primary">Add Administrator</div>
             <div id="add_dialog" title="Add User">
                 <s:actionerror/>
                 <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
@@ -183,8 +182,8 @@
                     <tr>
                     <td>&nbsp;</td>
                     <td>
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
+                    <div class="btn btn-primary submit_btn">Submit</div>
+                    <div class="btn btn-primary cancel_btn">Cancel</div>
                     </td>
                     </tr>
                 </s:form>
@@ -208,8 +207,8 @@
                         <tr>
                         <td>&nbsp;</td>
                         <td>
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-primary submit_btn">Submit</div>
+                        <div class="btn btn-primary cancel_btn">Cancel</div>
                         </td>
                         </tr>
                     </s:form>
@@ -218,6 +217,5 @@
 
 
     </div>
-</div>
 </body>
 </html>

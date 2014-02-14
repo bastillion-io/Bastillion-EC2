@@ -26,18 +26,18 @@
         $(document).ready(function() {
 
             $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 425,
-                width: 600,
-                modal: true
-            });
+                          autoOpen: false,
+                          height: 500,
+                          width: 500,
+                          modal: true
+                      });
 
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 425,
-                width: 600,
-                modal: true
-            });
+                      $(".edit_dialog").dialog({
+                          autoOpen: false,
+                          height: 500,
+                          width: 500,
+                          modal: true
+                      });
 
             //open add dialog
             $("#add_btn").button().click(function() {
@@ -63,18 +63,6 @@
             $(".cancel_btn").button().click(function() {
                 $("#add_dialog").dialog("close");
                 $(".edit_dialog").dialog("close");
-            });  //regenerate auth keys btn
-            $(".gen_auth_keys_btn").button().click(function() {
-                $("#gen_auth_keys").submit();
-            });
-            //select all check boxs
-            $("#gen_auth_keys_scriptSelectAll").click(function() {
-
-                if ($(this).is(':checked')) {
-                    $(".scriptSelect").attr('checked', true);
-                } else {
-                    $(".scriptSelect").attr('checked', false);
-                }
             });
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
@@ -120,10 +108,9 @@
 </head>
 <body>
 
-<div class="page">
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewScripts">
             <s:hidden name="sortedSet.orderByDirection" />
@@ -134,7 +121,7 @@
             <p>Add / Delete scripts or select a script below to execute</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
                     <tr>
 
@@ -149,10 +136,10 @@
                                 <a title="Execute Script" href="viewSystems.action?selectForm=true&script.id=<s:property value="id"/>""><s:property value="displayNm"/></a>
                         </td>
                             <td>
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-primary edit_btn" style="float:left">
                                     Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
                                     Delete
                                 </div>
                                 <div style="clear:both"></div>
@@ -165,7 +152,7 @@
 
 
 
-            <div id="add_btn">Add Script</div>
+            <div id="add_btn" class="btn btn-primary">Add Script</div>
             <div id="add_dialog" title="Add Script">
                 <s:form action="saveScript" class="save_script_form_add">
                     <s:textfield name="script.displayNm" label="Script Name" size="15"/>
@@ -175,8 +162,8 @@
                     <tr>
                     <td>&nbsp;</td>
                     <td>
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
+                    <div class="btn btn-primary submit_btn">Submit</div>
+                    <div class="btn btn-primary cancel_btn">Cancel</div>
                     </td>
                     </tr>
                 </s:form>
@@ -195,8 +182,8 @@
                        <tr>
                        <td>&nbsp;</td>
                        <td>
-                       <div class="submit_btn">Submit</div>
-                       <div class="cancel_btn">Cancel</div>
+                       <div class="btn btn-primary submit_btn">Submit</div>
+                       <div class="btn btn-primary cancel_btn">Cancel</div>
                        </td>
                        </tr>
                     </s:form>
@@ -205,6 +192,5 @@
 
 
     </div>
-</div>
 </body>
 </html>

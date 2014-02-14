@@ -16,43 +16,89 @@
      */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<div class="nav">
 
-    <div style="float: left;margin-top: 5px;margin-left: -10px"><img
-            src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
 
-    <h3>
-        <a href="../admin/menu.action">EC2Box</a>
-    </h3>
-    <s:if test="%{#session.userType==\"M\"}">
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
 
-     <div class="nav_item">
-            <a href="../manage/viewAWSCred.action">Set AWS Credentials</a>
-     </div>
+        <div class="navbar-header">
+            <div class="navbar-brand">
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                EC2Box
+            </div>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="../admin/menu.action">Home</a></li>
 
-     <div class="nav_item">
-        <a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>
-    </div>
-    </s:if>
-    <div class="nav_item">
-        <a href="../admin/viewSystems.action">Composite SSH Terms</a>
-    </div>
-    <div class="nav_item">
-        <a href="../admin/viewScripts.action">Composite Scripts</a>
-    </div>
-    <s:if test="%{#session.userType==\"M\"}">
-    <div class="nav_item">
-        <a href="../manage/viewUsers.action">Instance Administrators</a>
-    </div>
-    <div class="nav_item">
-        <a href="../manage/viewSessions.action">Audit Sessions</a>
-    </div>
-    </s:if>
-    <div class="nav_item">
-        <a href="../admin/setPassword.action">Change Password</a>
-    </div>
-    <div class="nav_item">
-        <a href="../logout.action">Logout</a>
-    </div>
 
+                <s:if test="%{#session.userType==\"M\"}">
+
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account Settings <b
+                            class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="../manage/viewAWSCred.action">Set AWS Credentials</a>
+                        </li>
+                        <li>
+                            <a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>
+                        </li>
+                    </ul>
+                    </li>
+
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../manage/viewUsers.action">Instance Administrators</a></li>
+                        </ul>
+                    </li>
+
+
+                </s:if>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../admin/viewSystems.action">Composite SSH Terms</a></li>
+                        <li><a href="../admin/viewScripts.action">Composite Scripts</a></li>
+                    </ul>
+                </li>
+                <s:if test="%{#session.userType==\"M\"}">
+                    <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
+                </s:if>
+                <li><a href="../admin/setPassword.action">Change Password</a></li>
+                <li><a href="../logout.action">Logout</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
