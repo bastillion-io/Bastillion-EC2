@@ -251,7 +251,9 @@ $(document).ready(function () {
     };
 
     setInterval(function () {
-        connection.send('');
+        try {
+            connection.send('');
+        }catch(ex){}
     }, 500);
 
     </s:if>
