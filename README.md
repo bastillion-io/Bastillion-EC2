@@ -13,15 +13,15 @@ terminal sessions and history can be audited.
 Screenshots
 -----------
 
-![Setting Keys](https://freecode.com/screenshots/fb/c3/fbc393368a65ec9e6b56df1ab95f2ee7_medium.png)
+![Importing Keys](https://freecode.com/screenshots/94/c9/94c93beb0a5c47954514c55b7a0f90ea_medium.png)
 
-![Select Instances](https://freecode.com/screenshots/1a/34/1a347a66e4e7bb561679ac4816ee73ae_medium.png)
+![Select Instances](https://freecode.com/screenshots/87/0c/870c38a0716fda82c1297a882b55b55f_medium.png)
 
-![Terminals](https://freecode.com/screenshots/82/d2/82d25a1c6f7e066fb6d459c779287f05_medium.png)
+![Terminals](https://freecode.com/screenshots/12/49/1249f116f0e6d4b4b97487e7c13289dd_medium.png)
 
-![More Terminals](https://freecode.com/screenshots/1c/f7/1cf7dfb5eaad5662ef2952072f97465b_medium.png)
+![More Terminals](https://freecode.com/screenshots/7d/ad/7dad2b4771a9c2332746b4bfeeedd919_medium.png)
 
-![Upload Files](https://freecode.com/screenshots/96/d4/96d4f9e502e8692874b7b95c13bd6666_medium.png)
+![Upload Files](https://freecode.com/screenshots/5c/10/5c10df47dad8d43eb6ffeba0009d00db_medium.png)
 
 Demo
 -----
