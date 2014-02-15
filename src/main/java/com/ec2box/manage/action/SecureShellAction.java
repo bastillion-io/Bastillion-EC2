@@ -17,15 +17,11 @@ package com.ec2box.manage.action;
 
 import com.ec2box.common.util.AppConfigLkup;
 import com.ec2box.common.util.AuthUtil;
-import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.db.ScriptDB;
 import com.ec2box.manage.db.SessionAuditDB;
-import com.ec2box.manage.util.DBUtils;
-import com.ec2box.manage.util.SessionOutputUtil;
 import com.ec2box.manage.db.SystemStatusDB;
 import com.ec2box.manage.model.*;
 import com.ec2box.manage.util.SSHUtil;
-import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -36,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,6 +51,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     Script script = new Script();
+    String terminalRefreshRate = AppConfigLkup.getProperty("terminalRefreshRate");
 
 
 
@@ -244,7 +240,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.passphrase = passphrase;
     }
 
-
     public String getPassword() {
         return password;
     }
@@ -281,9 +276,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return servletResponse;
     }
 
-    public void setServletResponse(HttpServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
-    }
+    public void setServletResponse(HttpServletResponse servletResponse) { this.servletResponse = servletResponse; }
+
+    public String getTerminalRefreshRate() { return terminalRefreshRate; }
+
+    public void setTerminalRefreshRate(String terminalRefreshRate) { this.terminalRefreshRate = terminalRefreshRate; }
+
 }
 
 
