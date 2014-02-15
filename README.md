@@ -17,9 +17,9 @@ Screenshots
 
 ![Select Instances](https://freecode.com/screenshots/87/0c/870c38a0716fda82c1297a882b55b55f_medium.png)
 
-![Terminals](https://freecode.com/screenshots/12/49/1249f116f0e6d4b4b97487e7c13289dd_medium.png)
+![Terminals](https://freecode.com/screenshots/7d/ad/7dad2b4771a9c2332746b4bfeeedd919_medium.png)
 
-![More Terminals](https://freecode.com/screenshots/7d/ad/7dad2b4771a9c2332746b4bfeeedd919_medium.png)
+![More Terminals](https://freecode.com/screenshots/12/49/1249f116f0e6d4b4b97487e7c13289dd_medium.png)
 
 ![Upload Files](https://freecode.com/screenshots/5c/10/5c10df47dad8d43eb6ffeba0009d00db_medium.png)
 
