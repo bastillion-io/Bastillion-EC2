@@ -32,7 +32,7 @@ Prerequisites
 Java JDK 1.7 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Browser with Web Sockets support
+Browser with Web Socket support
 http://caniuse.com/websockets
 
 **Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
