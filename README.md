@@ -102,4 +102,4 @@ Author
 + https://twitter.com/spkavanagh6
 
 
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/0566eda40886c71548228fe00a8feed9 "githalytics.com")](http://githalytics.com/skavanagh/EC2Box)
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/4a68d2b07e24fb7743b11025e1fedd4e "githalytics.com")](http://githalytics.com/skavanagh/EC2Box)
