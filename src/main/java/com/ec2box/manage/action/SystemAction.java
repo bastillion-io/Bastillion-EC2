@@ -72,7 +72,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         AmazonEC2 service = new AmazonEC2Client(awsCredentials);
                         service.setEndpoint(ec2Region);
 
-                        DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
 
                         List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
                         //only return systems that have keys set
@@ -80,6 +79,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                             List<String> valueList= new ArrayList<String>();
                             valueList.add(ec2Key.getKeyNm());
+
+                            DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
 
                             Filter filter = new Filter("key-name", valueList);
 

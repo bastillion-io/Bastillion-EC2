@@ -42,12 +42,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     HttpServletRequest servletRequest;
     HttpServletResponse servletResponse;
-    List<Long> idList = new ArrayList<Long>();
     List<Long> systemSelectId;
     HostSystem currentSystemStatus;
     HostSystem pendingSystemStatus;
     String passphrase;
     String password;
+    Long id;
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     Script script = new Script();
@@ -191,14 +191,33 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return SUCCESS;
     }
 
+    @Action(value = "/admin/disconnectTerm")
+    public String disconnectTerm() {
+        Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
+        if (SecureShellAction.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+            if (userSchSessions != null) {
+                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
-    public List<Long> getIdList() {
-        return idList;
+                //disconnect ssh session
+                schSession.getChannel().disconnect();
+                schSession.getSession().disconnect();
+                schSession.setChannel(null);
+                schSession.setSession(null);
+                schSession.setInputToChannel(null);
+                schSession.setCommander(null);
+                schSession.setOutFromChannel(null);
+                schSession = null;
+                //remove from map
+                userSchSessions.getSchSessionMap().remove(id);
+            }
+
+        }
+
+        return null;
     }
 
-    public void setIdList(List<Long> idList) {
-        this.idList = idList;
-    }
+
 
     public List<Long> getSystemSelectId() {
         return systemSelectId;
@@ -282,6 +301,13 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     public void setTerminalRefreshRate(String terminalRefreshRate) { this.terminalRefreshRate = terminalRefreshRate; }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
 
 
