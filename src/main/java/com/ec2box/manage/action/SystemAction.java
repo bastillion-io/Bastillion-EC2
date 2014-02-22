@@ -24,6 +24,7 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -89,14 +90,25 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
 
 
-                        List<String> instanceIdList=new ArrayList<String>();
+                        List<String> instanceIdList = new ArrayList<String>();
                         for (Reservation res : describeInstancesResult.getReservations()) {
                             for (Instance instance : res.getInstances()) {
 
 
                                 HostSystem hostSystem = new HostSystem();
                                 hostSystem.setInstanceId(instance.getInstanceId());
-                                hostSystem.setHost(instance.getPublicDnsName());
+
+                                //check for public dns if doesn't exist set to ip or pvt dns
+                                if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                    hostSystem.setHost(instance.getPublicDnsName());
+                                } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
+                                    hostSystem.setHost(instance.getPublicIpAddress());
+                                } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
+                                    hostSystem.setHost(instance.getPrivateDnsName());
+                                } else {
+                                    hostSystem.setHost(instance.getPrivateIpAddress());
+                                }
+
                                 hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
                                 hostSystem.setEc2Region(ec2Region);
                                 hostSystem.setState(instance.getState().getName());
