@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -38,6 +39,8 @@ public class SystemDB {
     public static final String SORT_BY_INSTANCE_ID = "instance_id";
     public static final String SORT_BY_REGION = "region";
     public static final String SORT_BY_STATE = "state";
+    public static final String SORT_BY_INSTANCE_STATUS= "instance_status";
+    public static final String SORT_BY_SYSTEM_STATUS= "system_status";
 
 
     /**
@@ -82,6 +85,8 @@ public class SystemDB {
                     hostSystem.setKeyId(rs.getLong("key_id"));
                     hostSystem.setEc2Region(rs.getString("region"));
                     hostSystem.setState(rs.getString("state"));
+                    hostSystem.setInstanceStatus(rs.getString("instance_status"));
+                    hostSystem.setSystemStatus(rs.getString("system_status"));
                     hostSystemList.add(hostSystem);
                 }
                 DBUtils.closeRs(rs);
@@ -248,7 +253,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state) values (?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state, instance_status, system_status) values (?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -257,6 +262,8 @@ public class SystemDB {
             stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
+            stmt.setString(9, hostSystem.getInstanceStatus());
+            stmt.setString(10, hostSystem.getSystemStatus());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -301,7 +308,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?, instance_status=?, system_status=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -310,7 +317,9 @@ public class SystemDB {
             stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
-            stmt.setLong(9, hostSystem.getId());
+            stmt.setString(9, hostSystem.getInstanceStatus());
+            stmt.setString(10, hostSystem.getSystemStatus());
+            stmt.setLong(11, hostSystem.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -326,7 +335,7 @@ public class SystemDB {
      *
      * @param hostSystemList list of host system object
      */
-    public static void setSystems(List<HostSystem> hostSystemList) {
+    public static void setSystems(Collection<HostSystem> hostSystemList) {
         Connection con = null;
         try {
             con = DBUtils.getConn();

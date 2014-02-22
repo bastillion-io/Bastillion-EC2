@@ -46,6 +46,8 @@ public class HostSystem {
 
     String statusCd = INITIAL_STATUS;
     String errorMsg;
+    String systemStatus;
+    String instanceStatus;
 
 
     List<String> publicKeyList;
@@ -166,5 +168,21 @@ public class HostSystem {
 
     public void setKeyId(Long keyId) {
         this.keyId = keyId;
+    }
+
+    public String getSystemStatus() {
+        return systemStatus;
+    }
+
+    public void setSystemStatus(String systemStatus) {
+        this.systemStatus = systemStatus;
+    }
+
+    public String getInstanceStatus() {
+        return instanceStatus;
+    }
+
+    public void setInstanceStatus(String instanceStatus) {
+        this.instanceStatus = instanceStatus;
     }
 }

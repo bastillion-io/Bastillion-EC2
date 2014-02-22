@@ -31,7 +31,9 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Action to manage systems
@@ -42,7 +44,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HostSystem hostSystem = new HostSystem();
     Script script = null;
     HttpServletRequest servletRequest;
-    List<String> instanceIdList = new ArrayList<String>();
 
     @Action(value = "/admin/viewSystems",
             results = {
@@ -58,13 +59,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
 
         try {
+            Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
+
             //get AWS credentials from DB
             for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
 
                 if (awsCred != null) {
                     //set  AWS credentials for service
                     BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-
 
                     for (String ec2Region : ec2RegionList) {
                         //create service
@@ -73,55 +75,65 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         service.setEndpoint(ec2Region);
 
 
-                        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
                         //only return systems that have keys set
+                        List<String> valueList = new ArrayList<String>();
                         for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-
-                            List<String> valueList= new ArrayList<String>();
                             valueList.add(ec2Key.getKeyNm());
+                        }
 
-                            DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
+                        DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
 
-                            Filter filter = new Filter("key-name", valueList);
+                        Filter filter = new Filter("key-name", valueList);
 
-                            describeInstancesRequest.withFilters(filter);
-                            DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
+                        describeInstancesRequest.withFilters(filter);
+                        DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
 
 
-                            for (Reservation res : describeInstancesResult.getReservations()) {
-                                for (Instance instance : res.getInstances()) {
+                        List<String> instanceIdList=new ArrayList<String>();
+                        for (Reservation res : describeInstancesResult.getReservations()) {
+                            for (Instance instance : res.getInstances()) {
 
-                                    HostSystem hostSystem = new HostSystem();
-                                    hostSystem.setInstanceId(instance.getInstanceId());
-                                    hostSystem.setHost(instance.getPublicDnsName());
-                                    hostSystem.setKeyId(ec2Key.getId());
-                                    hostSystem.setEc2Region(ec2Region);
-                                    hostSystem.setState(instance.getState().getName());
-                                    for (Tag tag : instance.getTags()) {
-                                        if ("Name".equals(tag.getKey())) {
-                                            hostSystem.setDisplayNm(tag.getValue());
-                                        }
+
+                                HostSystem hostSystem = new HostSystem();
+                                hostSystem.setInstanceId(instance.getInstanceId());
+                                hostSystem.setHost(instance.getPublicDnsName());
+                                hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
+                                hostSystem.setEc2Region(ec2Region);
+                                hostSystem.setState(instance.getState().getName());
+                                for (Tag tag : instance.getTags()) {
+                                    if ("Name".equals(tag.getKey())) {
+                                        hostSystem.setDisplayNm(tag.getValue());
                                     }
-
-                                    instanceIdList.add(hostSystem.getInstanceId());
-                                    hostSystemList.add(hostSystem);
                                 }
+                                instanceIdList.add(hostSystem.getInstanceId());
+                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
                             }
                         }
 
-                        //set ec2 systems
-                        SystemDB.setSystems(hostSystemList);
+                        //get status for host systems
+                        DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                        describeInstanceStatusRequest.withInstanceIds(instanceIdList);
+                        DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
 
-                        sortedSet = SystemDB.getSystemSet(sortedSet, instanceIdList);
+                        for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+                            HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                            hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                            hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+                            hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                        }
 
 
                     }
+
                 }
             }
 
-        } catch (AmazonServiceException ex) {
-            addActionError(ex.getMessage());
+            //set ec2 systems
+            SystemDB.setSystems(hostSystemList.values());
+            sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<String>(hostSystemList.keySet()));
 
+        } catch (AmazonServiceException ex) {
+            ex.printStackTrace();
         }
 
 
@@ -141,14 +153,12 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     )
     public String saveSystem() {
 
-        if (hostSystem.getId() != null && hostSystem.getPort()!=null
-           && hostSystem.getUser()!=null && !hostSystem.getUser().trim().equals("")) {
+        if (hostSystem.getId() != null && hostSystem.getPort() != null
+                && hostSystem.getUser() != null && !hostSystem.getUser().trim().equals("")) {
             SystemDB.updateSystem(hostSystem);
         }
         return SUCCESS;
     }
-
-
 
 
     public HostSystem getHostSystem() {
@@ -183,11 +193,5 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         this.servletRequest = servletRequest;
     }
 
-    public List<String> getInstanceIdList() {
-        return instanceIdList;
-    }
 
-    public void setInstanceIdList(List<String> instanceIdList) {
-        this.instanceIdList = instanceIdList;
-    }
 }

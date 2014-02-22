@@ -160,6 +160,8 @@
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_PORT"/>" class="sort">Port</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_STATE"/>" class="sort">State</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS"/>" class="sort">I-Status</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS"/>" class="sort">S-Status</th>
                         <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_REGION"/>" class="sort">Region</th>
                     </tr>
                     </thead>
@@ -190,10 +192,10 @@
                                 </a>
                             </td>
                             <td><s:property value="state"/></td>
+                            <td><s:property value="instanceStatus"/></td>
+                            <td><s:property value="systemStatus"/></td>
                             <td><s:property value="ec2Region"/></td>
-
                         </tr>
-
                     </s:iterator>
                     </tbody>
                 </table>
@@ -220,7 +222,7 @@
                             <td>
                                 <s:property value="host"/>
                              </td>
-                            </tr>
+                        </tr>
                         <s:textfield name="hostSystem.port"  value="%{port}" label="Port" size="2"/>
 
                         <s:hidden name="hostSystem.id" value="%{id}"/>
@@ -231,9 +233,10 @@
                         <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
                         <s:hidden name="hostSystem.state" value="%{state}"/>
                         <s:hidden name="hostSystem.instanceId" value="%{instanceId}"/>
+                        <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
+                        <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
-                        <s:hidden name="instanceIdList"/>
                         <s:hidden name="selectForm"/>
                         <s:if test="script!=null && script.id!=null">
                             <s:hidden name="script.id"/>
