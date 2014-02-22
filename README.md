@@ -25,7 +25,7 @@ Screenshots
 
 Demo
 -----
-http://youtu.be/QcvMDjBb4SY
+http://youtu.be/e00UD9dZ-wk
 
 Prerequisites
 -------------
