@@ -15,6 +15,7 @@
  */
 package com.ec2box.manage.action;
 
+import com.ec2box.common.util.AppConfigLkup;
 import com.ec2box.manage.db.SessionAuditDB;
 import com.ec2box.manage.model.SessionAudit;
 import com.ec2box.manage.model.SortedSet;
@@ -36,6 +37,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     Long hostSystemId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
+    String enableAudit = AppConfigLkup.getProperty("enableAudit");
 
     @Action(value = "/manage/viewSessions",
             results = {
@@ -124,5 +126,13 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
     public void setHostSystemId(Long hostSystemId) {
         this.hostSystemId = hostSystemId;
+    }
+
+    public String getEnableAudit() {
+        return enableAudit;
+    }
+
+    public void setEnableAudit(String enableAudit) {
+        this.enableAudit = enableAudit;
     }
 }

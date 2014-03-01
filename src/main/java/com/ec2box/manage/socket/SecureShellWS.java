@@ -15,6 +15,7 @@
  */
 package com.ec2box.manage.socket;
 
+import com.ec2box.manage.task.SentOutputTask;
 import com.google.gson.Gson;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.action.SecureShellAction;
@@ -45,23 +46,6 @@ public class SecureShellWS {
     private Session session;
     private Long sessionId = null;
 
-    /**
-     * sends output to socket
-     */
-    private void sendOutput() {
-        Connection con = DBUtils.getConn();
-        try {
-            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
-            if (outputList != null && !outputList.isEmpty()) {
-                String json = new Gson().toJson(outputList);
-                //send json to session
-                this.session.getBasicRemote().sendText(json);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-    }
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
@@ -70,6 +54,10 @@ public class SecureShellWS {
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
+
+        Runnable run = new SentOutputTask(sessionId, session);
+        Thread thread = new Thread(run);
+        thread.start();
 
     }
 
@@ -117,8 +105,6 @@ public class SecureShellWS {
                 AuthUtil.setTimeout(httpSession);
 
 
-            } else {
-                this.sendOutput();
             }
         }
 

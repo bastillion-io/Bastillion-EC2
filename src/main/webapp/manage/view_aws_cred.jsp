@@ -28,7 +28,7 @@
             $("#add_dialog").dialog({
                 autoOpen: false,
                 height: 200,
-                width: 400,
+                width: 435,
                 modal: true
             });
 

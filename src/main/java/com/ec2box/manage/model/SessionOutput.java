@@ -23,7 +23,7 @@ public class SessionOutput {
     Long sessionId;
     Long userId;
     Long hostSystemId;
-    String output="";
+    String output;
 
 
 

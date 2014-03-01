@@ -23,6 +23,7 @@ import com.amazonaws.services.ec2.model.*;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
+import com.ec2box.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -30,10 +31,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Action to manage systems
@@ -44,6 +42,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HostSystem hostSystem = new HostSystem();
     Script script = null;
     HttpServletRequest servletRequest;
+    String tag = null;
+    String securityGroup = null;
 
     @Action(value = "/admin/viewSystems",
             results = {
@@ -61,6 +61,33 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         try {
             Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
 
+
+            Map<String, String> tagMap = new HashMap<>();
+            List<String> tagList = new ArrayList<>();
+
+            //parse out tags in format tag-name[=value[,tag-name[=value]]
+            if (StringUtils.isNotEmpty(tag)) {
+                String[] tagArr1 = tag.split(",");
+                if (tagArr1.length > 0) {
+                    for (String tag1 : tagArr1) {
+                        String[] tagArr2 = tag1.split("=");
+                        if (tagArr2.length > 1) {
+                            tagMap.put(tag1.split("=")[0], tag1.split("=")[1]);
+                        } else {
+                            tagList.add(tag1);
+                        }
+                    }
+                }
+
+            }
+
+            //parse out security group list in format group[,group]
+            List<String> securityGroupList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(securityGroup)) {
+                securityGroupList = Arrays.asList(securityGroup.split(","));
+            }
+
+
             //get AWS credentials from DB
             for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
 
@@ -76,16 +103,32 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
 
                         //only return systems that have keys set
-                        List<String> valueList = new ArrayList<String>();
+                        List<String> keyValueList = new ArrayList<String>();
                         for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-                            valueList.add(ec2Key.getKeyNm());
+                            keyValueList.add(ec2Key.getKeyNm());
                         }
 
                         DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
 
-                        Filter filter = new Filter("key-name", valueList);
+                        Filter keyNmFilter = new Filter("key-name", keyValueList);
+                        describeInstancesRequest.withFilters(keyNmFilter);
 
-                        describeInstancesRequest.withFilters(filter);
+                        if (tagList.size() > 0) {
+                            Filter tagFilter = new Filter("tag-key", tagList);
+                            describeInstancesRequest.withFilters(tagFilter);
+                        }
+
+                        if (securityGroupList.size() > 0) {
+                            Filter groupFilter = new Filter("group-name", securityGroupList);
+                            describeInstancesRequest.withFilters(groupFilter);
+                        }
+                        //set name value pair for tag filter
+                        for (String tag : tagMap.keySet()) {
+                            Filter tagValueFilter = new Filter("tag:" + tag, Arrays.asList(tagMap.get(tag)));
+                            describeInstancesRequest.withFilters(tagValueFilter);
+                        }
+
+
                         DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
 
 
@@ -121,19 +164,21 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             }
                         }
 
-                        //get status for host systems
-                        DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-                        describeInstanceStatusRequest.withInstanceIds(instanceIdList);
-                        DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
+                        if (instanceIdList.size() > 0) {
+                            //get status for host systems
+                            DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                            describeInstanceStatusRequest.withInstanceIds(instanceIdList);
+                            DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
 
-                        for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
-                            HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
-                            hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
-                            hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
-                            hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                            for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+
+                                HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                                hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                                hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                            }
+
                         }
-
-
                     }
 
                 }
@@ -204,5 +249,19 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         this.servletRequest = servletRequest;
     }
 
+    public String getTag() {
+        return tag;
+    }
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getSecurityGroup() {
+        return securityGroup;
+    }
+
+    public void setSecurityGroup(String securityGroup) {
+        this.securityGroup = securityGroup;
+    }
 }

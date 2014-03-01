@@ -29,34 +29,37 @@ import java.io.InputStreamReader;
 public class SecureShellTask implements Runnable {
 
     InputStream outFromChannel;
-    SessionOutput sessionOutput;
+       SessionOutput sessionOutput;
 
-    public SecureShellTask(SessionOutput sessionOutput, InputStream outFromChannel) {
+       public SecureShellTask(SessionOutput sessionOutput, InputStream outFromChannel) {
 
-        this.sessionOutput = sessionOutput;
-        this.outFromChannel = outFromChannel;
-    }
+           this.sessionOutput = sessionOutput;
+           this.outFromChannel = outFromChannel;
+       }
 
-    public void run() {
-        BufferedReader br = new BufferedReader(new InputStreamReader(outFromChannel));
-        try {
-            int value = 0;
+       public void run() {
+           InputStreamReader isr = new InputStreamReader(outFromChannel);
+           BufferedReader br = new BufferedReader(isr);
+           try {
+
+               SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
+
+               char[] buff = new char[1024];
+               int read;
+               while((read = br.read(buff)) != -1) {
+
+                   SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), buff,0,read);
+                   Thread.sleep(50);
+               }
 
 
-            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
 
-            while ((value = br.read()) != -1) {
-                // converts int to character
-                char c = (char) value;
-                SessionOutputUtil.addCharToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), c);
+               SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId());
 
-            }
-            SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId());
+           } catch (Exception ex) {
 
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
-        }
-    }
+               ex.printStackTrace();
+           }
+       }
 
 }
