@@ -148,9 +148,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                     hostSystem.setHost(instance.getPublicIpAddress());
                                 } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
                                     hostSystem.setHost(instance.getPrivateDnsName());
-                                } else {
+                                } else if (StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
                                     hostSystem.setHost(instance.getPrivateIpAddress());
+                                } else {
+                                    for (InstanceNetworkInterface networkInterface : instance.getNetworkInterfaces()) {
+                                        hostSystem.setHost(networkInterface.getPrivateDnsName());
+                                    }
                                 }
+
 
                                 hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
                                 hostSystem.setEc2Region(ec2Region);
