@@ -47,7 +47,7 @@ public class AWSClientConfig {
             config.setProxyHost(awsProxyHost);
         }
         if (StringUtils.isNotEmpty(awsProxyPort)) {
-            config.setProxyHost(awsProxyPort);
+            config.setProxyPort(Integer.parseInt(awsProxyPort));
         }
         if (StringUtils.isNotEmpty(awsProxyUser)) {
             config.setProxyUsername(awsProxyUser);
