@@ -21,6 +21,7 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.SortedSet;
+import com.ec2box.manage.util.AWSClientConfig;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -90,7 +91,7 @@ public class AWSCredAction extends ActionSupport {
             try {
                 //check if credential are valid
                 BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-                AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+                AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
 
                 service.describeKeyPairs();
             } catch (Exception ex) {

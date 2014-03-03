@@ -26,6 +26,7 @@ import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.EC2Key;
 import com.ec2box.manage.model.SortedSet;
+import com.ec2box.manage.util.AWSClientConfig;
 import com.ec2box.manage.util.SSHUtil;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
@@ -74,7 +75,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
         //set  AWS credentials for service
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-        AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+        AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
 
         service.setEndpoint(ec2Key.getEc2Region());
 
@@ -112,7 +113,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 
             //create service
-            AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
             service.setEndpoint(ec2Key.getEc2Region());
 
             //create key pair request
@@ -159,7 +160,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 
             //create service
-            AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
             service.setEndpoint(ec2Key.getEc2Region());
 
             //describe key pair request

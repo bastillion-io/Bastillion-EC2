@@ -24,6 +24,7 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
 import com.ec2box.manage.model.SortedSet;
+import com.ec2box.manage.util.AWSClientConfig;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -98,7 +99,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                     for (String ec2Region : ec2RegionList) {
                         //create service
 
-                        AmazonEC2 service = new AmazonEC2Client(awsCredentials);
+                        AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
                         service.setEndpoint(ec2Region);
 
 
