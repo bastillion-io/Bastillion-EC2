@@ -20,6 +20,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
+import com.ec2box.common.util.AppConfigLkup;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
@@ -142,14 +143,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 hostSystem.setInstanceId(instance.getInstanceId());
 
                                 //check for public dns if doesn't exist set to ip or pvt dns
-                                if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                if (!"true".equals(AppConfigLkup.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
                                     hostSystem.setHost(instance.getPublicDnsName());
-                                } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
-                                    hostSystem.setHost(instance.getPublicIpAddress());
                                 } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
                                     hostSystem.setHost(instance.getPrivateDnsName());
-                                } else if (StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
-                                    hostSystem.setHost(instance.getPrivateIpAddress());
                                 } else {
                                     for (InstanceNetworkInterface networkInterface : instance.getNetworkInterfaces()) {
                                         hostSystem.setHost(networkInterface.getPrivateDnsName());
