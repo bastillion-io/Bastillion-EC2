@@ -48,6 +48,9 @@ public class HostSystem {
     String errorMsg;
     String systemStatus;
     String instanceStatus;
+    Integer monitorAlarm=0;
+    Integer monitorInsufficientData=0;
+    Integer monitorOk=0;
 
 
     List<String> publicKeyList;
@@ -184,5 +187,29 @@ public class HostSystem {
 
     public void setInstanceStatus(String instanceStatus) {
         this.instanceStatus = instanceStatus;
+    }
+
+    public Integer getMonitorOk() {
+        return monitorOk;
+    }
+
+    public void setMonitorOk(Integer monitorOk) {
+        this.monitorOk = monitorOk;
+    }
+
+    public Integer getMonitorAlarm() {
+        return monitorAlarm;
+    }
+
+    public void setMonitorAlarm(Integer monitorAlarm) {
+        this.monitorAlarm = monitorAlarm;
+    }
+
+    public Integer getMonitorInsufficientData() {
+        return monitorInsufficientData;
+    }
+
+    public void setMonitorInsufficientData(Integer monitorInsufficientData) {
+        this.monitorInsufficientData = monitorInsufficientData;
     }
 }

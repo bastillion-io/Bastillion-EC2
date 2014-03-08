@@ -17,6 +17,10 @@ package com.ec2box.manage.action;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient;
+import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
+import com.amazonaws.services.cloudwatch.model.Dimension;
+import com.amazonaws.services.cloudwatch.model.MetricAlarm;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
@@ -46,6 +50,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HttpServletRequest servletRequest;
     String tag = null;
     String securityGroup = null;
+    static Map<String, String> alarmStateMap = AppConfigLkup.getMapProperties("alarmState");
+    static Map<String, String> systemStatusMap = AppConfigLkup.getMapProperties("systemStatus");
+    static Map<String, String> instanceStatusMap = AppConfigLkup.getMapProperties("instanceStatus");
+
+    String alarmState = null;
+    String systemStatus = null;
+    String instanceStatus = null;
+
 
     @Action(value = "/admin/viewSystems",
             results = {
@@ -178,8 +190,57 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
                                 hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
                                 hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
-                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+
+                                //check and filter by instance or system status
+                                if ((StringUtils.isEmpty(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
+                                        || (hostSystem.getInstanceStatus().equals(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
+                                        || (hostSystem.getInstanceStatus().equals(this.systemStatus) && StringUtils.isEmpty(this.instanceStatus))
+                                        || (hostSystem.getInstanceStatus().equals(this.systemStatus) && hostSystem.getInstanceStatus().equals(this.instanceStatus))
+                                        ) {
+                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                }
                             }
+
+
+                            //check alarms for ec2 instances
+                            AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(awsCredentials, AWSClientConfig.getClientConfig());
+                            cloudWatchClient.setEndpoint(ec2Region.replace("ec2", "monitoring"));
+
+
+                            DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
+
+                            for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
+
+                                for (Dimension dim : metricAlarm.getDimensions()) {
+
+                                    if (dim.getName().equals("InstanceId")) {
+                                        HostSystem hostSystem = hostSystemList.remove(dim.getValue());
+                                        if (hostSystem != null) {
+                                            if ("ALARM".equals(metricAlarm.getStateValue())) {
+                                                hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
+                                            } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
+                                                hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
+                                            } else {
+                                                hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
+                                            }
+                                            //check and filter by alarm state
+                                            if (StringUtils.isEmpty(this.alarmState)) {
+                                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                            } else if ("ALARM".equals(this.alarmState) && hostSystem.getMonitorAlarm() > 0) {
+                                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                            } else if ("INSUFFICIENT_DATA".equals(this.alarmState) && hostSystem.getMonitorInsufficientData() > 0) {
+                                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                            } else if ("OK".equals(this.alarmState) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
+                                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                            }
+                                        }
+
+                                    }
+
+
+                                }
+                            }
+
 
                         }
                     }
@@ -266,5 +327,53 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     public void setSecurityGroup(String securityGroup) {
         this.securityGroup = securityGroup;
+    }
+
+    public static Map<String, String> getAlarmStateMap() {
+        return alarmStateMap;
+    }
+
+    public static void setAlarmStateMap(Map<String, String> alarmStateMap) {
+        SystemAction.alarmStateMap = alarmStateMap;
+    }
+
+    public static Map<String, String> getSystemStatusMap() {
+        return systemStatusMap;
+    }
+
+    public static void setSystemStatusMap(Map<String, String> systemStatusMap) {
+        SystemAction.systemStatusMap = systemStatusMap;
+    }
+
+    public static Map<String, String> getInstanceStatusMap() {
+        return instanceStatusMap;
+    }
+
+    public static void setInstanceStatusMap(Map<String, String> instanceStatusMap) {
+        SystemAction.instanceStatusMap = instanceStatusMap;
+    }
+
+    public String getAlarmState() {
+        return alarmState;
+    }
+
+    public void setAlarmState(String alarmState) {
+        this.alarmState = alarmState;
+    }
+
+    public String getSystemStatus() {
+        return systemStatus;
+    }
+
+    public void setSystemStatus(String systemStatus) {
+        this.systemStatus = systemStatus;
+    }
+
+    public String getInstanceStatus() {
+        return instanceStatus;
+    }
+
+    public void setInstanceStatus(String instanceStatus) {
+        this.instanceStatus = instanceStatus;
     }
 }

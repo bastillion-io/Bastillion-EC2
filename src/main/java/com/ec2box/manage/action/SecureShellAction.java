@@ -51,7 +51,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     Script script = new Script();
-    String terminalRefreshRate = AppConfigLkup.getProperty("terminalRefreshRate");
 
 
 
@@ -296,10 +295,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     }
 
     public void setServletResponse(HttpServletResponse servletResponse) { this.servletResponse = servletResponse; }
-
-    public String getTerminalRefreshRate() { return terminalRefreshRate; }
-
-    public void setTerminalRefreshRate(String terminalRefreshRate) { this.terminalRefreshRate = terminalRefreshRate; }
 
     public Long getId() {
         return id;

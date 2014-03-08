@@ -41,6 +41,7 @@ public class SystemDB {
     public static final String SORT_BY_STATE = "state";
     public static final String SORT_BY_INSTANCE_STATUS= "instance_status";
     public static final String SORT_BY_SYSTEM_STATUS= "system_status";
+    public static final String SORT_BY_ALARMS= "alarms";
 
 
     /**
@@ -59,7 +60,7 @@ public class SystemDB {
             if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
                 orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
             }
-            String sql = "select * from  system  where instance_id in ( ";
+            String sql = "select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system  where instance_id in ( ";
             for (int i = 0; i < instanceIdList.size(); i++) {
                 if (i == instanceIdList.size() - 1) sql = sql + "'" + instanceIdList.get(i) + "') ";
                 else sql = sql + "'" + instanceIdList.get(i) + "', ";
@@ -87,6 +88,9 @@ public class SystemDB {
                     hostSystem.setState(rs.getString("state"));
                     hostSystem.setInstanceStatus(rs.getString("instance_status"));
                     hostSystem.setSystemStatus(rs.getString("system_status"));
+                    hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
+                    hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
+                    hostSystem.setMonitorOk(rs.getInt("m_ok"));
                     hostSystemList.add(hostSystem);
                 }
                 DBUtils.closeRs(rs);
@@ -162,6 +166,9 @@ public class SystemDB {
                 hostSystem.setKeyId(rs.getLong("key_id"));
                 hostSystem.setEc2Region(rs.getString("region"));
                 hostSystem.setState(rs.getString("state"));
+                hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
+                hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
+                hostSystem.setMonitorOk(rs.getInt("m_ok"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -230,6 +237,9 @@ public class SystemDB {
                 hostSystem.setKeyId(rs.getLong("key_id"));
                 hostSystem.setEc2Region(rs.getString("region"));
                 hostSystem.setState(rs.getString("state"));
+                hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
+                hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
+                hostSystem.setMonitorOk(rs.getInt("m_ok"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -253,7 +263,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state, instance_status, system_status) values (?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -264,6 +274,9 @@ public class SystemDB {
             stmt.setString(8, hostSystem.getState());
             stmt.setString(9, hostSystem.getInstanceStatus());
             stmt.setString(10, hostSystem.getSystemStatus());
+            stmt.setInt(11, hostSystem.getMonitorAlarm());
+            stmt.setInt(12, hostSystem.getMonitorInsufficientData());
+            stmt.setInt(13, hostSystem.getMonitorOk());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -308,7 +321,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?, instance_status=?, system_status=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -319,7 +332,10 @@ public class SystemDB {
             stmt.setString(8, hostSystem.getState());
             stmt.setString(9, hostSystem.getInstanceStatus());
             stmt.setString(10, hostSystem.getSystemStatus());
-            stmt.setLong(11, hostSystem.getId());
+            stmt.setInt(11, hostSystem.getMonitorAlarm());
+            stmt.setInt(12, hostSystem.getMonitorInsufficientData());
+            stmt.setInt(13, hostSystem.getMonitorOk());
+            stmt.setLong(14, hostSystem.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
