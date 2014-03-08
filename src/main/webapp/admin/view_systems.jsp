@@ -175,7 +175,7 @@
 
 
                 <td style="padding-left:0px;"><label>Tag</label><br/><s:textfield name="tag" placeholder="tag-name[=value[,tag-name[=value]]"
-                                                        theme="simple" size="29"/></td>
+                                                        theme="simple" size="25"/></td>
 
                 <td><label>Security Group</label><br/><s:textfield name="securityGroup"
                                                                    placeholder="group[,group]"
@@ -245,7 +245,7 @@
                 <s:iterator var="system" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                            <s:if test="state=='running'">
+                            <s:if test="state=='running' && host!=''">
                                 <s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
                                                 theme="simple"/>
                             </s:if>
