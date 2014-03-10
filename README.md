@@ -15,11 +15,11 @@ Screenshots
 
 ![Importing Keys](https://freecode.com/screenshots/94/c9/94c93beb0a5c47954514c55b7a0f90ea_medium.png)
 
-![Select Instances](https://freecode.com/screenshots/87/0c/870c38a0716fda82c1297a882b55b55f_medium.png)
+![Select Instances](https://freecode.com/screenshots/d6/3c/d63c30595604fa90aaf1747ac694641b_medium.png)
 
-![Terminals](https://freecode.com/screenshots/7d/ad/7dad2b4771a9c2332746b4bfeeedd919_medium.png)
+![Terminals](https://freecode.com/screenshots/44/c4/44c4e44ff8e0be396bfe4d712e09109b_medium.png)
 
-![More Terminals](https://freecode.com/screenshots/12/49/1249f116f0e6d4b4b97487e7c13289dd_medium.png)
+![More Terminals](https://freecode.com/screenshots/d0/1b/d01b5e2e1b513138af0ec4cdef522a36_medium.png)
 
 ![Upload Files](https://freecode.com/screenshots/5c/10/5c10df47dad8d43eb6ffeba0009d00db_medium.png)
 
