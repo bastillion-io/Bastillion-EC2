@@ -53,8 +53,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     Script script = new Script();
 
 
-
-
     /**
      * creates composite terminals if there are errors or authentication issues.
      */
@@ -103,36 +101,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             }
 
         }
+        //set system list if no pending systems
         if (SystemStatusDB.getNextPendingSystem(userId) == null) {
-            //check user map
-            if (userSchSessionMap != null && !userSchSessionMap.isEmpty()) {
-
-                //get user servletRequest.getSession()s
-                Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
-
-
-                for (SchSession schSession : schSessionMap.values()) {
-                    //add to host system list
-                    systemList.add(schSession.getHostSystem());
-                    //run script it exists
-                    if (script != null && script.getId() != null && script.getId() > 0) {
-                        script = ScriptDB.getScript(script.getId(), userId);
-                        BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
-                        String line;
-                        try {
-                            while ((line = reader.readLine()) != null) {
-                                schSession.getCommander().println(line);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-
-                        }
-                    }
-                }
-            }
-
+            setSystemList(userId, sessionId);
         }
-
 
         return SUCCESS;
     }
@@ -153,7 +125,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
         pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
+        //set system list if no pending systems
+        if (pendingSystemStatus == null) {
+            setSystemList(userId, AuthUtil.getSessionId(servletRequest.getSession()));
+        }
         return SUCCESS;
+
     }
 
     @Action(value = "/admin/selectSystemsForCompositeTerms",
@@ -216,7 +193,44 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return null;
     }
 
+    /**
+     * set system list once all connections have been attempted
+     *
+     * @param userId    user id
+     * @param sessionId session id
+     */
+    private void setSystemList(Long userId, Long sessionId) {
 
+
+        //check user map
+        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId)!=null) {
+
+            //get user sessions
+            Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
+
+
+            for (SchSession schSession : schSessionMap.values()) {
+                //add to host system list
+                systemList.add(schSession.getHostSystem());
+                //run script it exists
+                if (script != null && script.getId() != null && script.getId() > 0) {
+                    script = ScriptDB.getScript(script.getId(), userId);
+                    BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
+                    String line;
+                    try {
+
+                        while ((line = reader.readLine()) != null) {
+                            schSession.getCommander().println(line);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                    }
+                }
+            }
+        }
+
+    }
 
     public List<Long> getSystemSelectId() {
         return systemSelectId;
@@ -294,7 +308,9 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return servletResponse;
     }
 
-    public void setServletResponse(HttpServletResponse servletResponse) { this.servletResponse = servletResponse; }
+    public void setServletResponse(HttpServletResponse servletResponse) {
+        this.servletResponse = servletResponse;
+    }
 
     public Long getId() {
         return id;
