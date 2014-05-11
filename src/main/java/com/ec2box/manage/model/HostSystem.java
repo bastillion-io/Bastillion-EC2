@@ -15,7 +15,7 @@
  */
 package com.ec2box.manage.model;
 
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
 
 import java.util.List;
 
@@ -35,9 +35,9 @@ public class HostSystem {
     Long id;
     String displayNm = "";
     String instanceId;
-    String user = AppConfigLkup.getProperty("defaultSystemUser");
+    String user = AppConfig.getProperty("defaultSystemUser");
     String host;
-    Integer port = Integer.parseInt(AppConfigLkup.getProperty("defaultSystemPort"));
+    Integer port = Integer.parseInt(AppConfig.getProperty("defaultSystemPort"));
     Long keyId;
     String displayLabel;
     String ec2Region;

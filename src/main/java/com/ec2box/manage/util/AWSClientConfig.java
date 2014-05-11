@@ -17,7 +17,7 @@ package com.ec2box.manage.util;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -31,11 +31,11 @@ public class AWSClientConfig {
      * set config info based on AppConfig
      */
     static {
-        String awsProtocol=AppConfigLkup.getProperty("awsProtocol");
-        String awsProxyHost = AppConfigLkup.getProperty("awsProxyHost");
-        String awsProxyPort = AppConfigLkup.getProperty("awsProxyPort");
-        String awsProxyUser = AppConfigLkup.getProperty("awsProxyUser");
-        String awsProxyPassword = AppConfigLkup.getProperty("awsProxyPassword");
+        String awsProtocol= AppConfig.getProperty("awsProtocol");
+        String awsProxyHost = AppConfig.getProperty("awsProxyHost");
+        String awsProxyPort = AppConfig.getProperty("awsProxyPort");
+        String awsProxyUser = AppConfig.getProperty("awsProxyUser");
+        String awsProxyPassword = AppConfig.getProperty("awsProxyPassword");
 
         if("http".equals(awsProtocol)){
             config.setProtocol(Protocol.HTTP);

@@ -24,7 +24,7 @@ import com.amazonaws.services.cloudwatch.model.MetricAlarm;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
@@ -50,9 +50,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HttpServletRequest servletRequest;
     String tag = null;
     String securityGroup = null;
-    static Map<String, String> alarmStateMap = AppConfigLkup.getMapProperties("alarmState");
-    static Map<String, String> systemStatusMap = AppConfigLkup.getMapProperties("systemStatus");
-    static Map<String, String> instanceStatusMap = AppConfigLkup.getMapProperties("instanceStatus");
+    static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
+    static Map<String, String> systemStatusMap = AppConfig.getMapProperties("systemStatus");
+    static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
 
     String alarmState = null;
     String systemStatus = null;
@@ -155,7 +155,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 hostSystem.setInstanceId(instance.getInstanceId());
 
                                 //check for public dns if doesn't exist set to ip or pvt dns
-                                if (!"true".equals(AppConfigLkup.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
                                     hostSystem.setHost(instance.getPublicDnsName());
                                 } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
                                     hostSystem.setHost(instance.getPrivateDnsName());

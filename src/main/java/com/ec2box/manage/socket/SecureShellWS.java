@@ -20,9 +20,7 @@ import com.google.gson.Gson;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.action.SecureShellAction;
 import com.ec2box.manage.model.SchSession;
-import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.UserSchSessions;
-import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,10 +28,8 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

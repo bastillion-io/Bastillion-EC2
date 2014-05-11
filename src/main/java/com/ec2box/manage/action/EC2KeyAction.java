@@ -20,14 +20,13 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.EC2Key;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
-import com.ec2box.manage.util.SSHUtil;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -45,7 +44,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     EC2Key ec2Key;
     SortedSet sortedSet = new SortedSet();
     HttpServletResponse servletResponse;
-    static Map<String, String> ec2RegionMap = AppConfigLkup.getMapProperties("ec2Regions");
+    static Map<String, String> ec2RegionMap = AppConfig.getMapProperties("ec2Regions");
     List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
 
 

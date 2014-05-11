@@ -16,7 +16,8 @@
 package com.ec2box.manage.db;
 
 
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.model.SessionAudit;
 import com.ec2box.manage.model.SessionOutput;
@@ -61,7 +62,7 @@ public class SessionAuditDB {
 
             //take today's date and subtract how many days to keep history
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, (-1 * Integer.parseInt(AppConfigLkup.getProperty("deleteAuditLogAfter")))); //subtract
+            cal.add(Calendar.DATE, (-1 * Integer.parseInt(AppConfig.getProperty("deleteAuditLogAfter")))); //subtract
             java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
 
 

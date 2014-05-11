@@ -15,7 +15,6 @@
  */
 package com.ec2box.manage.action;
 
-import com.ec2box.common.util.AppConfigLkup;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.ScriptDB;
 import com.ec2box.manage.db.SessionAuditDB;

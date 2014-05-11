@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Utility to look up configurable commands and resources
  */
-public class AppConfigLkup {
+public class AppConfig {
 
     private static ResourceBundle prop = ResourceBundle.getBundle("EC2BoxConfig");
 

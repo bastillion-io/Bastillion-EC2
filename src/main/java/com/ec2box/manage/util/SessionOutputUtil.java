@@ -15,7 +15,7 @@
  */
 package com.ec2box.manage.util;
 
-import com.ec2box.common.util.AppConfigLkup;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.SessionAuditDB;
 import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.UserSessionsOutput;
@@ -32,7 +32,7 @@ public class SessionOutputUtil {
 
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
-    private static String enableAudit = AppConfigLkup.getProperty("enableAudit");
+    private static String enableAudit = AppConfig.getProperty("enableAudit");
 
 
     /**
