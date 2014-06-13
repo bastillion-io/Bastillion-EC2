@@ -180,25 +180,42 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         }
 
                         if (instanceIdList.size() > 0) {
-                            //get status for host systems
-                            DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-                            describeInstanceStatusRequest.withInstanceIds(instanceIdList);
-                            DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
+                            //make service call 100 instances at a time b/c of AWS limitation
+                            int i = 0;
+                            List<String> idCallList = new ArrayList<String>();
+                            while (!instanceIdList.isEmpty()) {
+                                idCallList.add(instanceIdList.remove(0));
+                                i++;
+                                //when i eq 100 make call
+                                if (i >= 100 || instanceIdList.isEmpty()) {
 
-                            for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+                                    //get status for host systems
+                                    DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                                    describeInstanceStatusRequest.withInstanceIds(idCallList);
+                                    DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
 
-                                HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
-                                hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
-                                hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+                                    for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
 
-                                //check and filter by instance or system status
-                                if ((StringUtils.isEmpty(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
-                                        || (hostSystem.getInstanceStatus().equals(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
-                                        || (hostSystem.getInstanceStatus().equals(this.systemStatus) && StringUtils.isEmpty(this.instanceStatus))
-                                        || (hostSystem.getInstanceStatus().equals(this.systemStatus) && hostSystem.getInstanceStatus().equals(this.instanceStatus))
-                                        ) {
-                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                        HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                                        hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                                        hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+
+                                        //check and filter by instance or system status
+                                        if ((StringUtils.isEmpty(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
+                                                || (hostSystem.getInstanceStatus().equals(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
+                                                || (hostSystem.getInstanceStatus().equals(this.systemStatus) && StringUtils.isEmpty(this.instanceStatus))
+                                                || (hostSystem.getInstanceStatus().equals(this.systemStatus) && hostSystem.getInstanceStatus().equals(this.instanceStatus))
+                                                ) {
+                                            hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                        }
+                                    }
+
+                                    //start over
+                                    i = 0;
+                                    //clear list
+                                    idCallList.clear();
                                 }
+
                             }
 
 
