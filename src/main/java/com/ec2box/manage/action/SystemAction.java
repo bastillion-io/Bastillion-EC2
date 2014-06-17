@@ -53,10 +53,12 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
     static Map<String, String> systemStatusMap = AppConfig.getMapProperties("systemStatus");
     static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
+    static Map<String, String> instanceStateMap=AppConfig.getMapProperties("instanceState");
 
     String alarmState = null;
     String systemStatus = null;
     String instanceStatus = null;
+    String instanceState=AppConfig.getProperty("defaultInstanceState");
 
 
     @Action(value = "/admin/viewSystems",
@@ -127,6 +129,13 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         Filter keyNmFilter = new Filter("key-name", keyValueList);
                         describeInstancesRequest.withFilters(keyNmFilter);
 
+                        //instance state filter
+                        if(StringUtils.isNotEmpty(instanceState)){
+                            List<String> instanceStateList = new ArrayList<String>();
+                            instanceStateList.add(instanceState);
+                            Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
+                            describeInstancesRequest.withFilters(instanceStateFilter);
+                        }
                         if (tagList.size() > 0) {
                             Filter tagFilter = new Filter("tag-key", tagList);
                             describeInstancesRequest.withFilters(tagFilter);
@@ -392,5 +401,21 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     public void setInstanceStatus(String instanceStatus) {
         this.instanceStatus = instanceStatus;
+    }
+
+    public static Map<String, String> getInstanceStateMap() {
+        return instanceStateMap;
+    }
+
+    public static void setInstanceStateMap(Map<String, String> instanceStateMap) {
+        SystemAction.instanceStateMap = instanceStateMap;
+    }
+
+    public String getInstanceState() {
+        return instanceState;
+    }
+
+    public void setInstanceState(String instanceState) {
+        this.instanceState = instanceState;
     }
 }

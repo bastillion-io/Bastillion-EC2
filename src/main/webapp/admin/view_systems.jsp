@@ -149,7 +149,6 @@
     <h3>Composite SSH Terminals</h3>
 </s:else>
 
-<s:if test="(sortedSet.itemList!= null && !sortedSet.itemList.isEmpty())||tag!=null||securityGroup!=null">
 
     <s:if test="script!=null && script.id!=null">
         <p>Run <b>
@@ -181,16 +180,20 @@
                                                                    placeholder="group[,group]"
                                                                    theme="simple" size="10"/></td>
                 <td>
+                    <label>Instance State</label><br/><s:select name="instanceState" list="instanceStateMap"
+                                                                 theme="simple" headerKey="" headerValue="-Any-"/>
+                </td>
+                <td>
                     <label>Instance Status</label><br/><s:select name="instanceStatus" list="instanceStatusMap"
-                                                                 theme="simple" headerKey="" headerValue="-Select-"/>
+                                                                 theme="simple" headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
                     <label>System Status</label><br/><s:select name="systemStatus" list="systemStatusMap" theme="simple"
-                                                               headerKey="" headerValue="-Select-"/>
+                                                               headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
                     <label>Alarm State</label><br/><s:select name="alarmState" list="alarmStateMap" theme="simple"
-                                                             headerKey="" headerValue="-Select-"/>
+                                                             headerKey="" headerValue="-Any-"/>
                 </td>
                 <td style="padding:20px 5px 0px 5px;">
                     <div id="view_btn" class="btn btn-primary">Filter</div>
@@ -291,6 +294,15 @@
             <div class="btn btn-primary select_frm_btn">Create SSH Terminals</div>
         </s:else>
     </s:if>
+<s:else>
+    <div class="actionMessage">
+        <p class="error">No instances available. Try changing the filter values above
+            <s:if test="%{#session.userType==\"M\"}">
+                or importing the corresponding EC2 Keys <a href="../manage/viewEC2Keys.action">here</a>
+            </s:if>
+        </p>
+    </div>
+</s:else>
 
     <s:iterator var="system" value="sortedSet.itemList" status="stat">
 
@@ -339,17 +351,7 @@
 
 
     </s:iterator>
-</s:if>
-<s:else>
-    <div class="actionMessage">
-        <p class="error">Instances not available.
-            <s:if test="%{#session.userType==\"M\"}">
 
-                Import EC2 Keys <a href="../manage/viewEC2Keys.action">here</a>
-            </s:if>
-        </p>
-    </div>
-</s:else>
 
 </div>
 
