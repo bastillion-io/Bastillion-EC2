@@ -31,7 +31,6 @@
             <ul class="nav navbar-nav">
                 <li><a href="../admin/menu.action">Home</a></li>
 
-
                 <s:if test="%{#session.userType==\"M\"}">
 
                     <li class="dropdown">
@@ -46,16 +45,6 @@
                         </li>
                     </ul>
                     </li>
-
-
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="../manage/viewUsers.action">Instance Administrators</a></li>
-                        </ul>
-                    </li>
-
-
                 </s:if>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
@@ -65,6 +54,12 @@
                     </ul>
                 </li>
                 <s:if test="%{#session.userType==\"M\"}">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../manage/viewUsers.action">Instance Administrators</a></li>
+                        </ul>
+                    </li>
                     <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
                 </s:if>
                 <li><a href="../admin/setPassword.action">Change Password</a></li>

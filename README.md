@@ -53,12 +53,25 @@ https://github.com/skavanagh/EC2Box/releases
 
 Export environment variables
 
+for Linux/Unix/OSX
+
      export JAVA_HOME=/path/to/jdk
      export PATH=$JAVA_HOME/bin:$PATH
 
+for Windows
+
+     set JAVA_HOME=C:\path\to\jdk
+     set PATH=%JAVA_HOME%\bin;%PATH%
+
 Start EC2Box
 
+for Linux/Unix/OSX
+
         ./startEC2Box.sh
+
+for Windows
+
+        startEC2Box.bat
 
 How to Configure SSL in Jetty
 (it is a good idea to add or generate your own unique certificate)
@@ -96,6 +109,13 @@ Steps:
 4. Add instance administrator accounts
 5. Audit sessions for instance administrators
 
+Acknowledgments
+------
+Special thanks goes to these amazing projects which makes this (and other great projects) possible.
+
++ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by @ymnk
++ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by @chjj
+
 Author
 ------
 **Sean Kavanagh** 
@@ -103,4 +123,4 @@ Author
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
-
+(Follow me on twitter for release updates, but mostly nonsense)

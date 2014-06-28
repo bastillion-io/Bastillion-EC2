@@ -30,14 +30,10 @@ import java.util.Map;
 public class SSHUtil {
 
     //system path to public/private key
-    public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
+    public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("ec2db").getPath();
 
     public static final int SESSION_TIMEOUT = 60000;
     public static final int CHANNEL_TIMEOUT = 60000;
-
-
-
-
 
 
     /**

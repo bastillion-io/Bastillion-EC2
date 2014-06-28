@@ -180,7 +180,7 @@
                                                                    placeholder="group[,group]"
                                                                    theme="simple" size="10"/></td>
                 <td>
-                    <label>Instance State</label><br/><s:select name="instanceState" list="instanceStateMap"
+                    <label>Current State</label><br/><s:select name="instanceState" list="instanceStateMap"
                                                                  theme="simple" headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
