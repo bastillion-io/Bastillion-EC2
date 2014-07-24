@@ -157,21 +157,13 @@ div.term {
 }
 
 div.termwrapper {
-    width: 100%;
-    height: 620px;
-    overflow-x: auto;
-    border: 1px solid #CCCCCC;
-    overflow-y: scroll;
-}
-
-div.termwrapper div {
-
+    width:98%;
+    margin: 0 auto;
 }
 
 
-div.termwrapper div h4 {
+div.termwrapper div h6 {
     margin: 8px 0 0 8px;
-    font-size: 12px;
 }
 
 .top_nav {
@@ -183,24 +175,51 @@ div.termwrapper div h4 {
     float: left;
     padding: 0 15px 0px 0;
 }
+.run_cmd {
+    background: #eeeeee;
+}
 
 .run_cmd_active {
     background: #4d4d4d;
 }
 
-.run_cmd_active h4 {
-    color: #FFFFFF;
+.run_cmd_active h6 {
+    color: #eeeeee;
+}
+.navbar-inverse {
+    color: #dddddd;
+}
+.navbar-inverse input {
+    color: #4d4d4d;
 }
 
 .run_cmd {
+    border-radius: 4px;
+    margin-top: 5px;
     border: 1px solid #CCCCCC;
     float: left;
-    min-width: 620px;
+    min-width: 600px;
+}
+
+@media screen and (max-width: 1200px) {
+    .run_cmd {
+        min-width: 0px;
+    }
+    div.termwrapper {
+        width:105%;
+        margin: 0 auto;
+    }
+}
+
+.term-header {
+    cursor:move;
 }
 
 .term {
     background-color: #000000;
 }
+
+
 
 .top_link {
     float: left;

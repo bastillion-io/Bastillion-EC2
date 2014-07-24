@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.11.07</version>
+    <version>0.12.00</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
     <properties>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.8.2</version>
+            <version>1.8.5</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
