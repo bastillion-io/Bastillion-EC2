@@ -101,10 +101,19 @@
             <s:if test="%{#session.userType==\"M\"}">
                 <tr>
                     <td>
-                        <a href="../manage/viewUsers.action">Instance Administrators</a>
+                        <a href="../manage/viewProfiles.action">Profiles</a>
                     </td>
                     <td>
-                        Add accounts for instance administrators
+                        Create profiles based on instance tags
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="../manage/viewUsers.action">Users</a>
+
+                    </td>
+                    <td>
+                        Manage user accounts and assign profiles so that users will be granted access based on instance tags
                     </td>
                 </tr>
                 <tr>

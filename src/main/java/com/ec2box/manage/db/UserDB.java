@@ -51,13 +51,12 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users where enabled=true and user_type like ? " + orderBy;
+        String sql = "select * from  users where enabled=true " + orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, User.ADMINISTRATOR);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -130,6 +129,7 @@ public class UserDB {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setUserType(rs.getString("user_type"));
+                user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);

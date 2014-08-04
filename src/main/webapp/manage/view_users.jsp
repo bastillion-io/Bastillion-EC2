@@ -27,15 +27,15 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 350,
-                width: 400,
+                height: 400,
+                width: 500,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 350,
-                width: 400,
+                height: 400,
+                width: 500,
                 modal: true
             });
 
@@ -104,7 +104,7 @@
         </script>
     </s:if>
 
-    <title>EC2Box - Manage Instance Administrators</title>
+    <title>EC2Box - Manage Users</title>
 
 </head>
 <body>
@@ -117,9 +117,9 @@
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
 
-        <h3>Manage Instance Administrators</h3>
+        <h3>Manage Users</h3>
 
-        <p>Add / Delete Instance Administrators below</p>
+        <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <table class="table-striped scrollableTable" style="min-width: 80%">
@@ -128,6 +128,8 @@
                     <tr>
 
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
+                        </th>
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
                         </th>
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_LAST_NM"/>" class="sort">Last
                             Name
@@ -144,7 +146,25 @@
                     <tbody>
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                     <tr>
-                        <td><s:property value="username"/></td>
+                        <td>
+                            <s:if test="userType==\"M\"">
+                                <s:property value="username"/>
+                            </s:if>
+                            <s:else>
+                                <a href="viewUserProfiles.action?user.id=<s:property value="id"/>"
+                                   title="Manage Profiles for User">
+                                    <s:property value="username"/>
+                                </a>
+                            </s:else>
+                        </td>
+                        <td>
+                            <s:if test="userType==\"A\"">
+                                Administrative Only
+                            </s:if>
+                            <s:else>
+                                Full Access
+                            </s:else>
+                        </td>
                         <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
@@ -155,6 +175,12 @@
                                 <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
                                     Delete
                                 </div>
+                                <s:if test="userType==\"A\"">
+                                    <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
+                                        <div id="profile_btn_<s:property value="id"/>" class="btn btn-primary edit_btn" style="float:left">
+                                            Assign Profiles
+                                        </div></a>
+                                </s:if>
                                 <div style="clear:both"></div>
                             </td>
                     </tr>
@@ -167,11 +193,12 @@
 
 
 
-            <div id="add_btn" class="btn btn-primary">Add Administrator</div>
+            <div id="add_btn" class="btn btn-primary">Add User</div>
             <div id="add_dialog" title="Add User">
                 <s:actionerror/>
                 <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
                     <s:textfield name="user.username" label="Username" size="15"/>
+                    <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                     <s:textfield name="user.firstNm" label="First Name" size="15"/>
                     <s:textfield name="user.lastNm" label="Last Name" size="15"/>
                     <s:textfield name="user.email" label="Email Address" size="25"/>
@@ -196,6 +223,7 @@
                     <s:actionerror/>
                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
+                        <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>

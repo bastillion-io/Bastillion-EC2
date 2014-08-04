@@ -139,7 +139,7 @@
     </p>
 
 
-    <div class="btn btn-default submit_btn">OK</div>
+    <div class="btn btn-primary submit_btn">OK</div>
 </div>
 
 </body>

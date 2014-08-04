@@ -516,8 +516,8 @@ $(document).ready(function () {
         <tr>
             <td>&nbsp;</td>
             <td align="left">
-                <div class="btn btn-default submit_btn">Submit</div>
-                <div class="btn btn-default cancel_btn">Cancel</div>
+                <div class="btn btn-primary submit_btn">Submit</div>
+                <div class="btn btn-primary cancel_btn">Cancel</div>
             </td>
         </tr>
     </s:form>
@@ -536,8 +536,8 @@ $(document).ready(function () {
         <tr>
             <td>&nbsp;</td>
             <td align="left">
-                <div class="btn btn-default submit_btn">Submit</div>
-                <div class="btn btn-default cancel_btn">Cancel</div>
+                <div class="btn btn-primary submit_btn">Submit</div>
+                <div class="btn btn-primary cancel_btn">Cancel</div>
             </td>
         </tr>
     </s:form>
@@ -557,7 +557,7 @@ $(document).ready(function () {
         </s:if>
         <tr>
             <td colspan="2">
-                <div class="btn btn-default submit_btn">OK</div>
+                <div class="btn btn-primary submit_btn">OK</div>
             </td>
         </tr>
     </s:form>

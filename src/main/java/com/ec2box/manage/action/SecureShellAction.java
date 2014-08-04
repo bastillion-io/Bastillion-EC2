@@ -15,13 +15,17 @@
  */
 package com.ec2box.manage.action;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.*;
 import com.ec2box.common.util.AuthUtil;
-import com.ec2box.manage.db.ScriptDB;
-import com.ec2box.manage.db.SessionAuditDB;
-import com.ec2box.manage.db.SystemStatusDB;
+import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
+import com.ec2box.manage.util.AWSClientConfig;
 import com.ec2box.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -143,6 +147,83 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         //exit any previous terms
         exitTerms();
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
+            //check to see if user has perms to access selected systems
+            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+
+                /*
+                //get instance id's for all potential instances for user
+                Map<String, String> tagMap = new HashMap<>();
+                List<String> tagList = new ArrayList<>();
+                //parse out tags in format tag-name[=value[,tag-name[=value]]
+                List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
+                for (Profile profile : profileList) {
+                    String[] tagArr1 = profile.getTag().split(",");
+                    if (tagArr1.length > 0) {
+                        for (String tag1 : tagArr1) {
+                            String[] tagArr2 = tag1.split("=");
+                            if (tagArr2.length > 1) {
+                                tagMap.put(tag1.split("=")[0], tag1.split("=")[1]);
+                            } else {
+                                tagList.add(tag1);
+                            }
+                        }
+                    }
+                }
+                List<String> instanceIdList = new ArrayList<String>();
+                if (tagList.size() > 0 || tagMap.size() > 0) {
+
+                    List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
+
+                    //get AWS credentials from DB
+                    for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
+
+                        if (awsCred != null) {
+                            //set  AWS credentials for service
+                            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
+
+                            for (String ec2Region : ec2RegionList) {
+                                //create service
+                                AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
+                                service.setEndpoint(ec2Region);
+
+                                DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
+
+                                if (tagList.size() > 0) {
+                                    Filter tagFilter = new Filter("tag-key", tagList);
+                                    describeInstancesRequest.withFilters(tagFilter);
+                                }
+
+                                //set name value pair for tag filter
+                                for (String tag : tagMap.keySet()) {
+                                    Filter tagValueFilter = new Filter("tag:" + tag, Arrays.asList(tagMap.get(tag)));
+                                    describeInstancesRequest.withFilters(tagValueFilter);
+                                }
+
+                                DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
+
+                                for (Reservation res : describeInstancesResult.getReservations()) {
+                                    for (Instance instance : res.getInstances()) {
+                                        instanceIdList.add(instance.getInstanceId());
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                */
+                //make sure selected instance id is host the user has permission to.
+                List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
+                List<Long> systemIdList = new ArrayList<Long>();
+                for (HostSystem hostSystem : SystemDB.getSystems(instanceIdList)) {
+                    if (systemSelectId.contains(hostSystem.getId())) {
+                        systemIdList.add(hostSystem.getId());
+                    }
+                }
+                systemSelectId = systemIdList;
+
+            }
+            servletRequest.getSession().setAttribute("instanceIdList",null);
 
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
@@ -198,11 +279,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
      * @param userId    user id
      * @param sessionId session id
      */
+
     private void setSystemList(Long userId, Long sessionId) {
 
 
         //check user map
-        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId)!=null) {
+        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId) != null) {
 
             //get user sessions
             Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();

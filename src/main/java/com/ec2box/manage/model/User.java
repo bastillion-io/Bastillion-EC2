@@ -16,14 +16,26 @@
 package com.ec2box.manage.model;
 
 
+import java.util.List;
+
 /**
  * Value object that contains user information
  */
 public class User extends Auth {
     String firstNm;
     String lastNm;
+
+    public List<Profile> getProfileList() {
+        return profileList;
+    }
+
+    public void setProfileList(List<Profile> profileList) {
+        this.profileList = profileList;
+    }
+
     String email;
     boolean checked=false;
+    List<Profile> profileList;
 
 
     public boolean getChecked() {

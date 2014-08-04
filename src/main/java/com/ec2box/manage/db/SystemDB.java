@@ -378,4 +378,37 @@ public class SystemDB {
     }
 
 
+    /**
+     * returns list of systems by system instance id
+     *
+     * @param instanceIdList system instance id
+     * @return system
+     */
+    public static List<HostSystem> getSystems(List<String> instanceIdList) {
+
+        Connection con = null;
+
+        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        for(String instanceId: instanceIdList){
+
+            try {
+                con = DBUtils.getConn();
+
+                hostSystemList.add(getSystem(con, instanceId));
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            DBUtils.closeConn(con);
+
+        }
+
+        return hostSystemList;
+    }
+
+
+
+
+
 }

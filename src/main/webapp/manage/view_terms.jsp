@@ -168,7 +168,7 @@
                 <div class="align-right">
                     <s:form id="filter_frm" theme="simple">
                         <s:label value=""/>
-                        <s:textfield name="filter" type="text"/><div class="btn btn-default submit_btn">Filter</div><div class="btn btn-default clear_btn">Clear</div>
+                        <s:textfield name="filter" type="text"/><div class="btn btn-primary submit_btn">Filter</div><div class="btn btn-primary clear_btn">Clear</div>
                     </s:form>
                 </div>
                 <div class="align-right" style="padding-top: 20px">

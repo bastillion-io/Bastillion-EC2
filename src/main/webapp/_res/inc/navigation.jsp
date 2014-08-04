@@ -63,7 +63,8 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="../manage/viewUsers.action">Instance Administrators</a></li>
+                            <li><a href="../manage/viewProfiles.action">Profiles</a></li>
+                            <li><a href="../manage/viewUsers.action">Users</a></li>
                         </ul>
                     </li>
                     <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>

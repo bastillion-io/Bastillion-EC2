@@ -131,7 +131,7 @@
      <s:if test="awsCredList.isEmpty()">
         <div class="actionMessage">
             <p class="error">
-         EC2 Keys not available. Set AWS credentials <a href="viewAWSCred.action">here</a>
+         EC2 Keys not available (<a href="viewAWSCred.action">Set AWS Credentials</a>).
             </p>
         </div>
     </s:if>

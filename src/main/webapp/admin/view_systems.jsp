@@ -298,7 +298,7 @@
     <div class="actionMessage">
         <p class="error">No instances available. Try changing the filter values above
             <s:if test="%{#session.userType==\"M\"}">
-                or importing the corresponding EC2 Keys <a href="../manage/viewEC2Keys.action">here</a>
+                or importing the corresponding EC2 Keys (<a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>).
             </s:if>
         </p>
     </div>

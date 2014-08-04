@@ -139,8 +139,8 @@
         <div id="add_dialog" title="Add AWS Credentials">
             <s:actionerror/>
             <s:form action="saveAWSCred" class="save_aws_form_add" autocomplete="off">
-               <s:textfield name="awsCred.accessKey" label="Access Key" size="35" />
-                <s:password name="awsCred.secretKey" label="Secret Key" size="35" />
+               <s:textfield name="awsCred.accessKey" label="Access Key" size="25" />
+                <s:password name="awsCred.secretKey" label="Secret Key" size="25" />
                 <s:hidden name="sortedSet.orderByDirection"/>
                 <s:hidden name="sortedSet.orderByField"/>
                 <tr>
