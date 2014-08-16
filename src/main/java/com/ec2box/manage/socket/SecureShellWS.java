@@ -15,6 +15,7 @@
  */
 package com.ec2box.manage.socket;
 
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.task.SentOutputTask;
 import com.google.gson.Gson;
 import com.ec2box.common.util.AuthUtil;
@@ -46,6 +47,12 @@ public class SecureShellWS {
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
 
+        //set websocket timeout
+        if(StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))){
+            session.setMaxIdleTimeout( Long.parseLong(AppConfig.getProperty("websocketTimeout"))* 60000);
+        } else {
+            session.setMaxIdleTimeout(0);
+        }
 
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.sessionId = AuthUtil.getSessionId(httpSession);
@@ -162,12 +169,14 @@ public class SecureShellWS {
         keyMap.put(39, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x43});
         //DOWN
         keyMap.put(40, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x42});
-        //DEL
+        //BS
         keyMap.put(8, new byte[]{(byte) 0x7f});
         //TAB
         keyMap.put(9, new byte[]{(byte) 0x09});
         //CTR
         keyMap.put(17, new byte[]{});
+        //DEL
+        keyMap.put(46, new byte[]{(byte) 0x7f});
         //CTR-A
         keyMap.put(65, new byte[]{(byte) 0x01});
         //CTR-B
