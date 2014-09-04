@@ -183,9 +183,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                     } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
                                         hostSystem.setHost(instance.getPrivateDnsName());
                                     } else {
-                                        for (InstanceNetworkInterface networkInterface : instance.getNetworkInterfaces()) {
-                                            hostSystem.setHost(networkInterface.getPrivateDnsName());
-                                        }
+                                        hostSystem.setHost(instance.getPrivateIpAddress());
                                     }
 
 
