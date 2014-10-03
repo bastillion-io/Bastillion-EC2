@@ -15,6 +15,7 @@
  */
 package com.ec2box.manage.util;
 
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.model.*;
 import com.ec2box.manage.task.SecureShellTask;
 import com.jcraft.jsch.*;
@@ -131,6 +132,9 @@ public class SSHUtil {
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(SESSION_TIMEOUT);
             Channel channel = session.openChannel("shell");
+            if("true".equals(AppConfig.getProperty("agentForwarding"))){
+                ((ChannelShell) channel).setAgentForwarding(true);
+            }
             ((ChannelShell) channel).setPtyType("vt102");
 
             InputStream outFromChannel = channel.getInputStream();
