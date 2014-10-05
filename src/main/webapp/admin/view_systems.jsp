@@ -95,7 +95,7 @@
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
 
             $('#view_btn').unbind().click(function () {
-                $('#view_frm').submit();
+                $("#viewSystems").submit();
             });
 
         });
@@ -133,14 +133,6 @@
 
 <div class="system_container">
 
-<s:form action="viewSystems">
-    <s:hidden name="sortedSet.orderByDirection"/>
-    <s:hidden name="sortedSet.orderByField"/>
-    <s:if test="script!=null && script.id!=null">
-        <s:hidden name="script.id"/>
-    </s:if>
-</s:form>
-
 
 <s:if test="script!=null && script.id!=null">
     <h3>Execute Script on Instances</h3>
@@ -167,32 +159,37 @@
         </div>
     </s:else>
 
-    <s:form id="view_frm" action="viewSystems" theme="simple">
+    <s:form action="viewSystems" theme="simple">
+        <s:hidden name="sortedSet.orderByDirection"/>
+        <s:hidden name="sortedSet.orderByField"/>
+        <s:if test="script!=null && script.id!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
         <table>
 
             <tr>
 
 
-                <td style="padding-left:0px;"><label>Tag</label><br/><s:textfield name="tag" placeholder="tag-name[=value[,tag-name[=value]]"
+                <td style="padding-left:0px;"><label>Tag</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_TAG}']" placeholder="tag-name[=value[,tag-name[=value]]"
                                                         theme="simple" size="25"/></td>
 
-                <td><label>Security Group</label><br/><s:textfield name="securityGroup"
+                <td><label>Security Group</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SECURITY_GROUP}']"
                                                                    placeholder="group[,group]"
                                                                    theme="simple" size="10"/></td>
                 <td>
-                    <label>Current State</label><br/><s:select name="instanceState" list="instanceStateMap"
+                    <label>Current State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATE}']" list="instanceStateMap"
                                                                  theme="simple" headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
-                    <label>Instance Status</label><br/><s:select name="instanceStatus" list="instanceStatusMap"
+                    <label>Instance Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATUS}']" list="instanceStatusMap"
                                                                  theme="simple" headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
-                    <label>System Status</label><br/><s:select name="systemStatus" list="systemStatusMap" theme="simple"
+                    <label>System Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SYSTEM_STATUS}']" list="systemStatusMap" theme="simple"
                                                                headerKey="" headerValue="-Any-"/>
                 </td>
                 <td>
-                    <label>Alarm State</label><br/><s:select name="alarmState" list="alarmStateMap" theme="simple"
+                    <label>Alarm State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_ALARM_STATE}']" list="alarmStateMap" theme="simple"
                                                              headerKey="" headerValue="-Any-"/>
                 </td>
                 <td style="padding:20px 5px 0px 5px;">

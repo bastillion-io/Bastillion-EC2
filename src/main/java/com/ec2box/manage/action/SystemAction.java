@@ -48,18 +48,18 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HostSystem hostSystem = new HostSystem();
     Script script = null;
     HttpServletRequest servletRequest;
-    String tag = null;
-    String securityGroup = null;
     static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
     static Map<String, String> systemStatusMap = AppConfig.getMapProperties("systemStatus");
     static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
     static Map<String, String> instanceStateMap = AppConfig.getMapProperties("instanceState");
-
-    String alarmState = null;
-    String systemStatus = null;
-    String instanceStatus = null;
-    String instanceState = AppConfig.getProperty("defaultInstanceState");
-
+    
+    public static final String FILTER_BY_ALARM_STATE = "alarm_state";
+    public static final String FILTER_BY_INSTANCE_STATUS= "instance_status";
+    public static final String FILTER_BY_SYSTEM_STATUS= "system_status";
+    public static final String FILTER_BY_INSTANCE_STATE= "instance_state";
+    public static final String FILTER_BY_SECURITY_GROUP= "security_group";
+    public static final String FILTER_BY_TAG= "tag";
+    
 
     @Action(value = "/admin/viewSystems",
             results = {
@@ -73,6 +73,11 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
         List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
         List<String> instanceIdList = new ArrayList<String>();
+        
+        //default instance state
+        if(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null){
+            sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE,AppConfig.getProperty("defaultInstanceState"));  
+        }
 
 
         try {
@@ -87,8 +92,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             if (profileList.size() > 0 || Auth.MANAGER.equals(userType)) {
                 List<String> inputTagList = new ArrayList<String>();
                 //set tag from input filter
-                if (StringUtils.isNotEmpty(tag)) {
-                    inputTagList.add(tag);
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
+                    inputTagList.add(sortedSet.getFilterMap().get(FILTER_BY_TAG));
                 }
                 //set tags for profile
                 for (Profile profile : profileList) {
@@ -112,8 +117,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                 //parse out security group list in format group[,group]
                 List<String> securityGroupList = new ArrayList<>();
-                if (StringUtils.isNotEmpty(securityGroup)) {
-                    securityGroupList = Arrays.asList(securityGroup.split(","));
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SECURITY_GROUP))) {
+                    securityGroupList = Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_SECURITY_GROUP).split(","));
                 }
 
 
@@ -143,9 +148,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             describeInstancesRequest.withFilters(keyNmFilter);
 
                             //instance state filter
-                            if (StringUtils.isNotEmpty(instanceState)) {
+                            if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE))) {
                                 List<String> instanceStateList = new ArrayList<String>();
-                                instanceStateList.add(instanceState);
+                                instanceStateList.add(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE));
                                 Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
                                 describeInstancesRequest.withFilters(instanceStateFilter);
                             }
@@ -224,10 +229,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                             hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
 
                                             //check and filter by instance or system status
-                                            if ((StringUtils.isEmpty(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
-                                                    || (hostSystem.getInstanceStatus().equals(this.instanceStatus) && StringUtils.isEmpty(this.systemStatus))
-                                                    || (hostSystem.getInstanceStatus().equals(this.systemStatus) && StringUtils.isEmpty(this.instanceStatus))
-                                                    || (hostSystem.getInstanceStatus().equals(this.systemStatus) && hostSystem.getInstanceStatus().equals(this.instanceStatus))
+                                            if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
                                                     ) {
                                                 hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
                                             }
@@ -264,13 +269,13 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                                     hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
                                                 }
                                                 //check and filter by alarm state
-                                                if (StringUtils.isEmpty(this.alarmState)) {
+                                                if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))) {
                                                     hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
-                                                } else if ("ALARM".equals(this.alarmState) && hostSystem.getMonitorAlarm() > 0) {
+                                                } else if ("ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0) {
                                                     hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
-                                                } else if ("INSUFFICIENT_DATA".equals(this.alarmState) && hostSystem.getMonitorInsufficientData() > 0) {
+                                                } else if ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0) {
                                                     hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
-                                                } else if ("OK".equals(this.alarmState) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
+                                                } else if ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
                                                     hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
                                                 }
                                             }
@@ -361,22 +366,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         this.servletRequest = servletRequest;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public String getSecurityGroup() {
-        return securityGroup;
-    }
-
-    public void setSecurityGroup(String securityGroup) {
-        this.securityGroup = securityGroup;
-    }
-
     public static Map<String, String> getAlarmStateMap() {
         return alarmStateMap;
     }
@@ -401,29 +390,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         SystemAction.instanceStatusMap = instanceStatusMap;
     }
 
-    public String getAlarmState() {
-        return alarmState;
-    }
-
-    public void setAlarmState(String alarmState) {
-        this.alarmState = alarmState;
-    }
-
-    public String getSystemStatus() {
-        return systemStatus;
-    }
-
-    public void setSystemStatus(String systemStatus) {
-        this.systemStatus = systemStatus;
-    }
-
-    public String getInstanceStatus() {
-        return instanceStatus;
-    }
-
-    public void setInstanceStatus(String instanceStatus) {
-        this.instanceStatus = instanceStatus;
-    }
 
     public static Map<String, String> getInstanceStateMap() {
         return instanceStateMap;
@@ -433,11 +399,4 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         SystemAction.instanceStateMap = instanceStateMap;
     }
 
-    public String getInstanceState() {
-        return instanceState;
-    }
-
-    public void setInstanceState(String instanceState) {
-        this.instanceState = instanceState;
-    }
 }
