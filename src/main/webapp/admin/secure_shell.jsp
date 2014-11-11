@@ -276,8 +276,13 @@ $(document).ready(function () {
 
     $(".output").each(function (index) {
         var id = $(this).attr("id").replace("output_", "");
-        termMap[id] = new Terminal(80, 24);
-        termMap[id].open($(this));
+        termMap[id] = new Terminal({cols: 80, rows: 24,
+            screenKeys: false,
+            useStyle: true,
+            cursorBlink: true,
+            convertEol: true
+        });
+	termMap[id].open($(this));
     });
 
 
