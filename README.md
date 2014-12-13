@@ -1,8 +1,5 @@
 EC2Box
 ======
-
-About
------
 A web-based ssh console to execute commands and manage multiple EC2 instances
 simultaneously running on Amazon Web Services (AWS). EC2Box allows you to share
 terminal commands and upload files to all your EC2 instances. Once the sessions
@@ -10,20 +7,7 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-Screenshots
------------
-
-![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
-
-![Select Instances](http://ec2box.com/img/screenshots/medium/select_instances.png)
-
 ![Terminals](http://ec2box.com/img/screenshots/medium/terms.png)
-
-![More Terminals](http://ec2box.com/img/screenshots/medium/more_terms.png)
-
-![Upload Files](http://ec2box.com/img/screenshots/medium/upload_files.png)
-
-![Disconnect](http://ec2box.com/img/screenshots/medium/disconnect.png)
 
 Demo
 -----
@@ -42,6 +26,19 @@ Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
+
+* Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
+
+| FreeOTP       | Link                                                                                 |
+|:------------- |:------------------------------------------------------------------------------------:|
+| Android       | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)|
+| iOS           | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)                        |
+
+| Google Authenticator| Link                                                                                               |
+|:------------------- |:--------------------------------------------------------------------------------------------------:|
+| Android             | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)|
+| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605)                         |
+
 
 To Run Bundled with Jetty
 ------
@@ -108,6 +105,20 @@ Steps:
 3. Start composite-ssh sessions or create and execute a script across multiple sessions
 4. Add instance administrator accounts
 5. Audit sessions for instance administrators
+
+Screenshots
+-----------
+![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
+
+![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
+
+![Select Instances](http://ec2box.com/img/screenshots/medium/select_instances.png)
+
+![More Terminals](http://ec2box.com/img/screenshots/medium/more_terms.png)
+
+![Upload Files](http://ec2box.com/img/screenshots/medium/upload_files.png)
+
+![Disconnect](http://ec2box.com/img/screenshots/medium/disconnect.png)
 
 Acknowledgments
 ------
