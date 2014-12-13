@@ -108,7 +108,7 @@ Steps:
 
 Screenshots
 -----------
-![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
+![Two-Factor](http://ec2box.com/img/screenshots/medium/two-factor.png)
 
 ![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
 
