@@ -56,7 +56,7 @@ table td, table th {
     background-color: #e0e0e0;
 }
 
-.table-striped th, .tablescroll_head th {
+.table-striped th, .tablescroll_head th, .table-striped td, .tablescroll_head td {
     padding: 10px 15px 10px 10px;
 
 }
