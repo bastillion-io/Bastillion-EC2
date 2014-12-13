@@ -23,42 +23,22 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 250,
-                width: 500,
-                modal: true
-            });
-            $("#script_dia").dialog({
-                autoOpen: false,
-                height: 350,
-                width: 350,
-                modal: true,
-                open: function (event, ui) {
-                    $(".ui-dialog-titlebar-close").show();
-                }
-            });
-
             //open edit dialog
             $(".edit_btn").click(function () {
                 //get dialog id to open
                 var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).dialog("open");
+                $("#edit_dialog_" + id).modal();
 
             });
             $("#script_btn").click(function () {
-                $("#script_dia").dialog("open");
+                $("#script_dialog").modal();
             });
 
             //submit edit form
             $(".submit_btn").button().click(function () {
-                $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
 
-            $(".cancel_btn").button().click(function () {
-                $(".edit_dialog").dialog("close");
-            });
 
             $(".select_frm_btn").button().click(function () {
                 $("#select_frm").submit();
@@ -104,7 +84,7 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 <s:if test="hostSystem.id>0">
-                $("#edit_dialog_<s:property value="hostSystem.id"/>").dialog("open");
+                $("#edit_dialog_<s:property value="hostSystem.id"/>").modal();
                 </s:if>
             });
         </script>
@@ -143,15 +123,28 @@
 
 
     <s:if test="script!=null && script.id!=null">
-        <p>Run <b>
-            <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected instances
-            below
+        <p>Run <b> <a data-toggle="modal" data-target="#script_dialog"><s:property value="script.displayNm"/></a></b> on the selected systems below</p>
 
-        </p>
+        <div id="script_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">View Script: <s:property value="script.displayNm"/></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <pre><s:property value="script.script"/></pre>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Close</button>
 
-        <div id="script_dia" title="View Script">
-            <pre><s:property value="script.script"/></pre>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </s:if>
     <s:else>
         <div>Select the instances below to generate composite SSH sessions in multiple terminals<br/>
@@ -206,7 +199,7 @@
             <s:if test="script!=null && script.id!=null">
                 <s:hidden name="script.id"/>
             </s:if>
-            <table class="table-striped scrollableTable" style="width:100%;table-layout: auto">
+            <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
                 <thead>
                 <tr>
                     <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
@@ -303,47 +296,43 @@
 
     <s:iterator var="system" value="sortedSet.itemList" status="stat">
 
-        <div id="edit_dialog_<s:property value="id"/>" title="Set Properties" class="edit_dialog">
-            <p><s:property value="displayLabel"/></p>
-            <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
-                <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
-
-
-                <tr>
-                    <td class="tdLabel">
-                        <label class="label">Host</label>
-                    </td>
-                    <td>
-                        <s:property value="host"/>
-                    </td>
-                </tr>
-                <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
-
-                <s:hidden name="hostSystem.id" value="%{id}"/>
-                <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
-                <s:hidden name="hostSystem.host" value="%{host}"/>
-                <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
-                <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
-                <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
-                <s:hidden name="hostSystem.state" value="%{state}"/>
-                <s:hidden name="hostSystem.instanceId" value="%{instanceId}"/>
-                <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
-                <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <s:hidden name="selectForm"/>
-                <s:if test="script!=null && script.id!=null">
-                    <s:hidden name="script.id"/>
-                </s:if>
-                <tr>
-                    <td>
-                    </td>
-                    <td>
-                        <div class="btn btn-primary submit_btn">Submit</div>
-                        <div class="btn btn-primary cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
+        <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Set Properties: <s:property value="hostSystem.displayLabel"/></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+			     <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
+                                <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
+                                <s:hidden name="hostSystem.id" value="%{id}"/>
+                                <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
+                                <s:hidden name="hostSystem.host" value="%{host}"/>
+                                <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
+                                <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
+                                <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
+                                <s:hidden name="hostSystem.state" value="%{state}"/>
+                                <s:hidden name="hostSystem.instanceId" value="%{instanceId}"/>
+                                <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
+                                <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                                <s:hidden name="selectForm"/>
+                                <s:if test="script!=null && script.id!=null">
+                                    <s:hidden name="script.id"/>
+                                </s:if>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

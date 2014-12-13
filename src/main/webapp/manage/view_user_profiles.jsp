@@ -25,17 +25,6 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 150,
-                width: 400,
-                modal: true
-            });
-
-            //open add dialog
-            $("#add_btn").button().click(function() {
-                $("#add_dialog").dialog("open");
-            });
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -44,12 +33,7 @@
 
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-                $(this).parents('form:first').submit();
-            });
-            //close all forms
-            $(".cancel_btn").button().click(function() {
-                $("#add_dialog").dialog("close");
-                $(".edit_dialog").dialog("close");
+                $(this).parents('.modal').find('form').submit();
             });
 
             $('.scrollableTable').tableScroll({height:400});
@@ -113,21 +97,29 @@
     </s:if>
 
     <s:if test="profileList!= null && !profileList.isEmpty()">
-        <div id="add_btn" class="btn btn-primary">Add Profile</div>
-        <div id="add_dialog" title="Add Profile">
-            <s:form action="addProfileToUser">
-                <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
-                          listKey="id" listValue="%{nm}"/>
-                <s:hidden name="user.id"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-primary submit_btn">Submit</div>
-                        <div class="btn btn-primary cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
-
+        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add Profile</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:form action="addProfileToUser">
+                                <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
+                                          listKey="id" listValue="%{nm}"/>
+                                <s:hidden name="user.id"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </s:if>
     <s:else>

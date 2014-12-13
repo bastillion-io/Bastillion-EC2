@@ -28,15 +28,15 @@ table tbody {
     float: right;
     color: #DDDDDD;
 }
-.wwFormTable {
+form table {
     background-color: #FFFFFF;
     min-width:10px;
 }
 
-.wwFormTable input {
+form table input {
     padding: 2px;
 }
-.wwFormTable td {
+form table td, form table th {
     padding: 5px;
 }
 
@@ -78,6 +78,7 @@ table td, table th {
 .errorMessage, .errorMessage a {
     font-size: smaller;
     color: #cc0000;
+    list-style-type: none;
 }
 
 .errorLabel {
@@ -85,12 +86,11 @@ table td, table th {
 }
 
 
-.wwFormTable label,
-.wwFormTable  .label {
+form table label,
+form table .label {
     font-size: small;
     font-weight: bold;
     color: #666666;
-    padding: 2px 2px 2px 2px;
 }
 
 div.block {
@@ -219,8 +219,6 @@ div.termwrapper div h6 {
     background-color: #000000;
 }
 
-
-
 .top_link {
     float: left;
     padding: 0 0 10px 30px;
@@ -234,16 +232,9 @@ div.termwrapper div h6 {
     clear: both;
 }
 
-.ui-dialog-titlebar-close {
-    display: none;
-    background: #cccccc url("jquery-ui/base/images/ui-icons_222222_256x240.png");
-    background-position: -96px -128px;
-}
-
 .errorsBg {
     background-color: #fdd;
-    color: red;
-    border: 1px solid;
+    border: 1px solid red;
 }
 
 .errorMessage {
@@ -286,12 +277,21 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px;
+    margin: 5px 5px 0 5px;
 }
 
 .nav-img {
     float: left;
     margin-top: -8px;
     margin-left: -50px;
+}
+
+.modal-body .row {
+    padding-left:10px;
+}
+
+.modal-footer .btn {
+    margin-bottom: 0;
+    padding: 8px 12px;
 }
 

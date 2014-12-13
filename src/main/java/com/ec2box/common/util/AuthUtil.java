@@ -27,6 +27,18 @@ public class AuthUtil {
 
 
     /**
+     * query session for OTP shared secret
+     *
+     * @param session http session
+     * @return shared secret
+     */
+    public static String getOTPSecret( HttpSession session) {
+        String secret = (String) session.getAttribute("otp_secret");
+        secret = EncryptionUtil.decrypt(secret);
+        return secret;
+    }
+
+    /**
      * set user type
      *
      * @param session http session
@@ -115,6 +127,18 @@ public class AuthUtil {
     }
 
     /**
+     * set session OTP shared secret
+     *
+     * @param session http session
+     * @param secret shared secret
+     */
+    public static void setOTPSecret(HttpSession session, String secret) {
+        if (secret != null && !secret.trim().equals("")) {
+            session.setAttribute("otp_secret", EncryptionUtil.encrypt(secret));
+        }
+    }
+
+    /**
      * set session user id
      *
      * @param session http session
@@ -125,6 +149,8 @@ public class AuthUtil {
             session.setAttribute("userId", EncryptionUtil.encrypt(userId.toString()));
         }
     }
+
+
 
     /**
      * set session authentication token

@@ -15,10 +15,13 @@
  */
 package com.ec2box.manage.action;
 
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.model.Auth;
+import com.ec2box.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -31,8 +34,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class LoginAction extends ActionSupport implements ServletRequestAware {
 
-   HttpServletRequest servletRequest;
+    HttpServletRequest servletRequest;
     Auth auth;
+    //check if otp is enabled
+    boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
 
     @Action(value = "/login",
             results = {
@@ -59,6 +64,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             results = {
                     @Result(name = "input", location = "/login.jsp"),
                     @Result(name = "change_password", location = "/admin/setPassword.action", type = "redirect"),
+                    @Result(name = "otp", location = "/admin/viewOTP.action", type = "redirect"),
                     @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
     )
@@ -67,17 +73,35 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
         String authToken = AuthDB.loginAdmin(auth);
         if (authToken != null) {
+
+            Long userId = AuthDB.getUserIdByAuthToken(authToken);
+            String sharedSecret = null;
+            if (otpEnabled) {
+                sharedSecret = AuthDB.getSharedSecret(userId);
+                if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
+                    addFieldError("auth.otpToken", "Invalid");
+                    return INPUT;
+                }
+            }
+
             AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
             AuthUtil.setUserId(servletRequest.getSession(), AuthDB.getUserIdByAuthToken(authToken));
             AuthUtil.setTimeout(servletRequest.getSession());
+
+            //for first time login redirect to set OTP
+            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+                return "otp";
+            }
+            else if ("changeme".equals(auth.getPassword())) {
+                retVal = "change_password";
+            }
+
 
         } else {
             addActionError("Invalid username and password combination");
             retVal = INPUT;
         }
-        if (retVal == SUCCESS && "changeme".equals(auth.getPassword())) {
-            retVal = "change_password";
-        }
+
 
         return retVal;
     }
@@ -180,5 +204,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+    }
+
+    public boolean isOtpEnabled() {
+        return otpEnabled;
+    }
+
+    public void setOtpEnabled(boolean otpEnabled) {
+        this.otpEnabled = otpEnabled;
     }
 }

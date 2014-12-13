@@ -25,19 +25,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 200,
-                width: 435,
-                modal: true
-            });
 
-
-
-            //open add dialog
-            $("#add_btn").button().click(function() {
-                $("#add_dialog").dialog("open");
-            });
 
             //call delete action
             $(".del_btn").button().click(function() {
@@ -46,12 +34,9 @@
             });
             //submit add form
             $(".submit_btn").button().click(function() {
-                $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
-            $(".cancel_btn").button().click(function() {
-                $("#add_dialog").dialog("close");
-            });
+
 
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
@@ -81,7 +66,7 @@
         <script type="text/javascript">
             $(document).ready(function() {
 
-                $("#add_dialog").dialog("open");
+                $("#add_dialog").modal();
 
             });
         </script>
@@ -132,26 +117,31 @@
         </s:if>
 
 
-
-
-
-        <div id="add_btn" class="btn btn-primary">Add AWS Credentials</div>
-        <div id="add_dialog" title="Add AWS Credentials">
-            <s:actionerror/>
-            <s:form action="saveAWSCred" class="save_aws_form_add" autocomplete="off">
-               <s:textfield name="awsCred.accessKey" label="Access Key" size="25" />
-                <s:password name="awsCred.secretKey" label="Secret Key" size="25" />
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td>
-                        <div class="btn btn-primary submit_btn">Submit</div>
-                        <div class="btn btn-primary cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
-
+        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#add_dialog">Add AWS Credentials</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add AWS Credentials</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:actionerror/>
+                            <s:form action="saveAWSCred" class="save_aws_form_add" autocomplete="off">
+                                <s:textfield name="awsCred.accessKey" label="Access Key" size="25" />
+                                <s:password name="awsCred.secretKey" label="Secret Key" size="25" />
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

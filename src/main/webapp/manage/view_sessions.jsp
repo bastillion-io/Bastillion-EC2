@@ -29,11 +29,6 @@
                 window.location = 'getTermsForSession.action?sessionId=' + id;
             });
 
-            //submit add or edit form
-            $(".submit_btn").button().click(function () {
-                $(this).parents('form:first').submit();
-            });
-
             $(".sort,.sortAsc,.sortDesc").click(function () {
                 var id = $(this).attr('id')
 
@@ -81,7 +76,7 @@
             <p>Select a session to audit below</p>
 
 
-            <table class="table-striped scrollableTable">
+            <table class="table-striped scrollableTable" style="min-width:80%">
                 <thead>
                 <tr>
 

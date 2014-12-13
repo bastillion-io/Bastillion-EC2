@@ -49,18 +49,6 @@
 
             $.ajaxSetup({ cache: false });
 
-
-            $("#import_dialog").dialog({
-                autoOpen: false,
-                height: 500,
-                width: 600,
-                modal: true
-            });
-
-            //open import dialog
-           $("#import_btn").button().click(function() {
-                $("#import_dialog").dialog("open");
-            });
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -68,12 +56,9 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-                $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
-            $(".cancel_btn").button().click(function() {
-                $("#import_dialog").dialog("close");
-            });
+
 
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
@@ -107,7 +92,7 @@
                      populateKeyNames();
 
                     <s:if test="ec2Key.privateKey!=null">
-                    $("#import_dialog").dialog("open");
+                    $("#import_dialog").modal();
                     </s:if>
 
 
@@ -185,9 +170,17 @@
 
 
 
-             <div id="import_btn"  class="btn btn-primary">Import Private Key</div>
-                        <div id="import_dialog" title="Import Existing EC2 Key">
-                         <s:actionerror/>
+        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#import_dialog">Import Private Key</button>
+        <div id="import_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Import Existing EC2 Key</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:actionerror/>
                             <s:form action="importEC2Key" class="save_ec2Key_form_import">
                                 <s:if test="awsCredList.size()==1">
                                     <s:hidden name="ec2Key.awsCredId" value="%{awsCredList.get(0).getId()}"/>
@@ -201,15 +194,16 @@
 
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
-                                <tr>
-                                <td>&nbsp;</td>
-                                <td>
-                                <div class="btn btn-primary submit_btn">Submit</div>
-                                <div class="btn btn-primary cancel_btn">Cancel</div>
-                                </td>
-                                </tr>
                             </s:form>
-             </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </s:else>
 

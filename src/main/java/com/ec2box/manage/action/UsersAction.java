@@ -34,6 +34,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     SortedSet sortedSet=new SortedSet();
     User user = new User();
     HttpServletRequest servletRequest;
+    boolean resetSharedSecret=false;
 
     @Action(value = "/manage/viewUsers",
             results = {
@@ -55,15 +56,22 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String saveUser() {
 
+
         if (user.getId() != null) {
             if(user.getPassword()==null || user.getPassword().trim().equals("")){
-                User tmpUser = UserDB.getUser(getUser().getId());
-                user.setPassword(tmpUser.getPassword());
+                UserDB.updateUserNoCredentials(user);
             }
-            UserDB.updateUser(user);
+            else {
+                UserDB.updateUserCredentials(user);
+            }
+            //check if reset is set
+            if(resetSharedSecret){
+                UserDB.resetSharedSecret(user.getId());
+            }
         } else {
             UserDB.insertUser(user);
         }
+
         return SUCCESS;
     }
 
@@ -146,5 +154,13 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+    }
+
+    public boolean isResetSharedSecret() {
+        return resetSharedSecret;
+    }
+
+    public void setResetSharedSecret(boolean resetSharedSecret) {
+        this.resetSharedSecret = resetSharedSecret;
     }
 }

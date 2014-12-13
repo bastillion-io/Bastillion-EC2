@@ -27,6 +27,9 @@ public class Auth {
     String passwordConfirm;
     String prevPassword;
     String authToken;
+    String otpSecret;
+    Long otpToken;
+    String salt;
     String userType=ADMINISTRATOR;
 
     public String getUsername() {
@@ -83,5 +86,29 @@ public class Auth {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getOtpSecret() {
+        return otpSecret;
+    }
+
+    public void setOtpSecret(String otpSecret) {
+        this.otpSecret = otpSecret;
+    }
+
+    public Long getOtpToken() {
+        return otpToken;
+    }
+
+    public void setOtpToken(Long otpToken) {
+        this.otpToken = otpToken;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }
