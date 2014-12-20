@@ -38,6 +38,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     Auth auth;
     //check if otp is enabled
     boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
+    private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
 
     @Action(value = "/login",
             results = {
@@ -79,7 +80,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             if (otpEnabled) {
                 sharedSecret = AuthDB.getSharedSecret(userId);
                 if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                    addFieldError("auth.otpToken", "Invalid");
+                    addActionError(AUTH_ERROR);
                     return INPUT;
                 }
             }
@@ -98,7 +99,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
 
         } else {
-            addActionError("Invalid username and password combination");
+            addActionError(AUTH_ERROR);
             retVal = INPUT;
         }
 
