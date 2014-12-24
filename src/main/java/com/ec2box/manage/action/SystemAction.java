@@ -17,6 +17,8 @@ package com.ec2box.manage.action;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient;
 import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
 import com.amazonaws.services.cloudwatch.model.Dimension;
@@ -31,12 +33,14 @@ import com.ec2box.manage.model.*;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
 import com.opensymphony.xwork2.ActionSupport;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.*;
 
 /**
@@ -133,7 +137,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             //create service
 
                             AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-                            service.setEndpoint(ec2Region);
+                            service.setRegion(Region.getRegion(Regions.fromName(ec2Region)));
 
 
                             //only return systems that have keys set
@@ -249,7 +253,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                                 //check alarms for ec2 instances
                                 AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(awsCredentials, AWSClientConfig.getClientConfig());
-                                cloudWatchClient.setEndpoint(ec2Region.replace("ec2", "monitoring"));
+                                cloudWatchClient.setRegion(Region.getRegion(Regions.fromName(ec2Region)));
 
 
                                 DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
