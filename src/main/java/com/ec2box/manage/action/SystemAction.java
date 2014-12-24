@@ -32,6 +32,8 @@ import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.opensymphony.xwork2.ActionSupport;
 
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +90,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
 
 
-            Map<String, String> tagMap = new HashMap<>();
+            Multimap<String, String> tagMap = ArrayListMultimap.create();
             List<String> tagList = new ArrayList<>();
 
             //if user profile has been set or user is a manager
@@ -169,7 +171,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             }
                             //set name value pair for tag filter
                             for (String tag : tagMap.keySet()) {
-                                Filter tagValueFilter = new Filter("tag:" + tag, Arrays.asList(tagMap.get(tag)));
+                                Filter tagValueFilter = new Filter("tag:" + tag, (List<String>) tagMap.get(tag));
                                 describeInstancesRequest.withFilters(tagValueFilter);
                             }
 
