@@ -16,22 +16,30 @@
 package com.ec2box.manage.action;
 
 
-import com.ec2box.common.util.AuthUtil;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
+
 import com.ec2box.manage.db.UserDB;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.ServletRequestAware;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Action to manage users
  */
 public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
-    SortedSet sortedSet=new SortedSet();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 338185512652521656L;
+	SortedSet sortedSet=new SortedSet();
     User user = new User();
     HttpServletRequest servletRequest;
 
@@ -41,7 +49,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             }
     )
     public String viewUsers() {
-        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
 
         return SUCCESS;
@@ -60,8 +67,10 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                 User tmpUser = UserDB.getUser(getUser().getId());
                 user.setPassword(tmpUser.getPassword());
             }
+            user.setExpiryTime(DateUtils.addMinutes(new Date(), user.getTimeToExpire()));
             UserDB.updateUser(user);
         } else {
+        	user.setExpiryTime(DateUtils.addMinutes(new Date(), user.getTimeToExpire()));
             UserDB.insertUser(user);
         }
         return SUCCESS;

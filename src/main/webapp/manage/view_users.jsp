@@ -140,6 +140,7 @@
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_EMAIL"/>" class="sort">Email
                             Address
                         </th>
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_EXPIRY_TIME"/>" class="sort">Expiry Time</th>
                         <th>&nbsp;</th>
                     </tr>
                     </thead>
@@ -168,6 +169,7 @@
                         <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
+                        <td><s:property value='%{getText("{0,date,dd/MM/yyyy HH:mm:ss a}",{expiryTime})}'/></td>
                             <td>
                                 <div id="edit_btn_<s:property value="id"/>" class="btn btn-primary edit_btn" style="float:left">
                                     Edit
@@ -204,6 +206,7 @@
                     <s:textfield name="user.email" label="Email Address" size="25"/>
                     <s:password name="user.password" value="" label="Password" size="15"/>
                     <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                    <s:select name="user.timeToExpire" headerKey="0" headerValue="Select Expiry Time" list="#{'30':'30 minutes','60':'1 hour','90':'1.5 hours','120':'2 hours','150':'2.5 hours','180':'3 hours','210':'3.5 hours','240':'4 hours','270':'4.5 hours','300':'5 hours'}" label="ExpiryTime"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     <tr>
@@ -229,6 +232,7 @@
                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
                         <s:password name="user.password" value="" label="Password" size="15"/>
                         <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                        <s:select name="user.timeToExpire" headerKey="0" headerValue="Select Expiry Time" list="#{'30':'30 minutes','60':'1 hour','90':'1.5 hours','120':'2 hours','150':'2.5 hours','180':'3 hours','210':'3.5 hours','240':'4 hours','270':'4.5 hours','300':'5 hours'}" label="ExpiryTime"/>
                         <s:hidden name="user.id" value="%{id}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>

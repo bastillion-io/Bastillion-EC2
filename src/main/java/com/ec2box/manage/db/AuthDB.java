@@ -78,7 +78,7 @@ public class AuthDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=? and expiryTime > CURRENT_TIMESTAMP()");
             stmt.setString(1, auth.getUsername());
             stmt.setString(2, EncryptionUtil.hash(auth.getPassword()));
             ResultSet rs = stmt.executeQuery();

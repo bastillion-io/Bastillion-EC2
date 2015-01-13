@@ -15,15 +15,15 @@
  */
 package com.ec2box.manage.db;
 
-import com.ec2box.manage.model.SortedSet;
-import com.ec2box.manage.model.User;
-import com.ec2box.manage.util.DBUtils;
-import com.ec2box.manage.util.EncryptionUtil;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+
+import com.ec2box.manage.model.SortedSet;
+import com.ec2box.manage.model.User;
+import com.ec2box.manage.util.DBUtils;
+import com.ec2box.manage.util.EncryptionUtil;
 
 
 /**
@@ -36,6 +36,7 @@ public class UserDB {
     public static final String SORT_BY_EMAIL="email";
     public static final String SORT_BY_USERNAME="username";
     public static final String SORT_BY_USER_TYPE="user_type";
+    public static final String SORT_BY_EXPIRY_TIME="expiryTime";
 
     /**
      * returns users based on sort order defined
@@ -68,6 +69,7 @@ public class UserDB {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setUserType(rs.getString("user_type"));
+                user.setExpiryTime(rs.getTimestamp("expiryTime"));
                 userList.add(user);
 
             }
@@ -129,6 +131,7 @@ public class UserDB {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setUserType(rs.getString("user_type"));
+                user.setExpiryTime(rs.getTimestamp("expiryTime"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
             DBUtils.closeRs(rs);
@@ -151,13 +154,15 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password) values (?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password, timeToExpiry,expiryTime) values (?,?,?,?,?,?,?,?)");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getUsername());
             stmt.setString(5, user.getUserType());
             stmt.setString(6, EncryptionUtil.hash(user.getPassword()));
+            stmt.setInt(7, user.getTimeToExpire());
+            stmt.setTimestamp(8, new java.sql.Timestamp(user.getExpiryTime().getTime()));
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -178,14 +183,16 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=?, timeToExpiry=?,expiryTime=? where id=?");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getUsername());
             stmt.setString(5, user.getUserType());
             stmt.setString(6, EncryptionUtil.hash(user.getPassword()));
-            stmt.setLong(7, user.getId());
+            stmt.setInt(7, user.getTimeToExpire());
+            stmt.setTimestamp(8, new java.sql.Timestamp(user.getExpiryTime().getTime()));
+            stmt.setLong(9, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 

@@ -16,6 +16,7 @@
 package com.ec2box.manage.model;
 
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,20 +25,12 @@ import java.util.List;
 public class User extends Auth {
     String firstNm;
     String lastNm;
-
-    public List<Profile> getProfileList() {
-        return profileList;
-    }
-
-    public void setProfileList(List<Profile> profileList) {
-        this.profileList = profileList;
-    }
-
     String email;
     boolean checked=false;
     List<Profile> profileList;
-
-
+    Integer timeToExpire;
+	Date expiryTime;
+   
     public boolean getChecked() {
         return checked;
     }
@@ -70,6 +63,28 @@ public class User extends Auth {
         this.email = email;
     }
 
+    public List<Profile> getProfileList() {
+        return profileList;
+    }
 
+    public void setProfileList(List<Profile> profileList) {
+        this.profileList = profileList;
+    }
+    
+    public Date getExpiryTime() {
+        return expiryTime;
+    }
+
+    public void setExpiryTime(Date expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+    
+    public Integer getTimeToExpire() {
+		return timeToExpire;
+	}
+
+    public void setTimeToExpire(Integer timeToExpire) {
+		this.timeToExpire = timeToExpire;
+	}
 
 }
