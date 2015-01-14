@@ -224,7 +224,7 @@
 						list="#{'':'-Select Region Above-'}" />
 					<s:textarea name="ec2Key.privateKey" label="Private Key Value"
 						rows="15" cols="35" wrap="off" />
-
+	
 					<s:hidden name="sortedSet.orderByDirection" />
 					<s:hidden name="sortedSet.orderByField" />
 					<tr>
@@ -249,7 +249,8 @@
 					</s:else>
 					<s:select name="ec2Key.ec2Region" list="ec2RegionMap"
 						label="EC2 Region" />
-
+					<s:textfield name="header.username" label="Username" size="15"/>
+					<s:textfield name="header.token" label="Token" size="15"/>
 					<s:hidden name="sortedSet.orderByDirection" />
 					<s:hidden name="sortedSet.orderByField" />
 					<tr>

@@ -16,7 +16,9 @@
 package com.ec2box.common.util;
 
 import com.ec2box.manage.util.EncryptionUtil;
+
 import javax.servlet.http.HttpSession;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -147,7 +149,7 @@ public class AuthUtil {
         //set session timeout
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
         Calendar timeout = Calendar.getInstance();
-        timeout.add(Calendar.MINUTE, 15);
+        timeout.add(Calendar.MINUTE, Integer.parseInt(AppConfig.getProperty("sessionTimeout")));
         session.setAttribute("timeout", sdf.format(timeout.getTime()));
     }
 

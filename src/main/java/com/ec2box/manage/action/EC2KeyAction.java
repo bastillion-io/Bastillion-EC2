@@ -41,6 +41,7 @@ import com.amazonaws.services.ec2.model.KeyPairInfo;
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.ias.IasClient;
 import com.ec2box.ias.model.AwsSshKey;
+import com.ec2box.ias.model.IasRequestHeader;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.model.AWSCred;
@@ -57,6 +58,7 @@ import com.sun.jersey.api.client.WebResource;
 public class EC2KeyAction extends ActionSupport implements ServletResponseAware {
 
 	EC2Key ec2Key;
+	IasRequestHeader header;
 	SortedSet sortedSet = new SortedSet();
 	HttpServletResponse servletResponse;
 	static Map<String, String> ec2RegionMap = AppConfig.getMapProperties("ec2Regions");
@@ -192,7 +194,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
 			WebResource client = IasClient.getClient(AppConfig.getProperty("iasServer"));
 			String jsonData = client.path("/IAS/aws/sshkey/keys").queryParam("region", ec2Key.getEc2Region()).accept(MediaType.APPLICATION_JSON)
-					.get(String.class);
+					.header("crowd-sso-name", header.getUsername()).header("crowd-sso-token", header.getToken()).get(String.class);
 			if (!jsonData.isEmpty()) {
 				AwsSshKey[] keys = new Gson().fromJson(jsonData, AwsSshKey[].class);
 				for (AwsSshKey key : keys) {
@@ -300,6 +302,14 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
 	public void setAwsCredList(List<AWSCred> awsCredList) {
 		this.awsCredList = awsCredList;
+	}
+
+	public IasRequestHeader getHeader() {
+		return header;
+	}
+
+	public void setHeader(IasRequestHeader header) {
+		this.header = header;
 	}
 
 }
