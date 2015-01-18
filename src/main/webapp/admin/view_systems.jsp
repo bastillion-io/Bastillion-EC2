@@ -278,10 +278,10 @@
             </table>
         </s:form>
         <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="btn btn-primary select_frm_btn">Execute Script</div>
+            <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Execute Script</div>
         </s:if>
         <s:else>
-            <div class="btn btn-primary select_frm_btn">Create SSH Terminals</div>
+            <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Create SSH Terminals</div>
         </s:else>
     </s:if>
 <s:else>

@@ -82,7 +82,7 @@
                         <s:property value="nm"/>
                     </td>
                     <td>
-                        <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn">Delete</div>
+                        <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-middle">Delete</div>
                     </td>
 
 
@@ -97,7 +97,7 @@
     </s:if>
 
     <s:if test="profileList!= null && !profileList.isEmpty()">
-        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

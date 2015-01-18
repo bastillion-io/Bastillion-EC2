@@ -3,7 +3,7 @@ body {
     padding-top: 50px;
 }
 a {
-    color: #666666;
+    color: #666;
 }
 table {
     border-collapse: collapse;
@@ -24,12 +24,12 @@ table tbody {
     text-decoration: none;
 }
 .navbar .note {
-    padding: 10px 2px 2px 0px;
+    padding: 10px 2px 2px 0;
     float: right;
-    color: #DDDDDD;
+    color: #DDD;
 }
 form table {
-    background-color: #FFFFFF;
+    background-color: #FFF;
     min-width:10px;
 }
 
@@ -49,7 +49,7 @@ table td, table th {
 
 
 .table-striped {
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
 }
 
 .tablescroll_head th {
@@ -61,14 +61,14 @@ table td, table th {
 
 }
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
-    border: 1px solid #DDDDDD;
+    border: 1px solid #DDD;
     line-height: 1.42857;
     padding: 10px;
     vertical-align: middle;
 }
 
 .table-striped td, .table-striped th, .tablescroll_head th {
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
     white-space: nowrap;
 }
 
@@ -91,12 +91,12 @@ form table label,
 form table .label {
     font-size: small;
     font-weight: bold;
-    color: #666666;
+    color: #666;
 }
 
 div.block {
     overflow: hidden;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
 }
 
 div.block label, div.block .inner_block {
@@ -154,7 +154,7 @@ div.block .input {
 
 div.term {
     margin: 10px;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
 }
 
 div.termwrapper {
@@ -174,10 +174,10 @@ div.termwrapper div h6 {
 
 .top_nav_item {
     float: left;
-    padding: 0 15px 0px 0;
+    padding: 0 15px 0 0;
 }
 .run_cmd {
-    background: #eeeeee;
+    background: #eee;
 }
 
 .run_cmd_active {
@@ -188,7 +188,7 @@ div.termwrapper div h6 {
     color: #eeeeee;
 }
 .navbar-inverse {
-    color: #dddddd;
+    color: #ddd;
 }
 .navbar-inverse input {
     color: #4d4d4d;
@@ -197,19 +197,9 @@ div.termwrapper div h6 {
 .run_cmd {
     border-radius: 4px;
     margin-top: 5px;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
     float: left;
-    min-width: 600px;
-}
-
-@media screen and (max-width: 1200px) {
-    .run_cmd {
-        min-width: 0px;
-    }
-    div.termwrapper {
-        width:105%;
-        margin: 0 auto;
-    }
+    width: 50%;
 }
 
 .term-header {
@@ -217,7 +207,7 @@ div.termwrapper div h6 {
 }
 
 .term {
-    background-color: #000000;
+    background-color: #000;
 }
 
 .top_link {
@@ -239,7 +229,7 @@ div.termwrapper div h6 {
 }
 
 .errorMessage {
-    padding: 0px 8px;
+    padding: 0 8px;
 }
 
 .output {
@@ -249,17 +239,22 @@ div.termwrapper div h6 {
 .terminal {
     border: #f0f0f0 solid 5px;
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
-    font-size: 10px;
-    color: #000000;
+    font-size: 12px;
+    color: #000;
     background: #f0f0f0;
     line-height: 1.231;
 }
 
 .terminal pre {
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
-    font-size: 10px;
+    font-size: 12px;
     border: none;
     line-height: 1.231;
+}
+
+.terminal div {
+    white-space: nowrap;
+    height:14px;
 }
 
 .reverse-video {
@@ -278,7 +273,6 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px 5px 0 5px;
 }
 
 .nav-img {
@@ -294,5 +288,33 @@ div.termwrapper div h6 {
 .modal-footer .btn {
     margin-bottom: 0;
     padding: 8px 12px;
+}
+
+.spacer {
+    display: inline-block;
+}
+
+.spacer-middle {
+    margin: 0 5px;
+}
+
+.spacer-left {
+    margin: 0 5px 0 0;
+}
+
+.spacer-right {
+    margin: 0 0 0 5px;
+}
+
+.spacer-top {
+    margin: 0 0 5px 0;
+}
+
+.spacer-bottom {
+    margin: 5px 0 0 0;
+}
+
+.alertContainer {
+    margin-top: 25px;
 }
 

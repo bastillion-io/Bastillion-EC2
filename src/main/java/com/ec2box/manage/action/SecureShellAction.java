@@ -15,17 +15,12 @@
  */
 package com.ec2box.manage.action;
 
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.*;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
-import com.ec2box.manage.util.AWSClientConfig;
 import com.ec2box.manage.util.SSHUtil;
+import com.jcraft.jsch.ChannelShell;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -51,11 +46,15 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String passphrase;
     String password;
     Long id;
-    static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
     List<HostSystem> systemList = new ArrayList<HostSystem>();
+    Integer ptyWidth;
+    Integer ptyHeight;
+
+    static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
+    
+
     Script script = new Script();
-
-
+    
     /**
      * creates composite terminals if there are errors or authentication issues.
      */
@@ -150,68 +149,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             //check to see if user has perms to access selected systems
             if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
 
-                /*
-                //get instance id's for all potential instances for user
-                Map<String, String> tagMap = new HashMap<>();
-                List<String> tagList = new ArrayList<>();
-                //parse out tags in format tag-name[=value[,tag-name[=value]]
-                List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
-                for (Profile profile : profileList) {
-                    String[] tagArr1 = profile.getTag().split(",");
-                    if (tagArr1.length > 0) {
-                        for (String tag1 : tagArr1) {
-                            String[] tagArr2 = tag1.split("=");
-                            if (tagArr2.length > 1) {
-                                tagMap.put(tag1.split("=")[0], tag1.split("=")[1]);
-                            } else {
-                                tagList.add(tag1);
-                            }
-                        }
-                    }
-                }
-                List<String> instanceIdList = new ArrayList<String>();
-                if (tagList.size() > 0 || tagMap.size() > 0) {
-
-                    List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
-
-                    //get AWS credentials from DB
-                    for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
-
-                        if (awsCred != null) {
-                            //set  AWS credentials for service
-                            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-
-                            for (String ec2Region : ec2RegionList) {
-                                //create service
-                                AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-                                service.setEndpoint(ec2Region);
-
-                                DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
-
-                                if (tagList.size() > 0) {
-                                    Filter tagFilter = new Filter("tag-key", tagList);
-                                    describeInstancesRequest.withFilters(tagFilter);
-                                }
-
-                                //set name value pair for tag filter
-                                for (String tag : tagMap.keySet()) {
-                                    Filter tagValueFilter = new Filter("tag:" + tag, Arrays.asList(tagMap.get(tag)));
-                                    describeInstancesRequest.withFilters(tagValueFilter);
-                                }
-
-                                DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
-
-                                for (Reservation res : describeInstancesResult.getReservations()) {
-                                    for (Instance instance : res.getInstances()) {
-                                        instanceIdList.add(instance.getInstanceId());
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-                */
                 //make sure selected instance id is host the user has permission to.
                 List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
                 List<Long> systemIdList = new ArrayList<Long>();
@@ -267,6 +204,28 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                 //remove from map
                 userSchSessions.getSchSessionMap().remove(id);
             }
+
+        }
+
+        return null;
+    }
+
+    @Action(value = "/admin/setPtyType")
+    public String setPtyType() {
+
+        Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
+        if (SecureShellAction.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+            if (userSchSessions != null && userSchSessions.getSchSessionMap() !=null) {
+
+                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+
+                ChannelShell channel = (ChannelShell) schSession.getChannel();
+                channel.setPtySize((int)Math.floor(ptyWidth / 7.2981), (int)Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
+                schSession.setChannel(channel);
+
+            }
+
 
         }
 
@@ -399,6 +358,22 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getPtyWidth() {
+        return ptyWidth;
+    }
+
+    public void setPtyWidth(Integer ptyWidth) {
+        this.ptyWidth = ptyWidth;
+    }
+
+    public Integer getPtyHeight() {
+        return ptyHeight;
+    }
+
+    public void setPtyHeight(Integer ptyHeight) {
+        this.ptyHeight = ptyHeight;
     }
 }
 

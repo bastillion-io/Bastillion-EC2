@@ -105,7 +105,7 @@
                     <tr>
                         <td><s:property value="accessKey"/></td>
                         <td>
-                            <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
+                            <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-left">
                                 Delete
                             </div>
                             <div style="clear:both"></div>
@@ -117,7 +117,7 @@
         </s:if>
 
 
-        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#add_dialog">Add AWS Credentials</button>
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add AWS Credentials</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

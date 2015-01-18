@@ -24,8 +24,6 @@
 
     <script type="text/javascript">
 
-
-
         function populateKeyNames() {
             $.getJSON('getKeyPairJSON.action?ec2Key.awsCredId='+$("#importEC2Key_ec2Key_awsCredId").val()+'&ec2Key.ec2Region='+$("#importEC2Key_ec2Key_ec2Region").val(), function(result) {
 
@@ -157,7 +155,7 @@
                         <td><s:property value="accessKey"/></td>
                         </s:if>
                             <td>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-left" >
                                     Delete
                                 </div>
                                 <div style="clear:both"></div>
@@ -170,7 +168,7 @@
 
 
 
-        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#import_dialog">Import Private Key</button>
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#import_dialog">Import Private Key</button>
         <div id="import_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

@@ -141,14 +141,13 @@
                         <td>
                             <div style="width:235px">
 
+                                <button class="btn btn-primary spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
 
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn" style="float:left" >Delete</button>
+                                <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-middle">Delete</button>
 
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
-                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-primary edit_btn" style="float:left">Assign Profiles</button>
+                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-primary edit_btn spacer spacer-right">Assign Profiles</button>
                                     </a>
                                 </s:if>
                                 <div style="clear:both"></div>
@@ -164,7 +163,7 @@
 
 
 
-        <button class="btn btn-primary add_btn" data-toggle="modal" data-target="#add_dialog">Add User</button>
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add User</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
