@@ -71,9 +71,6 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height: 475});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
-
             $('#view_btn').unbind().click(function () {
                 $("#viewSystems").submit();
             });
@@ -89,19 +86,6 @@
             });
         </script>
     </s:if>
-    <style>
-        .system_container {
-            padding:0 -30px ;
-            margin:0 -30px ;
-        }
-        .tablescroll_head th{
-            padding: 10px 5px;
-        }
-
-        .tablescroll_body td {
-            padding: 10px 5px;
-        }
-    </style>
 
     <title>EC2Box - Manage Instances</title>
 </head>

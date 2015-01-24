@@ -114,7 +114,6 @@ $(document).ready(function() {
     .terminal {
         background-color: rgb(240, 240, 240);
         color: rgb(77, 77, 77);
-        width:595px;
         height:300px;
         overflow-y:scroll;
 

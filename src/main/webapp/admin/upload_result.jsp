@@ -33,8 +33,7 @@
                 $('#push').submit();
             });
 
-            $('.scrollableTable').tableScroll({height:150, width:650});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
+            $('.uploadTable').tableScroll({height:150, width:650});
             <s:if test="pendingSystemStatus!=null">
             //set scroll
             var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
@@ -66,7 +65,7 @@
 
 
 <s:if test="systemStatusList!= null && !systemStatusList.isEmpty()">
-    <table class="table-striped scrollableTable">
+    <table class="table-striped uploadTable">
         <thead>
 
         <tr>
