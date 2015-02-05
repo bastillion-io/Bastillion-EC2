@@ -44,6 +44,8 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     public String viewUsers() {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
+        
+        user.setId(userId);
 
         return SUCCESS;
     }
@@ -82,7 +84,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String deleteUser() {
 
-        if (user.getId() != null) {
+        if (user.getId() != null && user.getId()!=AuthUtil.getUserId(servletRequest.getSession())) {
             UserDB.disableUser(user.getId());
         }
         return SUCCESS;
