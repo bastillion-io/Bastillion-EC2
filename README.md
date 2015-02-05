@@ -89,6 +89,22 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
+Restricting User Access
+------
+Administrative access can be restricted through the use of tags defined in a user's profile. Profile tags must correspond to the instance tags that have been set through the AWS console.
+
+Tags work on a name or name/value pair.
+
+for example
+
+    tag-name
+    tag-name=mytag
+
+or multiple
+
+    tag-name1,tag-name2
+    tag-name1=mytag1,tag-name2=mytag2
+
 Using EC2Box
 ------
 Open browser to https://\<whatever ip\>:8443
