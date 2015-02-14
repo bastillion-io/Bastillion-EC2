@@ -7,7 +7,7 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-![Terminals](http://ec2box.com/img/screenshots/medium/terms.png)
+![Terminals](http://sshkeybox.com/img/screenshots/medium/ec2box/terms.png)
 
 Demo
 -----
@@ -124,17 +124,17 @@ Steps:
 
 Screenshots
 -----------
-![Two-Factor](http://ec2box.com/img/screenshots/medium/two-factor.png)
+![Two-Factor](http://sshkeybox.com/img/screenshots/medium/ec2box/two-factor.png)
 
-![Importing Keys](http://ec2box.com/img/screenshots/medium/importing_keys.png)
+![Importing Keys](http://sshkeybox.com/img/screenshots/medium/ec2box/importing_keys.png)
 
-![Select Instances](http://ec2box.com/img/screenshots/medium/select_instances.png)
+![Select Instances](http://sshkeybox.com/img/screenshots/medium/ec2box/select_instances.png)
 
-![More Terminals](http://ec2box.com/img/screenshots/medium/more_terms.png)
+![More Terminals](http://sshkeybox.com/img/screenshots/medium/ec2box/more_terms.png)
 
-![Upload Files](http://ec2box.com/img/screenshots/medium/upload_files.png)
+![Upload Files](http://sshkeybox.com/img/screenshots/medium/ec2box/upload_files.png)
 
-![Disconnect](http://ec2box.com/img/screenshots/medium/disconnect.png)
+![Disconnect](http://sshkeybox.com/img/screenshots/medium/ec2box/disconnect.png)
 
 Acknowledgments
 ------
