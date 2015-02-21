@@ -20,6 +20,7 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.UserDB;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.model.User;
+import com.ec2box.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -114,12 +115,19 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
         }
         if (user != null
                 && user.getPassword() != null
-                && !user.getPassword().trim().equals("")
-                && !user.getPassword().equals(user.getPasswordConfirm())) {
-            addActionError("Passwords do not match");
+                && !user.getPassword().trim().equals("")) {
+            
+            if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
+                if(!user.getPassword().equals(user.getPasswordConfirm())) {
+                    addActionError("Passwords do not match");
+                } else if(!PasswordUtil.isValid(user.getPassword())) {
+                    addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+                }
+            }
         }
 
         if(user!=null && user.getId()==null && (user.getPassword()==null || user.getPassword().trim().equals(""))){
+            
             addActionError("Password is required");
         }
 

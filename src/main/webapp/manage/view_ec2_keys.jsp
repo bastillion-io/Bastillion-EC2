@@ -45,7 +45,6 @@
 
         $(document).ready(function() {
 
-            $.ajaxSetup({ cache: false });
 
             //call delete action
             $(".del_btn").button().click(function() {

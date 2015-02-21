@@ -20,6 +20,7 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.OTPUtil;
+import com.ec2box.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -134,23 +135,22 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             }
     )
     public String passwordSubmit() {
-        String retVal = SUCCESS;
-
-        if (auth.getPassword().equals(auth.getPasswordConfirm())) {
-            auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
-
-            if (!AuthDB.updatePassword(auth)) {
-                addActionError("Current password is invalid");
-                retVal = INPUT;
-            }
-
-        } else {
+        
+        String retVal = INPUT;
+        if (!auth.getPassword().equals(auth.getPasswordConfirm())) {
             addActionError("Passwords do not match");
-            retVal = INPUT;
+        } else if(!PasswordUtil.isValid(auth.getPassword())){
+            addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+        } else {
+            auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
+            if (AuthDB.updatePassword(auth)) {
+                retVal=SUCCESS;
+            }else{
+                addActionError("Current password is invalid");
+            }
         }
-
-
         return retVal;
+
     }
 
 
