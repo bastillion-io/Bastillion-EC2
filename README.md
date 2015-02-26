@@ -29,15 +29,10 @@ http://maven.apache.org
 
 * Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
-| FreeOTP       | Link                                                                                 |
-|:------------- |:------------------------------------------------------------------------------------:|
-| Android       | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)|
-| iOS           | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)                        |
-
-| Google Authenticator| Link                                                                                               |
-|:------------------- |:--------------------------------------------------------------------------------------------------:|
-| Android             | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)|
-| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605)                         |
+    | Application          | Android                                                                                             | iOS                                                                        |             
+    |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+    | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
+    | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
 
 To Run Bundled with Jetty
