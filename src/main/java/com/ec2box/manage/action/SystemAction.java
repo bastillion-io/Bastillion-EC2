@@ -178,7 +178,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
 
                                     HostSystem hostSystem = new HostSystem();
-                                    hostSystem.setInstanceId(instance.getInstanceId());
+                                    hostSystem.setInstance(instance.getInstanceId());
 
                                     //check for public dns if doesn't exist set to ip or pvt dns
                                     if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
@@ -200,8 +200,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                             hostSystem.setDisplayNm(tag.getValue());
                                         }
                                     }
-                                    instanceIdList.add(hostSystem.getInstanceId());
-                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                    instanceIdList.add(hostSystem.getInstance());
+                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                 }
                             }
 
@@ -234,7 +234,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                                     || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
                                                     || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
                                                     ) {
-                                                hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                                hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                             }
                                         }
 
@@ -270,13 +270,13 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                                 }
                                                 //check and filter by alarm state
                                                 if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))) {
-                                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                 } else if ("ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0) {
-                                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                 } else if ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0) {
-                                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                 } else if ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
-                                                    hostSystemList.put(hostSystem.getInstanceId(), hostSystem);
+                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                 }
                                             }
 

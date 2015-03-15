@@ -30,11 +30,11 @@ public class HostSystem {
     public static final String PUBLIC_KEY_FAIL_STATUS = "KEYAUTHFAIL";
     public static final String GENERIC_FAIL_STATUS = "GENERICFAIL";
     public static final String SUCCESS_STATUS = "SUCCESS";
-
+    public static final String HOST_FAIL_STATUS="HOSTFAIL";
 
     Long id;
     String displayNm = "";
-    String instanceId;
+    String instance;
     String user = AppConfig.getProperty("defaultSystemUser");
     String host;
     Integer port = Integer.parseInt(AppConfig.getProperty("defaultSystemPort"));
@@ -43,6 +43,7 @@ public class HostSystem {
     String ec2Region;
     String state;
     boolean checked = false;
+    Integer instanceId;
 
     String statusCd = INITIAL_STATUS;
     String errorMsg;
@@ -125,14 +126,6 @@ public class HostSystem {
         this.checked = checked;
     }
 
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public String getEc2Region() {
         return ec2Region;
     }
@@ -211,5 +204,21 @@ public class HostSystem {
 
     public void setMonitorInsufficientData(Integer monitorInsufficientData) {
         this.monitorInsufficientData = monitorInsufficientData;
+    }
+
+    public void setInstanceId(Integer instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public Integer getInstanceId() {
+        return instanceId;
+    }
+
+    public String getInstance() {
+        return instance;
+    }
+
+    public void setInstance(String instance) {
+        this.instance = instance;
     }
 }

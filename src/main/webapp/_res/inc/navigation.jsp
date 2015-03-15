@@ -67,9 +67,11 @@
                             <li><a href="../manage/viewUsers.action">Users</a></li>
                         </ul>
                     </li>
-                    <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
+                    <s:if test="%{@com.ec2box.manage.util.SessionOutputUtil@enableAudit && #session.userType==\"M\"}">
+                        <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
+                    </s:if>
                 </s:if>
-                <li><a href="../admin/setPassword.action">Change Password</a></li>
+                <li><a href="../admin/userSettings.action">Settings</a></li>
                 <li><a href="../logout.action">Logout</a></li>
             </ul>
         </div>

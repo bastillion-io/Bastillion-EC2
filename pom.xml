@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.23.00</version>
+    <version>0.25.00</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
     <properties>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.185</version>
+            <version>1.4.186</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.9.22</version>
+            <version>1.9.24</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.2.9.v20150224</version>
+                <version>9.2.10.v20150310</version>
                 <configuration>
                     <jettyXml>
                         ${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml

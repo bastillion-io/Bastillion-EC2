@@ -21,28 +21,11 @@ package com.ec2box.manage.model;
  */
 public class SessionOutput {
     Long sessionId;
-    Long userId;
     Long hostSystemId;
+    Integer instanceId;
     String output;
 
 
-
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public Long getUserId() {
-
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public Long getHostSystemId() {
         return hostSystemId;
@@ -52,11 +35,28 @@ public class SessionOutput {
         this.hostSystemId = hostSystemId;
     }
 
+    public Long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+
     public String getOutput() {
         return output;
     }
 
     public void setOutput(String output) {
         this.output = output;
+    }
+
+    public Integer getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(Integer instanceId) {
+        this.instanceId = instanceId;
     }
 }

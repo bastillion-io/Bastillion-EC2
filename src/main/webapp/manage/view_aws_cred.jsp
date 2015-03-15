@@ -86,6 +86,7 @@
         <p>Add / Delete your AWS credentials below</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+            <div class="scrollWrapper">
             <table class="table-striped scrollableTable">
                 <thead>
 
@@ -111,6 +112,7 @@
                 </s:iterator>
                 </tbody>
             </table>
+            </div>
         </s:if>
 
 

@@ -116,23 +116,23 @@
                         Manage user accounts and assign profiles so that users will be granted access based on instance tags
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <a href="../manage/viewSessions.action">Audit Sessions</a>
-                    </td>
-                    <td>
-                        Audit administrator's sessions and terminal history
-                    </td>
-                </tr>
+                <s:if test="%{@com.ec2box.manage.util.SessionOutputUtil@enableAudit && #session.userType==\"M\"}">
+                    <tr>
+                        <td>
+                            <a href="../manage/viewSessions.action">Audit Sessions</a>
+                        </td>
+                        <td>
+                            Audit administrator's sessions and terminal history
+                        </td>
+                    </tr>
+                </s:if>
             </s:if>
 
             <tr>
                 <td>
-                    <a href="../admin/setPassword.action">Change Password</a>
+                    <a href="../admin/userSettings.action">Settings</a>
                 </td>
-                <td>
-                    Change administrative login
-                </td>
+                <td>Change administrative login and settings</td>
             </tr>
 
 

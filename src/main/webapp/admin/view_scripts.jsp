@@ -90,6 +90,7 @@
     <p>Add / Delete scripts or select a script below to execute</p>
 
     <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+        <div class="scrollWrapper">
         <table class="table-striped scrollableTable">
             <thead>
             <tr>
@@ -119,6 +120,7 @@
             </s:iterator>
             </tbody>
         </table>
+        </div>
     </s:if>
 
 

@@ -20,7 +20,6 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.OTPUtil;
-import com.ec2box.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -65,7 +64,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     @Action(value = "/loginSubmit",
             results = {
                     @Result(name = "input", location = "/login.jsp"),
-                    @Result(name = "change_password", location = "/admin/setPassword.action", type = "redirect"),
+                    @Result(name = "change_password", location = "/admin/userSettings.action", type = "redirect"),
                     @Result(name = "otp", location = "/admin/viewOTP.action", type = "redirect"),
                     @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
@@ -118,40 +117,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 
-    @Action(value = "/admin/setPassword",
-            results = {
-                    @Result(name = "success", location = "/admin/set_password.jsp")
-            }
-    )
-    public String setPassword() {
-
-        return SUCCESS;
-    }
-
-    @Action(value = "/admin/passwordSubmit",
-            results = {
-                    @Result(name = "input", location = "/admin/set_password.jsp"),
-                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
-            }
-    )
-    public String passwordSubmit() {
-        
-        String retVal = INPUT;
-        if (!auth.getPassword().equals(auth.getPasswordConfirm())) {
-            addActionError("Passwords do not match");
-        } else if(!PasswordUtil.isValid(auth.getPassword())){
-            addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
-        } else {
-            auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
-            if (AuthDB.updatePassword(auth)) {
-                retVal=SUCCESS;
-            }else{
-                addActionError("Current password is invalid");
-            }
-        }
-        return retVal;
-
-    }
 
 
     /**
@@ -170,26 +135,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     }
 
-
-    /**
-     * Validates fields for password submit
-     */
-    public void validatePasswordSubmit() {
-        if (auth.getPassword() == null ||
-                auth.getPassword().trim().equals("")) {
-            addFieldError("auth.password", "Required");
-        }
-        if (auth.getPasswordConfirm() == null ||
-                auth.getPasswordConfirm().trim().equals("")) {
-            addFieldError("auth.passwordConfirm", "Required");
-        }
-        if (auth.getPrevPassword() == null ||
-                auth.getPrevPassword().trim().equals("")) {
-            addFieldError("auth.prevPassword", "Required");
-        }
-
-
-    }
 
     public Auth getAuth() {
         return auth;

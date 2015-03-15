@@ -24,15 +24,6 @@ import java.util.List;
 public class User extends Auth {
     String firstNm;
     String lastNm;
-
-    public List<Profile> getProfileList() {
-        return profileList;
-    }
-
-    public void setProfileList(List<Profile> profileList) {
-        this.profileList = profileList;
-    }
-
     String email;
     boolean checked=false;
     List<Profile> profileList;
@@ -69,7 +60,13 @@ public class User extends Auth {
     public void setEmail(String email) {
         this.email = email;
     }
+    public List<Profile> getProfileList() {
+        return profileList;
+    }
 
+    public void setProfileList(List<Profile> profileList) {
+        this.profileList = profileList;
+    }
 
 
 }

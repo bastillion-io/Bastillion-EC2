@@ -72,7 +72,7 @@
 
             <p>Select a session to audit below</p>
 
-
+        <div class="scrollWrapper">
             <table class="table-striped scrollableTable" style="min-width:80%">
                 <thead>
                 <tr>
@@ -115,6 +115,7 @@
                 </s:iterator>
                 </tbody>
             </table>
+            </div>
 
         </s:if>
         <s:else>

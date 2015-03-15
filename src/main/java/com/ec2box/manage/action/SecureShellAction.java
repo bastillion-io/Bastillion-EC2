@@ -15,11 +15,12 @@
  */
 package com.ec2box.manage.action;
 
+import com.jcraft.jsch.ChannelShell;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
+import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.SSHUtil;
-import com.jcraft.jsch.ChannelShell;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -38,23 +39,26 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SecureShellAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
-    HttpServletRequest servletRequest;
+    List<SessionOutput> outputList;
+    String command;
     HttpServletResponse servletResponse;
+    HttpServletRequest servletRequest;
     List<Long> systemSelectId;
     HostSystem currentSystemStatus;
     HostSystem pendingSystemStatus;
-    String passphrase;
     String password;
-    Long id;
+    String passphrase;
+    Integer id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
-    Integer ptyWidth;
-    Integer ptyHeight;
+    List<HostSystem> allocatedSystemList = new ArrayList<HostSystem>();
+    UserSettings userSettings;
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
-    
+
 
     Script script = new Script();
-    
+
+
     /**
      * creates composite terminals if there are errors or authentication issues.
      */
@@ -67,7 +71,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
         Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
-
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
             //get status
@@ -79,7 +82,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     || HostSystem.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
                     ) {
 
-                //set current servletRequest.getSession()
+                //set current session
                 currentSystemStatus = SSHUtil.openSSHTermOnSystem(passphrase, password, userId, sessionId, currentSystemStatus, userSchSessionMap);
 
             }
@@ -90,7 +93,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
-
 
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 //if success loop through systems until finished or need password
@@ -106,7 +108,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         //set system list if no pending systems
         if (SystemStatusDB.getNextPendingSystem(userId) == null) {
             setSystemList(userId, sessionId);
+            List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
+            allocatedSystemList= SystemDB.getSystems(instanceIdList);
+            //set theme
+            this.userSettings =UserThemeDB.getTheme(userId);
         }
+
 
         return SUCCESS;
     }
@@ -125,14 +132,16 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
 
         SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
+        SystemDB.updateSystem(currentSystemStatus);
+
         pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
         //set system list if no pending systems
         if (pendingSystemStatus == null) {
             setSystemList(userId, AuthUtil.getSessionId(servletRequest.getSession()));
         }
-        return SUCCESS;
 
+        return SUCCESS;
     }
 
     @Action(value = "/admin/selectSystemsForCompositeTerms",
@@ -144,25 +153,9 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
         //exit any previous terms
-        exitTerms();
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
             //check to see if user has perms to access selected systems
-            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-
-                //make sure selected instance id is host the user has permission to.
-                List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
-                List<Long> systemIdList = new ArrayList<Long>();
-                for (HostSystem hostSystem : SystemDB.getSystems(instanceIdList)) {
-                    if (systemSelectId.contains(hostSystem.getId())) {
-                        systemIdList.add(hostSystem.getId());
-                    }
-                }
-                systemSelectId = systemIdList;
-
-            }
-            servletRequest.getSession().setAttribute("instanceIdList",null);
-
-            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, servletRequest);
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
             AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
@@ -181,6 +174,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     )
     public String exitTerms() {
 
+
         return SUCCESS;
     }
 
@@ -190,24 +184,55 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
-                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                try {
+                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
-                //disconnect ssh session
-                schSession.getChannel().disconnect();
-                schSession.getSession().disconnect();
-                schSession.setChannel(null);
-                schSession.setSession(null);
-                schSession.setInputToChannel(null);
-                schSession.setCommander(null);
-                schSession.setOutFromChannel(null);
-                schSession = null;
-                //remove from map
-                userSchSessions.getSchSessionMap().remove(id);
+                    //disconnect ssh session
+                    if(schSession!=null) {
+                        if (schSession.getChannel() != null)
+                            schSession.getChannel().disconnect();
+                        if (schSession.getSession() != null)
+                            schSession.getSession().disconnect();
+                        schSession.setChannel(null);
+                        schSession.setSession(null);
+                        schSession.setInputToChannel(null);
+                        schSession.setCommander(null);
+                        schSession.setOutFromChannel(null);
+                        schSession = null;
+                    }
+                    //remove from map
+                    userSchSessions.getSchSessionMap().remove(id);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+
 
         }
 
+
         return null;
+    }
+
+
+    @Action(value = "/admin/createSession")
+    public String createSession() {
+        
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+        if (systemSelectId != null && !systemSelectId.isEmpty()) {
+
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, servletRequest);
+            
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
+
+            createTerms();
+            
+        }
+
+        return null;
+
+
     }
 
     @Action(value = "/admin/setPtyType")
@@ -216,12 +241,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
-            if (userSchSessions != null && userSchSessions.getSchSessionMap() !=null) {
+            if (userSchSessions != null && userSchSessions.getSchSessionMap() != null) {
 
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
                 ChannelShell channel = (ChannelShell) schSession.getChannel();
-                channel.setPtySize((int)Math.floor(ptyWidth / 7.2981), (int)Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
+                channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 7.2981), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
                 schSession.setChannel(channel);
 
             }
@@ -238,7 +263,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
      * @param userId    user id
      * @param sessionId session id
      */
-
     private void setSystemList(Long userId, Long sessionId) {
 
 
@@ -246,7 +270,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId) != null) {
 
             //get user sessions
-            Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
+            Map<Integer, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
 
 
             for (SchSession schSession : schSessionMap.values()) {
@@ -272,12 +296,52 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     }
 
+    public List<SessionOutput> getOutputList() {
+        return outputList;
+    }
+
+    public void setOutputList(List<SessionOutput> outputList) {
+        this.outputList = outputList;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    public HttpServletResponse getServletResponse() {
+        return servletResponse;
+    }
+
+    public void setServletResponse(HttpServletResponse servletResponse) {
+        this.servletResponse = servletResponse;
+    }
+
     public List<Long> getSystemSelectId() {
         return systemSelectId;
     }
 
     public void setSystemSelectId(List<Long> systemSelectId) {
         this.systemSelectId = systemSelectId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public HostSystem getCurrentSystemStatus() {
@@ -312,20 +376,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.passphrase = passphrase;
     }
 
-    public String getPassword() {
-        return password;
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public static Map<Long, UserSchSessions> getUserSchSessionMap() {
-        return userSchSessionMap;
-    }
-
-    public static void setUserSchSessionMap(Map<Long, UserSchSessions> userSchSessionMap) {
-        SecureShellAction.userSchSessionMap = userSchSessionMap;
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
     }
 
     public List<HostSystem> getSystemList() {
@@ -336,44 +392,28 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.systemList = systemList;
     }
 
-    public HttpServletRequest getServletRequest() {
-        return servletRequest;
+    public static Map<Long, UserSchSessions> getUserSchSessionMap() {
+        return userSchSessionMap;
     }
 
-    public void setServletRequest(HttpServletRequest servletRequest) {
-        this.servletRequest = servletRequest;
+    public static void setUserSchSessionMap(Map<Long, UserSchSessions> userSchSessionMap) {
+        SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 
-    public HttpServletResponse getServletResponse() {
-        return servletResponse;
+    public List<HostSystem> getAllocatedSystemList() {
+        return allocatedSystemList;
     }
 
-    public void setServletResponse(HttpServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
+    public void setAllocatedSystemList(List<HostSystem> allocatedSystemList) {
+        this.allocatedSystemList = allocatedSystemList;
     }
 
-    public Long getId() {
-        return id;
+    public UserSettings getUserSettings() {
+        return userSettings;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getPtyWidth() {
-        return ptyWidth;
-    }
-
-    public void setPtyWidth(Integer ptyWidth) {
-        this.ptyWidth = ptyWidth;
-    }
-
-    public Integer getPtyHeight() {
-        return ptyHeight;
-    }
-
-    public void setPtyHeight(Integer ptyHeight) {
-        this.ptyHeight = ptyHeight;
+    public void setUserSettings(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 }
 

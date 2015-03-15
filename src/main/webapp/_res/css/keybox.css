@@ -2,9 +2,11 @@
 body {
     padding-top: 50px;
 }
+
 a {
     color: #666;
 }
+
 table {
     border-collapse: collapse;
     font-size: small;
@@ -23,14 +25,16 @@ table tbody {
 .navbar .container a {
     text-decoration: none;
 }
+
 .navbar .note {
     padding: 10px 2px 2px 0;
     float: right;
     color: #DDD;
 }
+
 form table {
     background-color: #FFF;
-    min-width:10px;
+    min-width: 10px;
 }
 
 form table input {
@@ -44,9 +48,8 @@ form table td, form table th {
 table td, table th {
     vertical-align: middle;
     line-height: 1.42857;
-    padding:10px;
+    padding: 10px;
 }
-
 
 .table-striped {
     border: 1px solid #CCC;
@@ -60,6 +63,7 @@ table td, table th {
     padding: 10px 15px 10px 10px;
 
 }
+
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
     border: 1px solid #DDD;
     line-height: 1.42857;
@@ -85,7 +89,6 @@ table td, table th {
 .errorLabel {
     color: #cc0000;
 }
-
 
 form table label,
 form table .label {
@@ -158,13 +161,16 @@ div.term {
 }
 
 div.termwrapper {
-    width:98%;
+    width: 98%;
     margin: 0 auto;
 }
 
-
 div.termwrapper div h6 {
     margin: 8px 0 0 8px;
+}
+
+.term-header {
+    white-space: nowrap;
 }
 
 .top_nav {
@@ -176,20 +182,25 @@ div.termwrapper div h6 {
     float: left;
     padding: 0 15px 0 0;
 }
+
 .run_cmd {
-    background: #eee;
+    background: #f0f0f0;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active {
-    background: #4d4d4d;
+    background: #555753;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active h6 {
-    color: #eeeeee;
+    color: #f0f0f0;
 }
+
 .navbar-inverse {
     color: #ddd;
 }
+
 .navbar-inverse input {
     color: #4d4d4d;
 }
@@ -197,13 +208,12 @@ div.termwrapper div h6 {
 .run_cmd {
     border-radius: 4px;
     margin-top: 5px;
-    border: 1px solid #CCC;
     float: left;
     width: 50%;
 }
 
 .term-header {
-    cursor:move;
+    cursor: move;
 }
 
 .term {
@@ -237,7 +247,6 @@ div.termwrapper div h6 {
 }
 
 .terminal {
-    border: #f0f0f0 solid 5px;
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
     color: #000;
@@ -254,7 +263,7 @@ div.termwrapper div h6 {
 
 .terminal div {
     white-space: nowrap;
-    height:14px;
+    height: 14px;
 }
 
 .reverse-video {
@@ -282,7 +291,7 @@ div.termwrapper div h6 {
 }
 
 .modal-body .row {
-    padding-left:10px;
+    padding-left: 10px;
 }
 
 .modal-footer .btn {
@@ -318,3 +327,32 @@ div.termwrapper div h6 {
     margin-top: 25px;
 }
 
+.scrollWrapperActive {
+    overflow-y: scroll;
+    height: 450px;
+    display: inline-block;
+}
+
+.uploadScrollWrapperActive {
+    overflow-y: scroll;
+    height: 200px;
+    display: inline-block;
+}
+
+.uploadScrollableTable {
+    min-width: 600px;
+}
+
+.scrollableTable {
+    min-width: 700px;
+}
+
+.scrollableTable th {
+    background-color: #e0e0e0;
+}
+
+table.floatThead-table {
+    border-top: none;
+    border-bottom: none;
+    background-color: #FFF;
+}

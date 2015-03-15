@@ -15,13 +15,13 @@
  */
 package com.ec2box.manage.socket;
 
-import com.ec2box.common.util.AppConfig;
-import com.ec2box.manage.task.SentOutputTask;
 import com.google.gson.Gson;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.action.SecureShellAction;
 import com.ec2box.manage.model.SchSession;
 import com.ec2box.manage.model.UserSchSessions;
+import com.ec2box.manage.task.SentOutputTask;
 import com.ec2box.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,8 +44,10 @@ public class SecureShellWS {
     private Long sessionId = null;
 
 
+
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
+
 
         //set websocket timeout
         if(StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))){
@@ -58,7 +60,7 @@ public class SecureShellWS {
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
 
-        Runnable run = new SentOutputTask(sessionId, session);
+        Runnable run=new SentOutputTask(sessionId, session);
         Thread thread = new Thread(run);
         thread.start();
 
@@ -83,8 +85,7 @@ public class SecureShellWS {
                 }
 
                 for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
-                    Long id = Long.parseLong(idStr);
-
+                    Integer id = Integer.parseInt(idStr);
 
                     //get servletRequest.getSession() for user
                     UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
@@ -120,9 +121,9 @@ public class SecureShellWS {
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
-                Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+                Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-                for (Long sessionKey : schSessionMap.keySet()) {
+                for (Integer sessionKey : schSessionMap.keySet()) {
 
                     SchSession schSession = schSessionMap.get(sessionKey);
 
@@ -176,7 +177,7 @@ public class SecureShellWS {
         //CTR
         keyMap.put(17, new byte[]{});
         //DEL
-	keyMap.put(46, "\033[3~".getBytes());
+        keyMap.put(46, "\033[3~".getBytes());
         //CTR-A
         keyMap.put(65, new byte[]{(byte) 0x01});
         //CTR-B

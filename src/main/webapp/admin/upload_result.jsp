@@ -23,20 +23,29 @@
     <jsp:include page="../_res/inc/header.jsp"/>
 
 
-    <title>EC2Box - Upload &amp; Push</title>
+    <title>- Upload &amp; Push</title>
 
     <script type="text/javascript">
         $(document).ready(function() {
 
-            //submit add or edit form
             $(".submit_btn").button().click(function() {
                 $('#push').submit();
             });
 
-            $('.uploadTable').tableScroll({height:150, width:650});
+            if ($('.uploadScrollWrapper').height() >= 200) {
+
+                $('.uploadScrollWrapper').addClass('uploadScrollWrapperActive');
+                $('.uploadScrollableTable').floatThead({
+                    scrollContainer: function ($table) {
+                        return $table.closest(".uploadScrollWrapper");
+                    }
+                });
+            }
+            $(".uploadScrollableTable tr:even").css("background-color", "#e0e0e0");
+
             <s:if test="pendingSystemStatus!=null">
             //set scroll
-            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
+            var container = $('.uploadScrollWrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
             container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
             </s:if>
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
@@ -64,24 +73,23 @@
 </h4>
 
 
-<s:if test="systemStatusList!= null && !systemStatusList.isEmpty()">
-    <table class="table-striped uploadTable">
+<s:if test="hostSystemList!= null && !hostSystemList.isEmpty()">
+    <div class="uploadScrollWrapper">
+
+    <table class="table-striped uploadScrollableTable" >
         <thead>
 
         <tr>
 
-
             <th>Display Name</th>
             <th>User</th>
             <th>Host</th>
-
             <th>Status</th>
-
         </tr>
         </thead>
         <tbody>
 
-        <s:iterator value="systemStatusList" status="stat">
+        <s:iterator value="hostSystemList" status="stat">
             <tr>
 
                 <td>
@@ -89,24 +97,27 @@
                             value="displayNm"/></div>
                 </td>
                 <td><s:property value="user"/></td>
-                <td><s:property value="host"/></td>
+                <td><s:property value="host"/>:<s:property value="port"/></td>
 
                 <td>
-                    <s:if test="statusCd=='INITIAL'">
-                        <div class="warning">Not Started</div>
-                    </s:if>
-                    <s:elseif test="statusCd=='AUTHFAIL'">
-                        <div class="warning">Authentication Failed</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd=='KEYAUTHFAIL'">
-                        <div class="warning">Passphrase Authentication Failed</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd=='GENERICFAIL'">
-                        <div class="error">Failed</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd=='SUCCESS'">
-                        <div class="success">Success</div>
-                    </s:elseif>
+                   <s:if test="statusCd=='INITIAL'">
+                    <div class="warning">Not Started</div>
+                   </s:if>
+                   <s:elseif test="statusCd=='AUTHFAIL'">
+                    <div class="warning">Authentication Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='HOSTFAIL'">
+                    <div class="error">DNS Lookup Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='KEYAUTHFAIL'">
+                    <div class="warning">Passphrase Authentication Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='GENERICFAIL'">
+                    <div class="error">Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='SUCCESS'">
+                    <div class="success">Success</div>
+                   </s:elseif>
                 </td>
 
             </tr>
@@ -114,6 +125,7 @@
         </s:iterator>
         </tbody>
     </table>
+    </div>
 </s:if>
 <s:else>
     <p class="error">No systems associated with upload</p>
@@ -123,6 +135,8 @@
     <s:hidden name="pushDir"/>
     <s:hidden name="uploadFileName"/>
 </s:form>
+
+
 
 <div id="error_dialog" class="modal fade">
     <div class="modal-dialog">

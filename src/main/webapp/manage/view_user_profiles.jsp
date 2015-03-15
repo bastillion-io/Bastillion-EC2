@@ -60,6 +60,7 @@
 
     <s:if test="user.profileList!= null && !user.profileList.isEmpty()">
 
+    <div class="scrollWrapper">
         <table class="table-striped scrollableTable">
             <thead>
 
@@ -92,6 +93,7 @@
 
 
         </table>
+        </div>
     </s:if>
 
     <s:if test="profileList!= null && !profileList.isEmpty()">

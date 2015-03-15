@@ -183,6 +183,7 @@
             <s:if test="script!=null && script.id!=null">
                 <s:hidden name="script.id"/>
             </s:if>
+            <div class="scrollWrapper">
             <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
                 <thead>
                 <tr>
@@ -231,7 +232,7 @@
                         <td>
                             <s:property value="displayNm"/>
                         </td>
-                        <td><s:property value="instanceId"/></td>
+                        <td><s:property value="instance"/></td>
                         <td>
 
                             <a id="edit_btn_<s:property value="id"/>" title="Update System Properties"
@@ -299,7 +300,7 @@
                                 <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
                                 <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
                                 <s:hidden name="hostSystem.state" value="%{state}"/>
-                                <s:hidden name="hostSystem.instanceId" value="%{instanceId}"/>
+                                <s:hidden name="hostSystem.instance" value="%{instance}"/>
                                 <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
                                 <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>

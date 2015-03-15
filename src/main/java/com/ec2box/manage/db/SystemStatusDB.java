@@ -15,9 +15,12 @@
  */
 package com.ec2box.manage.db;
 
+import com.ec2box.common.util.AuthUtil;
+import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.util.DBUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
 
 import java.sql.PreparedStatement;
@@ -36,11 +39,25 @@ public class SystemStatusDB {
      * @param systemSelectIds systems ids to set initial status
      * @param userId user id
      */
-    public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId) {
+    public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId, HttpServletRequest servletRequest) {
         Connection con = null;
         try {
             con = DBUtils.getConn();
 
+
+            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+
+                //make sure selected instance id is host the user has permission to.
+                List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
+                List<Long> systemIdList = new ArrayList<Long>();
+                for (HostSystem hostSystem : SystemDB.getSystems(instanceIdList)) {
+                    if (systemSelectIds.contains(hostSystem.getId())) {
+                        systemIdList.add(hostSystem.getId());
+                    }
+                }
+                systemSelectIds = systemIdList;
+
+            }
             //deletes all old systems
             deleteAllSystemStatus(con, userId);
 

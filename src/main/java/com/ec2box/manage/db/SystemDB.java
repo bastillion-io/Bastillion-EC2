@@ -79,7 +79,7 @@ public class SystemDB {
                     HostSystem hostSystem = new HostSystem();
                     hostSystem.setId(rs.getLong("id"));
                     hostSystem.setDisplayNm(rs.getString("display_nm"));
-                    hostSystem.setInstanceId(rs.getString("instance_id"));
+                    hostSystem.setInstance(rs.getString("instance_id"));
                     hostSystem.setUser(rs.getString("user"));
                     hostSystem.setHost(rs.getString("host"));
                     hostSystem.setPort(rs.getInt("port"));
@@ -159,7 +159,7 @@ public class SystemDB {
                 hostSystem = new HostSystem();
                 hostSystem.setId(rs.getLong("id"));
                 hostSystem.setDisplayNm(rs.getString("display_nm"));
-                hostSystem.setInstanceId(rs.getString("instance_id"));
+                hostSystem.setInstance(rs.getString("instance_id"));
                 hostSystem.setUser(rs.getString("user"));
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
@@ -230,7 +230,7 @@ public class SystemDB {
                 hostSystem = new HostSystem();
                 hostSystem.setId(rs.getLong("id"));
                 hostSystem.setDisplayNm(rs.getString("display_nm"));
-                hostSystem.setInstanceId(rs.getString("instance_id"));
+                hostSystem.setInstance(rs.getString("instance_id"));
                 hostSystem.setUser(rs.getString("user"));
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
@@ -268,7 +268,7 @@ public class SystemDB {
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
-            stmt.setString(5, hostSystem.getInstanceId());
+            stmt.setString(5, hostSystem.getInstance());
             stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
@@ -326,7 +326,7 @@ public class SystemDB {
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
-            stmt.setString(5, hostSystem.getInstanceId());
+            stmt.setString(5, hostSystem.getInstance());
             stmt.setLong(6, hostSystem.getKeyId());
             stmt.setString(7, hostSystem.getEc2Region());
             stmt.setString(8, hostSystem.getState());
@@ -359,7 +359,7 @@ public class SystemDB {
 
             //insert new host systems
             for (HostSystem hostSystem : hostSystemList) {
-                HostSystem hostSystemTmp = getSystem(con, hostSystem.getInstanceId());
+                HostSystem hostSystemTmp = getSystem(con, hostSystem.getInstance());
                 if (hostSystemTmp == null) {
                     insertSystem(con, hostSystem);
                 } else {
