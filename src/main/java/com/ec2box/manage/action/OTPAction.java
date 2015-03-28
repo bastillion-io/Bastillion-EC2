@@ -41,110 +41,126 @@ import java.util.Hashtable;
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
 
-	//QR image size
-	private static final int QR_IMAGE_WIDTH = 325;
-	private static final int QR_IMAGE_HEIGHT = 325;
+    //QR image size
+    private static final int QR_IMAGE_WIDTH = 325;
+    private static final int QR_IMAGE_HEIGHT = 325;
 
-	HttpServletRequest servletRequest;
-	HttpServletResponse servletResponse;
-	String qrImage;
+    HttpServletRequest servletRequest;
+    HttpServletResponse servletResponse;
+    String qrImage;
+    String sharedSecret;
 
-	@Action(value = "/admin/viewOTP",
-			results = {
-					@Result(name = "success", location = "/admin/two-factor_otp.jsp"),
-					@Result(name = "error", location = "/login.action", type = "redirect")
-			}
-	)
-	public String viewOTP() {
+    @Action(value = "/admin/viewOTP",
+            results = {
+                    @Result(name = "success", location = "/admin/two-factor_otp.jsp"),
+                    @Result(name = "error", location = "/login.action", type = "redirect")
+            }
+    )
+    public String viewOTP() {
+        
+        sharedSecret = OTPUtil.generateSecret();
+        
+        AuthUtil.setOTPSecret(servletRequest.getSession(), sharedSecret);
+        
+        this.setQrImage(Long.toString(new Date().getTime()) + ".png");
 
-		this.setQrImage(Long.toString(new Date().getTime()) + ".png");
-		return SUCCESS;
+        return SUCCESS;
 
-	}
-
-
-	@Action(value = "/admin/otpSubmit",
-			results = {
-					@Result(name = "success", location = "/logout.action", type = "redirect")
-			}
-	)
-	public String otpSubmit() {
-
-		String sharedSecret = AuthUtil.getOTPSecret(servletRequest.getSession());
-
-		AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(servletRequest.getSession()));
-
-		return SUCCESS;
-
-	}
+    }
 
 
-	@Action(value = "/admin/qrImage")
-	public String qrImage() {
+    @Action(value = "/admin/otpSubmit",
+            results = {
+                    @Result(name = "success", location = "/logout.action", type = "redirect")
+            }
+    )
+    public String otpSubmit() {
 
-		String username = UserDB.getUser(AuthUtil.getUserId(servletRequest.getSession())).getUsername();
+        AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(servletRequest.getSession()));
+        return SUCCESS;
 
-		String secret = OTPUtil.generateSecret();
-		AuthUtil.setOTPSecret(servletRequest.getSession(), secret);
-		try {
-
-			String qrCodeText = "otpauth://totp/EC2Box%20%28" + URLEncoder.encode(servletRequest.getHeader("host").replaceAll("\\:.*$",""), "utf-8") + "%29:" + username + "?secret=" + secret;
-
-			QRCodeWriter qrWriter = new QRCodeWriter();
-
-			Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
-			hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+    }
 
 
-			BitMatrix matrix = qrWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, hints);
-			servletResponse.setContentType("image/png");
+    @Action(value = "/admin/qrImage")
+    public String qrImage() {
 
-			BufferedImage image = new BufferedImage(QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        String username = UserDB.getUser(AuthUtil.getUserId(servletRequest.getSession())).getUsername();
 
-			Graphics2D graphics = (Graphics2D) image.getGraphics();
-			graphics.setColor(Color.WHITE);
-			graphics.fillRect(0, 0, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT);
-			graphics.setColor(Color.BLACK);
+        String secret = AuthUtil.getOTPSecret(servletRequest.getSession());
+        
+        AuthUtil.setOTPSecret(servletRequest.getSession(), null);
 
-			for (int x = 0; x < QR_IMAGE_WIDTH; x++) {
-				for (int y = 0; y < QR_IMAGE_HEIGHT; y++) {
-					if (matrix.get(x, y)) {
-						graphics.fillRect(x, y, 1, 1);
-					}
-				}
-			}
-			ImageIO.write(image, "png", servletResponse.getOutputStream());
-			servletResponse.getOutputStream().flush();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        try {
+
+            String qrCodeText = "otpauth://totp/EC2Box%20%28" + URLEncoder.encode(servletRequest.getHeader("host").replaceAll("\\:.*$",""), "utf-8") + "%29:" + username + "?secret=" + secret;
+
+            QRCodeWriter qrWriter = new QRCodeWriter();
+
+            Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
 
 
-		return null;
+            BitMatrix matrix = qrWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, hints);
+            servletResponse.setContentType("image/png");
 
-	}
+            BufferedImage image = new BufferedImage(QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-	public String getQrImage() {
-		return qrImage;
-	}
+            Graphics2D graphics = (Graphics2D) image.getGraphics();
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT);
+            graphics.setColor(Color.BLACK);
 
-	public void setQrImage(String qrImage) {
-		this.qrImage = qrImage;
-	}
+            for (int x = 0; x < QR_IMAGE_WIDTH; x++) {
+                for (int y = 0; y < QR_IMAGE_HEIGHT; y++) {
+                    if (matrix.get(x, y)) {
+                        graphics.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+            ImageIO.write(image, "png", servletResponse.getOutputStream());
+            
+            servletResponse.getOutputStream().flush();
+            servletResponse.getOutputStream().close();
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-	public HttpServletResponse getServletResponse() {
-		return servletResponse;
-	}
 
-	public void setServletResponse(HttpServletResponse servletResponse) {
-		this.servletResponse = servletResponse;
-	}
+        return null;
 
-	public HttpServletRequest getServletRequest() {
-		return servletRequest;
-	}
+    }
 
-	public void setServletRequest(HttpServletRequest servletRequest) {
-		this.servletRequest = servletRequest;
-	}
+    public String getQrImage() {
+        return qrImage;
+    }
+
+    public void setQrImage(String qrImage) {
+        this.qrImage = qrImage;
+    }
+
+    public HttpServletResponse getServletResponse() {
+        return servletResponse;
+    }
+
+    public void setServletResponse(HttpServletResponse servletResponse) {
+        this.servletResponse = servletResponse;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
+    }
+
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
+
+    public void setSharedSecret(String sharedSecret) {
+        this.sharedSecret = sharedSecret;
+    }
 }
