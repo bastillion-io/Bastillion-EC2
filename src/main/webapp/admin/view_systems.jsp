@@ -145,9 +145,19 @@
         <table>
 
             <tr>
+                <td class="align_left">&nbsp;<br/>
+                    <s:if test="showStatus==true">
+                        <s:hidden name="showStatus" value="false"/>
+                        <s:submit cssClass="btn btn-danger" value="Disable Status"/>
+                    </s:if>
+                    <s:else>
+                        <s:hidden name="showStatus" value="true"/>
+                        <s:submit cssClass="btn btn-success" value="Show Status"/>
+                    </s:else>
+                </td>
+                <td>&nbsp;<br/> | </td>
 
-
-                <td style="padding-left:0px;"><label>Tag</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_TAG}']" placeholder="tag-name[=value[,tag-name[=value]]"
+                <td><label>Tag</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_TAG}']" placeholder="tag-name[=value[,tag-name[=value]]"
                                                         theme="simple" size="25"/></td>
 
                 <td><label>Security Group</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SECURITY_GROUP}']"
@@ -157,18 +167,20 @@
                     <label>Current State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATE}']" list="instanceStateMap"
                                                                  theme="simple" headerKey="" headerValue="-Any-"/>
                 </td>
-                <td>
-                    <label>Instance Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATUS}']" list="instanceStatusMap"
+                <s:if test="showStatus">
+                    <td>
+                        <label>Instance Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATUS}']" list="instanceStatusMap"
                                                                  theme="simple" headerKey="" headerValue="-Any-"/>
-                </td>
-                <td>
-                    <label>System Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SYSTEM_STATUS}']" list="systemStatusMap" theme="simple"
+                    </td>
+                    <td>
+                        <label>System Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SYSTEM_STATUS}']" list="systemStatusMap" theme="simple"
                                                                headerKey="" headerValue="-Any-"/>
-                </td>
-                <td>
-                    <label>Alarm State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_ALARM_STATE}']" list="alarmStateMap" theme="simple"
+                    </td>
+                    <td>
+                        <label>Alarm State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_ALARM_STATE}']" list="alarmStateMap" theme="simple"
                                                              headerKey="" headerValue="-Any-"/>
-                </td>
+                    </td>
+                </s:if>
                 <td style="padding:20px 5px 0px 5px;">
                     <div id="view_btn" class="btn btn-primary">Filter</div>
                 </td>
@@ -205,15 +217,17 @@
                     </th>
                     <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_STATE"/>" class="sort">State
                     </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS"/>"
-                        class="sort">I-Status
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS"/>"
-                        class="sort">S-Status
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_ALARMS"/>" class="sort">
-                        Alarms
-                    </th>
+                    <s:if test="showStatus">
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS"/>"
+                            class="sort">I-Status
+                        </th>
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS"/>"
+                            class="sort">S-Status
+                        </th>
+                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_ALARMS"/>" class="sort">
+                            Alarms
+                        </th>
+                    </s:if>
                     <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_REGION"/>" class="sort">
                         Region
                     </th>
@@ -290,7 +304,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-			     <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                        <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
                                 <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
                                 <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
                                 <s:hidden name="hostSystem.id" value="%{id}"/>

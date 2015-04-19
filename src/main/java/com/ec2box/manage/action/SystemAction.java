@@ -46,6 +46,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
+    boolean showStatus=false;
     Script script = null;
     HttpServletRequest servletRequest;
     static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
@@ -206,93 +207,88 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             }
 
                             if (instanceIdList.size() > 0) {
-                                //set instance id list ot check permissions when creating sessions
+                                //set instance id list to check permissions when creating sessions
                                 servletRequest.getSession().setAttribute("instanceIdList", new ArrayList<String>(instanceIdList));
-                                //make service call 100 instances at a time b/c of AWS limitation
-                                int i = 0;
-                                List<String> idCallList = new ArrayList<String>();
-                                while (!instanceIdList.isEmpty()) {
-                                    idCallList.add(instanceIdList.remove(0));
-                                    i++;
-                                    //when i eq 100 make call
-                                    if (i >= 100 || instanceIdList.isEmpty()) {
+                                if(showStatus) {
+                                    //make service call 100 instances at a time b/c of AWS limitation
+                                    int i = 0;
+                                    List<String> idCallList = new ArrayList<String>();
+                                    while (!instanceIdList.isEmpty()) {
+                                        idCallList.add(instanceIdList.remove(0));
+                                        i++;
+                                        //when i eq 100 make call
+                                        if (i >= 100 || instanceIdList.isEmpty()) {
 
-                                        //get status for host systems
-                                        DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-                                        describeInstanceStatusRequest.withInstanceIds(idCallList);
-                                        DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
+                                            //get status for host systems
+                                            DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                                            describeInstanceStatusRequest.withInstanceIds(idCallList);
+                                            DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
 
-                                        for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+                                            for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
 
-                                            HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
-                                            hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
-                                            hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+                                                HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                                                hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                                                hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
 
-                                            //check and filter by instance or system status
-                                            if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
-                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
-                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
-                                                    || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
-                                                    ) {
-                                                hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                            }
-                                        }
-
-                                        //start over
-                                        i = 0;
-                                        //clear list
-                                        idCallList.clear();
-                                    }
-
-                                }
-
-
-                                //check alarms for ec2 instances
-                                AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(awsCredentials, AWSClientConfig.getClientConfig());
-                                cloudWatchClient.setEndpoint(ec2Region.replace("ec2", "monitoring"));
-
-
-                                DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
-
-                                for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
-
-                                    for (Dimension dim : metricAlarm.getDimensions()) {
-
-                                        if (dim.getName().equals("InstanceId")) {
-                                            HostSystem hostSystem = hostSystemList.remove(dim.getValue());
-                                            if (hostSystem != null) {
-                                                if ("ALARM".equals(metricAlarm.getStateValue())) {
-                                                    hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
-                                                } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
-                                                    hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
-                                                } else {
-                                                    hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
-                                                }
-                                                //check and filter by alarm state
-                                                if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))) {
-                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                } else if ("ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0) {
-                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                } else if ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0) {
-                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                } else if ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
+                                                //check and filter by instance or system status
+                                                if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                        ) {
                                                     hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                 }
                                             }
 
+                                            //start over
+                                            i = 0;
+                                            //clear list
+                                            idCallList.clear();
                                         }
 
+                                    }
 
+
+                                    //check alarms for ec2 instances
+                                    AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(awsCredentials, AWSClientConfig.getClientConfig());
+                                    cloudWatchClient.setEndpoint(ec2Region.replace("ec2", "monitoring"));
+
+
+                                    DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
+
+                                    for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
+
+                                        for (Dimension dim : metricAlarm.getDimensions()) {
+
+                                            if (dim.getName().equals("InstanceId")) {
+                                                HostSystem hostSystem = hostSystemList.remove(dim.getValue());
+                                                if (hostSystem != null) {
+                                                    if ("ALARM".equals(metricAlarm.getStateValue())) {
+                                                        hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
+                                                    } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
+                                                        hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
+                                                    } else {
+                                                        hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
+                                                    }
+                                                    //check and filter by alarm state
+                                                    if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))) {
+                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                    } else if ("ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0) {
+                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                    } else if ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0) {
+                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                    } else if ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
+                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-
-
                             }
                         }
-
                     }
                 }
-
 
                 //set ec2 systems
                 SystemDB.setSystems(hostSystemList.values());
@@ -399,4 +395,11 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         SystemAction.instanceStateMap = instanceStateMap;
     }
 
+    public boolean isShowStatus() {
+        return showStatus;
+    }
+
+    public void setShowStatus(boolean showStatus) {
+        this.showStatus = showStatus;
+    }
 }
