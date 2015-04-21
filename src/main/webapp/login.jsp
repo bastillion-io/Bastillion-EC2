@@ -44,7 +44,7 @@
 
             <div class="navbar-header">
                 <div class="navbar-brand" >
-                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png"/></div>
                  EC2Box</div>
             </div>
             <!--/.nav-collapse -->
