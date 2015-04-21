@@ -70,11 +70,6 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-
-            $('#view_btn').unbind().click(function () {
-                $("#viewSystems").submit();
-            });
-
         });
     </script>
     <s:if test="fieldErrors.size > 0">
@@ -95,107 +90,138 @@
 
 <div class="container">
 
-<div class="system_container">
+    <div class="system_container">
 
 
-<s:if test="script!=null && script.id!=null">
-    <h3>Execute Script on Instances</h3>
-</s:if>
-<s:else>
-    <h3>Composite SSH Terminals</h3>
-</s:else>
+        <s:if test="script!=null && script.id!=null">
+            <h3>Execute Script on Instances</h3>
+        </s:if>
+        <s:else>
+            <h3>Composite SSH Terminals</h3>
+        </s:else>
 
 
-    <s:if test="script!=null && script.id!=null">
-        <p>Run <b> <a data-toggle="modal" data-target="#script_dialog"><s:property value="script.displayNm"/></a></b> on the selected systems below</p>
+        <s:if test="script!=null && script.id!=null">
+            <p>Run <b> <a data-toggle="modal" data-target="#script_dialog"><s:property
+                    value="script.displayNm"/></a></b> on the selected systems below</p>
 
-        <div id="script_dialog" class="modal fade">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">View Script: <s:property value="script.displayNm"/></h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <pre><s:property value="script.script"/></pre>
+            <div id="script_dialog" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">View Script: <s:property value="script.displayNm"/></h4>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Close</button>
+                        <div class="modal-body">
+                            <div class="row">
+                                <pre><s:property value="script.script"/></pre>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Close</button>
 
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </s:if>
-    <s:else>
-        <div>Select the instances below to generate composite SSH sessions in multiple terminals<br/>
-        <span class="note">(Select on the user field to change the instance username and other properties)</span>
-        </div>
-    </s:else>
-
-    <s:form action="viewSystems" theme="simple">
-        <s:hidden name="sortedSet.orderByDirection"/>
-        <s:hidden name="sortedSet.orderByField"/>
-        <s:if test="script!=null && script.id!=null">
-            <s:hidden name="script.id"/>
         </s:if>
+        <s:else>
+            <div>Select the instances below to generate composite SSH sessions in multiple terminals<br/>
+                <span class="note">(Select on the user field to change the instance username and other properties)</span>
+            </div>
+        </s:else>
+
+
         <table>
 
             <tr>
-                <td class="align_left">&nbsp;<br/>
-                    <s:if test="showStatus==true">
-                        <s:hidden name="showStatus" value="false"/>
-                        <s:submit cssClass="btn btn-danger" value="Disable Status"/>
-                    </s:if>
-                    <s:else>
-                        <s:hidden name="showStatus" value="true"/>
-                        <s:submit cssClass="btn btn-success" value="Show Status"/>
-                    </s:else>
+                <td class="align_left"><br/>
+                    <s:form action="viewSystems" id="showStatusForm" theme="simple">
+                        <s:hidden name="sortedSet.orderByDirection"/>
+                        <s:hidden name="sortedSet.orderByField"/>
+                        <s:if test="script!=null && script.id!=null">
+                            <s:hidden name="script.id"/>
+                        </s:if>
+                        <s:if test="showStatus">
+                            <s:hidden name="showStatus" value="false"/>
+                            <s:submit cssClass="btn btn-danger" value="Disable Status"/>
+                        </s:if>
+                        <s:else>
+                            <s:hidden name="showStatus" value="true"/>
+                            <s:submit cssClass="btn btn-success" value="Show Status"/>
+                        </s:else>
+                    </s:form>
                 </td>
-                <td>&nbsp;<br/> | </td>
+                <td><br/> |</td>
 
-                <td><label>Tag</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_TAG}']" placeholder="tag-name[=value[,tag-name[=value]]"
-                                                        theme="simple" size="25"/></td>
 
-                <td><label>Security Group</label><br/><s:textfield name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SECURITY_GROUP}']"
-                                                                   placeholder="group[,group]"
-                                                                   theme="simple" size="10"/></td>
                 <td>
-                    <label>Current State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATE}']" list="instanceStateMap"
-                                                                 theme="simple" headerKey="" headerValue="-Any-"/>
-                </td>
-                <s:if test="showStatus">
-                    <td>
-                        <label>Instance Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATUS}']" list="instanceStatusMap"
-                                                                 theme="simple" headerKey="" headerValue="-Any-"/>
-                    </td>
-                    <td>
-                        <label>System Status</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SYSTEM_STATUS}']" list="systemStatusMap" theme="simple"
-                                                               headerKey="" headerValue="-Any-"/>
-                    </td>
-                    <td>
-                        <label>Alarm State</label><br/><s:select name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_ALARM_STATE}']" list="alarmStateMap" theme="simple"
-                                                             headerKey="" headerValue="-Any-"/>
-                    </td>
-                </s:if>
-                <td style="padding:20px 5px 0px 5px;">
-                    <div id="view_btn" class="btn btn-primary">Filter</div>
+                    <s:form action="viewSystems" theme="simple">
+                        <s:hidden name="sortedSet.orderByDirection"/>
+                        <s:hidden name="sortedSet.orderByField"/>
+                        <s:if test="script!=null && script.id!=null">
+                            <s:hidden name="script.id"/>
+                        </s:if>
+                        <s:hidden name="showStatus"/>
+                        <table>
+                            <tr>
+
+                                <td>
+                                    <label>Tag</label><br/><s:textfield
+                                        name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_TAG}']"
+                                        placeholder="tag-name[=value[,tag-name[=value]]"
+                                        theme="simple" size="25"/></td>
+
+                                <td><label>Security Group</label><br/><s:textfield
+                                        name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SECURITY_GROUP}']"
+                                        placeholder="group[,group]"
+                                        theme="simple" size="10"/></td>
+                                <td>
+                                    <label>Current State</label><br/><s:select
+                                        name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATE}']"
+                                        list="instanceStateMap"
+                                        theme="simple" headerKey="" headerValue="-Any-"/>
+                                </td>
+                                <s:if test="showStatus">
+                                    <td>
+                                        <label>Instance Status</label><br/><s:select
+                                            name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_INSTANCE_STATUS}']"
+                                            list="instanceStatusMap"
+                                            theme="simple" headerKey="" headerValue="-Any-"/>
+                                    </td>
+                                    <td>
+                                        <label>System Status</label><br/><s:select
+                                            name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_SYSTEM_STATUS}']"
+                                            list="systemStatusMap" theme="simple"
+                                            headerKey="" headerValue="-Any-"/>
+                                    </td>
+                                    <td>
+                                        <label>Alarm State</label><br/><s:select
+                                            name="sortedSet.filterMap['%{@com.ec2box.manage.action.SystemAction@FILTER_BY_ALARM_STATE}']"
+                                            list="alarmStateMap" theme="simple"
+                                            headerKey="" headerValue="-Any-"/>
+                                    </td>
+                                </s:if>
+                                <td style="padding:20px 5px 0px 5px;">
+                                    <s:submit cssClass="btn btn-primary" value="Filter"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </s:form>
                 </td>
             </tr>
         </table>
 
 
-    </s:form>
 
-    <s:if test="(sortedSet.itemList!= null && !sortedSet.itemList.isEmpty())">
+        <s:if test="(sortedSet.itemList!= null && !sortedSet.itemList.isEmpty())">
         <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
-            <s:if test="script!=null && script.id!=null">
-                <s:hidden name="script.id"/>
-            </s:if>
-            <div class="scrollWrapper">
+        <s:if test="script!=null && script.id!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
+        <s:hidden name="showStatus"/>
+        <div class="scrollWrapper">
             <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
                 <thead>
                 <tr>
@@ -262,84 +288,88 @@
                             </a>
                         </td>
                         <td><s:property value="state"/></td>
-                        <td><s:property value="instanceStatus"/></td>
-                        <td><s:property value="systemStatus"/></td>
-                        <td><span class="text-success"><s:property value="monitorOk"/></span> / <span
-                                class="text-warning"><s:property value="monitorInsufficientData"/></span> / <span
-                                class="text-danger"><s:property value="monitorAlarm"/></span>
-
-
-                        </td>
+                        <s:if test="showStatus">
+                            <td><s:property value="instanceStatus"/></td>
+                            <td><s:property value="systemStatus"/></td>
+                            <td><span class="text-success"><s:property value="monitorOk"/></span> / <span
+                                    class="text-warning"><s:property value="monitorInsufficientData"/></span> / <span
+                                    class="text-danger"><s:property value="monitorAlarm"/></span>
+                            </td>
+                        </s:if>
                         <td><s:property value="ec2Region"/></td>
                     </tr>
                 </s:iterator>
                 </tbody>
             </table>
-        </s:form>
-        <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Execute Script</div>
-        </s:if>
-        <s:else>
-            <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Create SSH Terminals</div>
-        </s:else>
-    </s:if>
-<s:else>
-    <div class="actionMessage">
-        <p class="error">No instances available. Try changing the filter values above
-            <s:if test="%{#session.userType==\"M\"}">
-                or importing the corresponding EC2 Keys (<a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>).
+            </s:form>
+            <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+                <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Execute Script</div>
             </s:if>
-        </p>
-    </div>
-</s:else>
+            <s:else>
+                <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Create SSH Terminals</div>
+            </s:else>
+            </s:if>
+            <s:else>
+                <div class="actionMessage">
+                    <p class="error">No instances available. Try changing the filter values above
+                        <s:if test="%{#session.userType==\"M\"}">
+                            or importing the corresponding EC2 Keys (<a href="../manage/viewEC2Keys.action">Set EC2 Keys</a>).
+                        </s:if>
+                    </p>
+                </div>
+            </s:else>
 
-    <s:iterator var="system" value="sortedSet.itemList" status="stat">
+            <s:iterator var="system" value="sortedSet.itemList" status="stat">
 
-        <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Set Properties: <s:property value="hostSystem.displayLabel"/></h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                        <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
-                                <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
-                                <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
-                                <s:hidden name="hostSystem.id" value="%{id}"/>
-                                <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
-                                <s:hidden name="hostSystem.host" value="%{host}"/>
-                                <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
-                                <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
-                                <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
-                                <s:hidden name="hostSystem.state" value="%{state}"/>
-                                <s:hidden name="hostSystem.instance" value="%{instance}"/>
-                                <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
-                                <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
-                                <s:hidden name="sortedSet.orderByDirection"/>
-                                <s:hidden name="sortedSet.orderByField"/>
-                                <s:hidden name="selectForm"/>
-                                <s:if test="script!=null && script.id!=null">
-                                    <s:hidden name="script.id"/>
-                                </s:if>
-                            </s:form>
+                <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title">Set Properties: <s:property
+                                        value="hostSystem.displayLabel"/></h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                        <s:textfield name="hostSystem.user" value="%{user}" label="System User"
+                                                     size="10"/>
+                                        <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
+                                        <s:hidden name="hostSystem.id" value="%{id}"/>
+                                        <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
+                                        <s:hidden name="hostSystem.host" value="%{host}"/>
+                                        <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
+                                        <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
+                                        <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
+                                        <s:hidden name="hostSystem.state" value="%{state}"/>
+                                        <s:hidden name="hostSystem.instance" value="%{instance}"/>
+                                        <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
+                                        <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
+                                        <s:hidden name="sortedSet.orderByDirection"/>
+                                        <s:hidden name="sortedSet.orderByField"/>
+                                        <s:hidden name="selectForm"/>
+                                        <s:if test="script!=null && script.id!=null">
+                                            <s:hidden name="script.id"/>
+                                        </s:if>
+                                        <s:hidden name="showStatus"/>
+                                    </s:form>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel
+                                </button>
+                                <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
-                    </div>
                 </div>
-            </div>
+
+
+            </s:iterator>
+
+
         </div>
 
-
-    </s:iterator>
-
-
-</div>
-
-</div>
+    </div>
 </body>
 </html>
