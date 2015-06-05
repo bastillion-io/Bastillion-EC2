@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.9.35</version>
+            <version>1.9.40</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -101,7 +101,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.2.10.v20150310</version>
+                <version>9.2.11.v20150529</version>
                 <configuration>
                     <jettyXml>
                         ${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml
