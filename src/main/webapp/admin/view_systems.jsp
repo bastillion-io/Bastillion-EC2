@@ -100,7 +100,7 @@
             <h3>Composite SSH Terminals</h3>
         </s:else>
 
-
+		<s:actionerror/>
         <s:if test="script!=null && script.id!=null">
             <p>Run <b> <a data-toggle="modal" data-target="#script_dialog"><s:property
                     value="script.displayNm"/></a></b> on the selected systems below</p>

@@ -68,7 +68,23 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             }
     )
     public String viewSystems() {
-
+    	
+    	//Test AWS Credentials are valid
+    	List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
+    	Integer awsCredErrorCount = 0;
+    	for (AWSCred awsCred : awsCredList) {
+    		if(!awsCred.isValid()) 
+    			{ awsCredErrorCount++; }
+    	}
+    	if(awsCredErrorCount>0)
+    	{
+    		if(awsCredList.size()==1){
+    			addActionError("The AWS Credential is invalid");
+    		}else{
+    			addActionError(awsCredErrorCount + " of " + awsCredList.size() + " AWS Credentials are invalid");
+    		}
+    	}
+    	
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
         String userType = AuthUtil.getUserType(servletRequest.getSession());
 
@@ -126,7 +142,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 //get AWS credentials from DB
                 for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
 
-                    if (awsCred != null) {
+                    if (awsCred != null  && awsCred.isValid()) {
                         //set  AWS credentials for service
                         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 
