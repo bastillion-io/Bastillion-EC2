@@ -85,7 +85,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
 
 
-            Map<String, String> tagMap = new HashMap<>();
+            Map<String,List<String>> tagMap = new HashMap<>();
             List<String> tagList = new ArrayList<>();
 
             //if user profile has been set or user is a manager
@@ -107,7 +107,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         for (String tag1 : tagArr1) {
                             String[] tagArr2 = tag1.split("=");
                             if (tagArr2.length > 1) {
-                                tagMap.put(tag1.split("=")[0], tag1.split("=")[1]);
+                                String tagNm=tag1.split("=")[0];
+                                String tagVal=tag1.split("=")[1];
+                                if(tagMap.get(tagNm) !=null && tagMap.get(tagNm).size()>0){
+                                    tagMap.get(tagNm).add(tagVal);
+                                }else {
+                                    tagMap.put(tagNm, new LinkedList<String>());
+                                    tagMap.get(tagNm).add(tagVal);
+                                }
                             } else {
                                 tagList.add(tag1);
                             }
@@ -166,7 +173,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             }
                             //set name value pair for tag filter
                             for (String tag : tagMap.keySet()) {
-                                Filter tagValueFilter = new Filter("tag:" + tag, Arrays.asList(tagMap.get(tag)));
+                                Filter tagValueFilter = new Filter("tag:" + tag, tagMap.get(tag));
                                 describeInstancesRequest.withFilters(tagValueFilter);
                             }
 
