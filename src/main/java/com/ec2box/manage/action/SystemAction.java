@@ -80,48 +80,39 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE,AppConfig.getProperty("defaultInstanceState"));  
         }
 
-
         try {
             Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
-
-
-            Map<String,List<String>> tagMap = new HashMap<>();
-            List<String> tagList = new ArrayList<>();
 
             //if user profile has been set or user is a manager
             List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
             if (profileList.size() > 0 || Auth.MANAGER.equals(userType)) {
-                List<String> inputTagList = new ArrayList<String>();
-                //set tag from input filter
-                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
-                    inputTagList.add(sortedSet.getFilterMap().get(FILTER_BY_TAG));
-                }
                 //set tags for profile
+                List<String> profileTags = new ArrayList<>();
                 for (Profile profile : profileList) {
-                    inputTagList.add(profile.getTag());
+                    profileTags.add(profile.getTag());
                 }
-                //parse out tags in format tag-name[=value[,tag-name[=value]]
-                for (String tagStr : inputTagList) {
-                    String[] tagArr1 = tagStr.split(",");
-                    if (tagArr1.length > 0) {
-                        for (String tag1 : tagArr1) {
-                            String[] tagArr2 = tag1.split("=");
-                            if (tagArr2.length > 1) {
-                                String tagNm=tag1.split("=")[0];
-                                String tagVal=tag1.split("=")[1];
-                                if(tagMap.get(tagNm) !=null && tagMap.get(tagNm).size()>0){
-                                    tagMap.get(tagNm).add(tagVal);
-                                }else {
-                                    tagMap.put(tagNm, new LinkedList<String>());
-                                    tagMap.get(tagNm).add(tagVal);
-                                }
-                            } else {
-                                tagList.add(tag1);
+                Map<String,List<String>> profileTagMap = parseTags(profileTags);
+
+                //set tag from input filter
+                Map<String,List<String>> tagMap = profileTagMap;
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
+                    //if manager allow any filter
+                    Map<String,List<String>> filterTags = new HashMap<>();
+                    if(Auth.MANAGER.equals(userType)) {
+                        filterTags.putAll(parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG))));
+                    //check against profile
+                    } else {
+                        Map<String,List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
+                        for(String name : tmpMap.keySet()) {
+                            if(profileTagMap.get(name).containsAll(tmpMap.get(name))) {
+                                filterTags.put(name,tmpMap.get(name));
                             }
                         }
                     }
+                    if(filterTags.size() > 0){
+                        tagMap = filterTags;
+                    }
                 }
-
 
                 //parse out security group list in format group[,group]
                 List<String> securityGroupList = new ArrayList<>();
@@ -162,24 +153,27 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
                                 describeInstancesRequest.withFilters(instanceStateFilter);
                             }
-                            if (tagList.size() > 0) {
-                                Filter tagFilter = new Filter("tag-key", tagList);
-                                describeInstancesRequest.withFilters(tagFilter);
-                            }
 
                             if (securityGroupList.size() > 0) {
                                 Filter groupFilter = new Filter("group-name", securityGroupList);
                                 describeInstancesRequest.withFilters(groupFilter);
                             }
                             //set name value pair for tag filter
+                            List<String> tagList = new ArrayList<String>();
                             for (String tag : tagMap.keySet()) {
-                                Filter tagValueFilter = new Filter("tag:" + tag, tagMap.get(tag));
-                                describeInstancesRequest.withFilters(tagValueFilter);
+                                if(tagMap.get(tag) != null) {
+                                    Filter tagValueFilter = new Filter("tag:" + tag, tagMap.get(tag));
+                                    describeInstancesRequest.withFilters(tagValueFilter);
+                                } else {
+                                    tagList.add(tag);
+                                }
+                            }
+                            if (tagList.size() > 0) {
+                                Filter tagFilter = new Filter("tag-key", tagList);
+                                describeInstancesRequest.withFilters(tagFilter);
                             }
 
-
                             DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
-
 
                             for (Reservation res : describeInstancesResult.getReservations()) {
                                 for (Instance instance : res.getInstances()) {
@@ -336,6 +330,36 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 
+	/**
+     *  Parse out tags in format tag-name[=value[,tag-name[=value]]
+     *
+     * @param tags list of unparsed tags
+     * @return map of tags
+     */
+    private Map<String,List<String>> parseTags(List<String> tags) {
+        Map<String,List<String>> tagMap = new HashMap<>();
+        for(String tag : tags) {
+            String[] tagArr1 = tag.split(",");
+            if (tagArr1.length > 0) {
+                for (String tag1 : tagArr1) {
+                    String[] tagArr2 = tag1.split("=");
+                    if (tagArr2.length > 1) {
+                        String tagNm = tag1.split("=")[0];
+                        String tagVal = tag1.split("=")[1];
+                        if (tagMap.get(tagNm) != null && tagMap.get(tagNm).size() > 0) {
+                            tagMap.get(tagNm).add(tagVal);
+                        } else {
+                            tagMap.put(tagNm, new LinkedList<String>());
+                            tagMap.get(tagNm).add(tagVal);
+                        }
+                    } else {
+                        tagMap.put(tag1, null);
+                    }
+                }
+            }
+        }
+        return tagMap;
+    }
 
     public HostSystem getHostSystem() {
         return hostSystem;
