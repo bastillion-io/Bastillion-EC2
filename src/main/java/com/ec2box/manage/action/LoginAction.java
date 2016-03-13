@@ -75,8 +75,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     )
     public String loginSubmit() {
         String retVal = SUCCESS;
+        //get client IP
         String clientIP = null;
-        clientIP = servletRequest.getRemoteAddr();
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("clientIPHeader"))) {
+            clientIP = servletRequest.getHeader(AppConfig.getProperty("clientIPHeader"));
+        }
+        if (StringUtils.isEmpty(clientIP)) {
+            clientIP = servletRequest.getRemoteAddr();
+        }
 
         String authToken = AuthDB.loginAdmin(auth);
         if (authToken != null) {
