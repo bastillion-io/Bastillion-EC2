@@ -17,6 +17,8 @@ package com.ec2box.manage.util;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,6 +29,8 @@ import java.security.SecureRandom;
  * Utility to encrypt, decrypt, and hash
  */
 public class EncryptionUtil {
+
+    private static Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     //secret key
     private static final byte[] key = new byte[]{'t', '3', '2', 'm', 'p', 'd', 'M', 'O', 'i', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
@@ -91,7 +95,7 @@ public class EncryptionUtil {
                 byte[] encVal = c.doFinal(str.getBytes());
                 retVal = new String(Base64.encodeBase64(encVal));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error(ex.toString(), ex);
             }
 
         }
@@ -113,7 +117,7 @@ public class EncryptionUtil {
                 byte[] decodedVal = Base64.decodeBase64(str.getBytes());
                 retVal = new String(c.doFinal(decodedVal));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error(ex.toString(), ex);
             }
 
         }

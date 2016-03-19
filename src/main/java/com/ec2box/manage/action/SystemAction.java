@@ -35,6 +35,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -43,6 +45,8 @@ import java.util.*;
  * Action to manage systems
  */
 public class SystemAction extends ActionSupport implements ServletRequestAware {
+
+    private static Logger log = LoggerFactory.getLogger(SystemAction.class);
 
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
@@ -301,7 +305,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 )
 
         {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

@@ -24,6 +24,9 @@ import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -31,13 +34,14 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SessionAuditAction extends ActionSupport implements ServletResponseAware {
 
+    private static Logger log = LoggerFactory.getLogger(SessionAuditAction.class);
 
     SortedSet sortedSet=new SortedSet();
     Long sessionId;
     Long hostSystemId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
-    String enableAudit = AppConfig.getProperty("enableAudit");
+    String enableAudit = AppConfig.getProperty("enableInternalAudit");
 
     @Action(value = "/manage/viewSessions",
             results = {
@@ -81,7 +85,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         try {
             servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         return null;

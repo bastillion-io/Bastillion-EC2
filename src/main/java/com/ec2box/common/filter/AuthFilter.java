@@ -18,6 +18,8 @@ package com.ec2box.common.filter;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.model.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +33,8 @@ import java.util.Date;
  */
 
 public class AuthFilter implements Filter {
+
+    private static Logger log = LoggerFactory.getLogger(AuthFilter.class);
 
     public void init(FilterConfig config) throws ServletException{
 
@@ -92,7 +96,7 @@ public class AuthFilter implements Filter {
                     }
 
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    log.error(ex.toString(), ex);
                     isAdmin = false;
                 }
             }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,25 @@
  */
 package com.ec2box.manage.model;
 
-
 /**
- * Output from ssh session
+ * host id and string builder output
  */
-public class SessionOutput {
+public class SessionOutput extends HostSystem {
+
     Long sessionId;
-    Long hostSystemId;
-    Integer instanceId;
-    String output;
+    StringBuilder output = new StringBuilder();
 
+    public SessionOutput() {
 
-
-    public Long getHostSystemId() {
-        return hostSystemId;
     }
-
-    public void setHostSystemId(Long hostSystemId) {
-        this.hostSystemId = hostSystemId;
+    public SessionOutput(Long sessionId, HostSystem hostSystem) {
+        this.sessionId=sessionId;
+        this.setId(hostSystem.getId());
+        this.setInstanceId(hostSystem.getInstanceId());
+        this.setUser(hostSystem.getUser());
+        this.setHost(hostSystem.getHost());
+        this.setPort(hostSystem.getPort());
+        this.setDisplayNm(hostSystem.getDisplayNm());
     }
 
     public Long getSessionId() {
@@ -43,20 +44,11 @@ public class SessionOutput {
         this.sessionId = sessionId;
     }
 
-
-    public String getOutput() {
+    public StringBuilder getOutput() {
         return output;
     }
 
-    public void setOutput(String output) {
+    public void setOutput(StringBuilder output) {
         this.output = output;
-    }
-
-    public Integer getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Integer instanceId) {
-        this.instanceId = instanceId;
     }
 }

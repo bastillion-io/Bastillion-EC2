@@ -19,13 +19,14 @@ import com.jcraft.jsch.ChannelShell;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.*;
 import com.ec2box.manage.model.*;
-import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * This action will create composite ssh terminals to be used
  */
 public class SecureShellAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+
+    private static Logger log = LoggerFactory.getLogger(SecureShellAction.class);
 
     List<SessionOutput> outputList;
     String command;
@@ -203,7 +206,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     //remove from map
                     userSchSessions.getSchSessionMap().remove(id);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    log.error(ex.toString(), ex);
                 }
             }
 

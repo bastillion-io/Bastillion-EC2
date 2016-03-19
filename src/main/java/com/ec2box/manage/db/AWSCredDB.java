@@ -19,6 +19,8 @@ import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +33,7 @@ import java.util.List;
  */
 public class AWSCredDB {
 
+    private static Logger log = LoggerFactory.getLogger(AWSCredDB.class);
 
     public static final String SORT_BY_ACCESS_KEY = "access_key";
 
@@ -76,7 +79,7 @@ public class AWSCredDB {
 
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         //close db connection
@@ -123,7 +126,7 @@ public class AWSCredDB {
 
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         //close db connection
@@ -165,7 +168,7 @@ public class AWSCredDB {
 
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         //close db connection
@@ -207,7 +210,7 @@ public class AWSCredDB {
 
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         //close db connection

@@ -75,14 +75,14 @@ $(document).ready(function() {
 
                $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&hostSystemId='+id+'&t='+new Date().getTime(), function(data) {
                    $.each(data, function(key, val) {
-                       if (val.output != '' && val.hostSystemId!=null) {
+                       if (val.output != '' && val.id !=null) {
 
-                               $("#output_"+val.hostSystemId+"> .terminal").empty();
+                               $("#output_"+val.id+"> .terminal").empty();
                                var output=val.output;
                                output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
                                var outputList = output.split('\r\n');
                                for(var i=0; i<outputList.length;i++){
-                                   $("#output_"+val.hostSystemId+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
+                                   $("#output_"+val.id+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
                                }
 
 

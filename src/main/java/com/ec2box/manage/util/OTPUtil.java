@@ -17,6 +17,8 @@ package com.ec2box.manage.util;
 
 
 import org.apache.commons.codec.binary.Base32;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
  * Time-based One-Time Password Utility
  */
 public class OTPUtil {
+
+    private static Logger log = LoggerFactory.getLogger(OTPUtil.class);
 
     //sizes to generate OTP secret
     private static final int SECRET_SIZE = 10;
@@ -113,7 +117,7 @@ public class OTPUtil {
             calculated &= 0x7FFFFFFF;
             calculated %= 1000000;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

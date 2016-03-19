@@ -23,6 +23,8 @@ import com.ec2box.manage.model.SessionAudit;
 import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +40,7 @@ import java.util.List;
  */
 public class SessionAuditDB {
 
+    private static Logger log = LoggerFactory.getLogger(SessionAuditDB.class);
 
     public static final String SORT_BY_FIRST_NM = "first_nm";
     public static final String SORT_BY_LAST_NM = "last_nm";
@@ -218,12 +221,12 @@ public class SessionAuditDB {
 
         try {
 
-            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getHostSystemId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
+            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getHost() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
                 //insert
                 PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, system_id, output) values(?,?,?)");
                 stmt.setLong(1, sessionOutput.getSessionId());
-                stmt.setLong(2, sessionOutput.getHostSystemId());
-                stmt.setString(3, sessionOutput.getOutput());
+                stmt.setLong(2, sessionOutput.getId());
+                stmt.setString(3, sessionOutput.getOutput().toString());
                 stmt.execute();
                 DBUtils.closeStmt(stmt);
             }
@@ -289,9 +292,9 @@ public class SessionAuditDB {
             DBUtils.closeRs(rs);
 
             SessionOutput sessionOutput = new SessionOutput();
-            sessionOutput.setHostSystemId(hostSystemId);
+            sessionOutput.setId(hostSystemId);
             sessionOutput.setSessionId(sessionId);
-            sessionOutput.setOutput(output);
+            sessionOutput.getOutput().append(output);
 
 
             outputList.add(sessionOutput);
@@ -332,7 +335,7 @@ public class SessionAuditDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         return hostSystemList;
 

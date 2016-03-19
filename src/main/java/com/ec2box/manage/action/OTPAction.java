@@ -28,6 +28,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ import java.util.Hashtable;
 
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    private static Logger log = LoggerFactory.getLogger(OTPAction.class);
 
     //QR image size
     private static final int QR_IMAGE_WIDTH = 325;
@@ -124,7 +127,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
             servletResponse.getOutputStream().close();
             
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

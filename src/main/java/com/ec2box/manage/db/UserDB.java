@@ -19,6 +19,8 @@ import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.model.User;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,6 +32,8 @@ import java.util.ArrayList;
  * DAO class to manage users
  */
 public class UserDB {
+
+    private static Logger log = LoggerFactory.getLogger(UserDB.class);
 
     public static final String SORT_BY_FIRST_NM="first_nm";
     public static final String SORT_BY_LAST_NM="last_nm";
@@ -285,7 +289,7 @@ public class UserDB {
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
         } catch(Exception ex){
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         DBUtils.closeConn(con);
 

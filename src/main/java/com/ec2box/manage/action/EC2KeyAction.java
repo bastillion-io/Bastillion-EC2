@@ -32,6 +32,8 @@ import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -40,6 +42,8 @@ import java.util.*;
  * Action to import private key for EC2 instances
  */
 public class EC2KeyAction extends ActionSupport implements ServletResponseAware {
+
+    private static Logger log = LoggerFactory.getLogger(EC2KeyAction.class);
 
     EC2Key ec2Key;
     SortedSet sortedSet = new SortedSet();
@@ -87,7 +91,7 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
         try {
             servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         return null;
     }

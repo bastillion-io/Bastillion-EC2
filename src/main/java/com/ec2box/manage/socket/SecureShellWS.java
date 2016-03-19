@@ -15,6 +15,7 @@
  */
 package com.ec2box.manage.socket;
 
+import com.ec2box.manage.db.UserDB;
 import com.google.gson.Gson;
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
@@ -24,6 +25,8 @@ import com.ec2box.manage.model.UserSchSessions;
 import com.ec2box.manage.task.SentOutputTask;
 import com.ec2box.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
@@ -39,6 +42,9 @@ import java.util.Map;
 @ServerEndpoint(value = "/admin/terms.ws", configurator = GetHttpSessionConfigurator.class)
 @SuppressWarnings("unchecked")
 public class SecureShellWS {
+
+    private static Logger log = LoggerFactory.getLogger(SecureShellWS.class);
+
     private HttpSession httpSession;
     private Session session;
     private Long sessionId = null;
@@ -60,7 +66,7 @@ public class SecureShellWS {
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
 
-        Runnable run=new SentOutputTask(sessionId, session);
+        Runnable run=new SentOutputTask(sessionId, session, UserDB.getUser(AuthUtil.getUserId(httpSession)));
         Thread thread = new Thread(run);
         thread.start();
 
@@ -96,7 +102,7 @@ public class SecureShellWS {
                                 try {
                                     schSession.getCommander().write(keyMap.get(keyCode));
                                 } catch (IOException ex) {
-                                    ex.printStackTrace();
+                                    log.error(ex.toString(), ex);
                                 }
                             }
                         } else {

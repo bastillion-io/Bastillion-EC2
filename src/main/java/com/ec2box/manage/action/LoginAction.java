@@ -25,9 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.logging.Logger;
 
 
 /**
@@ -36,7 +37,7 @@ import java.util.logging.Logger;
 public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     HttpServletRequest servletRequest;
-    private Logger logger = Logger.getLogger("com.ec2box.manage.action.loginAudit");
+    private static Logger loginAuditLogger = LoggerFactory.getLogger("com.ec2box.manage.action.LoginAudit");
     Auth auth;
     //check if otp is enabled
     boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
@@ -91,7 +92,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             if (otpEnabled) {
                 sharedSecret = AuthDB.getSharedSecret(userId);
                 if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                    logger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
                     addActionError(AUTH_ERROR);
                     return INPUT;
                 }
@@ -100,7 +101,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
             AuthUtil.setUserId(servletRequest.getSession(), AuthDB.getUserIdByAuthToken(authToken));
             AuthUtil.setTimeout(servletRequest.getSession());
-            logger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_SUCCESS);
+            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_SUCCESS);
 
             //for first time login redirect to set OTP
             if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
@@ -111,7 +112,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             }
 
         } else {
-            logger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
+            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
             addActionError(AUTH_ERROR);
             retVal = INPUT;
         }

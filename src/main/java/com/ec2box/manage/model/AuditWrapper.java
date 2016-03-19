@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
@@ -15,31 +16,29 @@
  */
 package com.ec2box.manage.model;
 
-/**
- * host id and string builder output
- */
-public class SessionHostOutput {
-    Long id;
-    StringBuilder output;
-    
-    public SessionHostOutput(Long id, StringBuilder output){
-        this.id=id;
-        this.output=output;
-    }
+public class AuditWrapper {
 
-    public Long getId() {
-        return id;
-    }
+	User user;
+	SessionOutput sessionOutput;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public AuditWrapper(User user, SessionOutput sessionOutput) {
+		this.user=user;
+		this.sessionOutput=sessionOutput;
+	}
 
-    public StringBuilder getOutput() {
-        return output;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public void setOutput(StringBuilder output) {
-        this.output = output;
-    }
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public SessionOutput getSessionOutput() {
+		return sessionOutput;
+	}
+
+	public void setSessionOutput(SessionOutput sessionOutput) {
+		this.sessionOutput = sessionOutput;
+	}
 }

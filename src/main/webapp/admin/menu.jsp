@@ -116,7 +116,7 @@
                         Manage user accounts and assign profiles so that users will be granted access based on instance tags
                     </td>
                 </tr>
-                <s:if test="%{@com.ec2box.manage.util.SessionOutputUtil@enableAudit && #session.userType==\"M\"}">
+                <s:if test="%{@com.ec2box.manage.util.SessionOutputUtil@enableInternalAudit && #session.userType==\"M\"}">
                     <tr>
                         <td>
                             <a href="../manage/viewSessions.action">Audit Sessions</a>

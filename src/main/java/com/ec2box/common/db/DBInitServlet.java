@@ -18,6 +18,8 @@ package com.ec2box.common.db;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -34,6 +36,7 @@ import java.sql.Statement;
         loadOnStartup = 1)
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
+    private static Logger log = LoggerFactory.getLogger(DBInitServlet.class);
     /**
      * task init method that created DB
      *
@@ -77,7 +80,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         
         DBUtils.closeStmt(statement);

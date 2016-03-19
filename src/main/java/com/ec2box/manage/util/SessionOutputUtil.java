@@ -17,10 +17,15 @@ package com.ec2box.manage.util;
 
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.SessionAuditDB;
-import com.ec2box.manage.model.SessionHostOutput;
+import com.ec2box.manage.model.AuditWrapper;
 import com.ec2box.manage.model.SessionOutput;
+import com.ec2box.manage.model.User;
 import com.ec2box.manage.model.UserSessionsOutput;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.*;
@@ -31,9 +36,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionOutputUtil {
 
+    private static Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
+
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
-    public static boolean enableAudit = "true".equals(AppConfig.getProperty("enableAudit"));
+    public static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
+    private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
+    private static Logger systemAuditLogger = LoggerFactory.getLogger("com.ec2box.manage.util.SystemAudit");
 
 
     /**
@@ -67,20 +76,16 @@ public class SessionOutputUtil {
     /**
      * adds a new output
      *
-     * @param sessionId     session id
-     * @param hostId        host id
      * @param sessionOutput session output object
      */
-    public static void addOutput(Long sessionId, Long hostId, SessionOutput sessionOutput) {
+    public static void addOutput(SessionOutput sessionOutput) {
 
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionOutput.getSessionId());
         if (userSessionsOutput == null) {
-            userSessionsOutputMap.put(sessionId, new UserSessionsOutput());
-            userSessionsOutput = userSessionsOutputMap.get(sessionId);
+            userSessionsOutputMap.put(sessionOutput.getSessionId(), new UserSessionsOutput());
+            userSessionsOutput = userSessionsOutputMap.get(sessionOutput.getSessionId());
         }
-        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), new SessionHostOutput(hostId, new StringBuilder()));
-
-
+        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), sessionOutput);
     }
 
 
@@ -110,42 +115,34 @@ public class SessionOutputUtil {
      * @param sessionId session id object
      * @return session output list
      */
-    public static List<SessionOutput> getOutput(Connection con, Long sessionId) {
+    public static List<SessionOutput> getOutput(Connection con, Long sessionId, User user) {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
-
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-
-
 
             for (Integer key : userSessionsOutput.getSessionOutputMap().keySet()) {
 
                 //get output chars and set to output
                 try {
-                    SessionHostOutput sessionHostOutput = userSessionsOutput.getSessionOutputMap().get(key);
-                    Long hostId = sessionHostOutput.getId();
-                    StringBuilder sb = sessionHostOutput.getOutput();
-                    if (sb != null) {
-                        SessionOutput sessionOutput = new SessionOutput();
-                        sessionOutput.setSessionId(sessionId);
-                        sessionOutput.setHostSystemId(hostId);
-                        sessionOutput.setInstanceId(key);
-
-                        sessionOutput.setOutput(sb.toString());
+                    SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(key);
+                    if (sessionOutput!=null && sessionOutput.getOutput() != null) {
 
                         if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
                             outputList.add(sessionOutput);
 
-                            if (enableAudit) {
+                            //send to audit logger
+                            systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
+
+                            if(enableInternalAudit) {
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
 
-                            userSessionsOutput.getSessionOutputMap().put(key, new SessionHostOutput(hostId, new StringBuilder()));
+                            userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    log.error(ex.toString(), ex);
                 }
 
             }
