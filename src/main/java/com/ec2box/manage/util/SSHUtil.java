@@ -158,6 +158,7 @@ public class SSHUtil {
                 session.setPassword(password);
             }
             session.setConfig("StrictHostKeyChecking", "no");
+            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect(SESSION_TIMEOUT);
             Channel channel = session.openChannel("shell");
             if ("true".equals(AppConfig.getProperty("agentForwarding"))) {
