@@ -16,9 +16,11 @@
 package com.ec2box.manage.util;
 
 import org.apache.commons.dbcp.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ec2box.common.util.AppConfig;
 
 /**
  * Class to create a pooling data source object using commons DBCP
@@ -28,10 +30,13 @@ public class DSPool {
 
     private static Logger log = LoggerFactory.getLogger(DSPool.class);
 
-    //system path to the H2 DB
-    private static String DB_PATH = DBUtils.class.getClassLoader().getResource("ec2db").getPath();
-
     private static PoolingDataSource dsPool;
+
+    private static String DB_PATH = AppConfig.getProperty("dbPath");
+    private static int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
+    private static boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
+    private static  int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
+    private static int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
 
 
     /**
@@ -61,7 +66,7 @@ public class DSPool {
         // create a database connection
         String user="ec2box";
         String password="filepwd 0WJLnwhpA47EepT1A4drVnDn3vYRvJhpZi0sVdvN9SmlbKw";
-        String connectionURI = "jdbc:h2:" + DB_PATH + "/ec2box;CIPHER=AES";
+        String connectionURI = "jdbc:h2:" + getDBPath() + "/ec2box;CIPHER=AES";
 
         String validationQuery = "select 1";
 
@@ -74,10 +79,10 @@ public class DSPool {
 
         GenericObjectPool connectionPool = new GenericObjectPool(null);
 
-        connectionPool.setMaxActive(25);
-        connectionPool.setTestOnBorrow(true);
-        connectionPool.setMinIdle(2);
-        connectionPool.setMaxWait(15000);
+        connectionPool.setMaxActive(MAX_ACTIVE);
+        connectionPool.setTestOnBorrow(TEST_ON_BORROW);
+        connectionPool.setMinIdle(MIN_IDLE);
+        connectionPool.setMaxWait(MAX_WAIT);
         connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 
 
@@ -90,6 +95,13 @@ public class DSPool {
 
     }
 
+    private static String getDBPath() {
+        if(StringUtils.isEmpty(DB_PATH)){
+            //system path to the H2 DB
+            return DBUtils.class.getClassLoader().getResource("ec2db").getPath();
+        }
+        return DB_PATH;
+    }
 
 }
 
