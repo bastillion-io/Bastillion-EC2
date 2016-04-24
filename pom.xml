@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.27.01-SNAPSHOT</version>
+    <version>0.27.01</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
     <properties>
