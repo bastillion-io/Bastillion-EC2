@@ -22,6 +22,7 @@ import com.ec2box.manage.task.SecureShellTask;
 import com.jcraft.jsch.*;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.db.SystemStatusDB;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class SSHUtil {
     public static final int SESSION_TIMEOUT = 60000;
     public static final int CHANNEL_TIMEOUT = 60000;
 
+
+    public static final int SERVER_ALIVE_INTERVAL = StringUtils.isNumeric(AppConfig.getProperty("serverAliveInterval")) ? Integer.parseInt(AppConfig.getProperty("serverAliveInterval")) * 1000 : 60 * 1000;
 
     /**
      * distributes uploaded item to system defined
@@ -159,6 +162,7 @@ public class SSHUtil {
             }
             session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+            session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
             session.connect(SESSION_TIMEOUT);
             Channel channel = session.openChannel("shell");
             if ("true".equals(AppConfig.getProperty("agentForwarding"))) {
