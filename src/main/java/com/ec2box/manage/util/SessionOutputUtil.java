@@ -44,6 +44,9 @@ public class SessionOutputUtil {
     private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
     private static Logger systemAuditLogger = LoggerFactory.getLogger("com.ec2box.manage.util.SystemAudit");
 
+    private SessionOutputUtil() {
+    }
+
 
     /**
      * removes session for user session

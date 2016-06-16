@@ -41,6 +41,9 @@ public class SSHUtil {
 
     public static final int SERVER_ALIVE_INTERVAL = StringUtils.isNumeric(AppConfig.getProperty("serverAliveInterval")) ? Integer.parseInt(AppConfig.getProperty("serverAliveInterval")) * 1000 : 60 * 1000;
 
+    private SSHUtil() {
+    }
+
     /**
      * distributes uploaded item to system defined
      *

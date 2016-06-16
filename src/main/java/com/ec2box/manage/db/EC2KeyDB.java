@@ -37,6 +37,9 @@ public class EC2KeyDB {
     public static final String SORT_BY_EC2_REGION="ec2_region";
     public static final String SORT_BY_ACCESS_KEY="access_key";
 
+    private EC2KeyDB() {
+    }
+
     /**
      * returns private key information for user
      *

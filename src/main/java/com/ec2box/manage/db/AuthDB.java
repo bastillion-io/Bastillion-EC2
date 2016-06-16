@@ -29,6 +29,9 @@ import java.util.UUID;
  */
 public class AuthDB {
 
+    private AuthDB() {
+    }
+
     /**
      * returns admin login object based on auth token
      *
