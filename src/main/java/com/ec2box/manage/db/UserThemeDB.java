@@ -28,6 +28,9 @@ import java.sql.ResultSet;
  */
 public class UserThemeDB {
 
+    private UserThemeDB() {
+    }
+
     /**
      * get user theme
      *

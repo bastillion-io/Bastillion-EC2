@@ -37,6 +37,9 @@ public class AWSCredDB {
 
     public static final String SORT_BY_ACCESS_KEY = "access_key";
 
+    private AWSCredDB() {
+    }
+
 
     /**
      * returns list of all amazon credentials

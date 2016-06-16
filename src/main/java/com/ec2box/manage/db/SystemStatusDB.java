@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class SystemStatusDB {
 
+    private SystemStatusDB() {
+    }
+
     /**
      * set the initial status for selected systems
      *

@@ -28,6 +28,9 @@ public class AppConfig {
 
     private static ResourceBundle prop = ResourceBundle.getBundle("EC2BoxConfig");
 
+    private AppConfig() {
+    }
+
     /**
      * gets the property from config
      *

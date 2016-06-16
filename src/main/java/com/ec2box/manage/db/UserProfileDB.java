@@ -30,6 +30,9 @@ import java.util.List;
  */
 public class UserProfileDB {
 
+    private UserProfileDB() {
+    }
+
     /**
      * add profile for given user
      * @param profileId profile id

@@ -43,6 +43,9 @@ public class SystemDB {
     public static final String SORT_BY_SYSTEM_STATUS= "system_status";
     public static final String SORT_BY_ALARMS= "alarms";
 
+    private SystemDB() {
+    }
+
 
     /**
      * method to do order by based on the sorted set object for systems. only selects instance IDs in provided list.

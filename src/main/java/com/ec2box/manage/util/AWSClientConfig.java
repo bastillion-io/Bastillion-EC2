@@ -58,6 +58,9 @@ public class AWSClientConfig {
 
     }
 
+    private AWSClientConfig() {
+    }
+
     /**
      * return configuration information for AWS client
      * @return client configuration information

@@ -41,6 +41,9 @@ public class UserDB {
     public static final String SORT_BY_USERNAME="username";
     public static final String SORT_BY_USER_TYPE="user_type";
 
+    private UserDB() {
+    }
+
     /**
      * returns users based on sort order defined
      * @param sortedSet object that defines sort order

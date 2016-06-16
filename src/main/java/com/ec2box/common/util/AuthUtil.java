@@ -26,6 +26,9 @@ import java.util.Calendar;
 public class AuthUtil {
 
 
+    private AuthUtil() {
+    }
+
     /**
      * query session for OTP shared secret
      *
