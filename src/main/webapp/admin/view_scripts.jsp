@@ -95,7 +95,7 @@
             <thead>
             <tr>
 
-                <th id="<s:property value="@com.ec2box.manage.db.ScriptDB@SORT_BY_DISPLAY_NM"/>" class="sort">Script
+                <th id="<s:property value="@com.ec2box.manage.db.ScriptDB@DISPLAY_NM"/>" class="sort">Script
                     Name
                 </th>
                 <th>&nbsp;</th>
