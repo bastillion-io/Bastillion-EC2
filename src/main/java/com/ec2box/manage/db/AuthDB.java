@@ -31,6 +31,7 @@ public class AuthDB {
 
     private AuthDB() {
     }
+    public static final String SELECT_FROM_USERS_WITH_AUTH_TOKEN = "select * from users where enabled=true and auth_token=?";
 
     /**
      * returns admin login object based on auth token
@@ -44,7 +45,7 @@ public class AuthDB {
             Connection con = null;
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
+                PreparedStatement stmt = con.prepareStatement(SELECT_FROM_USERS_WITH_AUTH_TOKEN);
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 
@@ -129,7 +130,7 @@ public class AuthDB {
 
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
+                PreparedStatement stmt = con.prepareStatement(SELECT_FROM_USERS_WITH_AUTH_TOKEN);
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 
@@ -277,7 +278,7 @@ public class AuthDB {
 
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
+                PreparedStatement stmt = con.prepareStatement(SELECT_FROM_USERS_WITH_AUTH_TOKEN);
                 stmt.setString(1, authToken);
                 ResultSet rs = stmt.executeQuery();
 

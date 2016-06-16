@@ -42,7 +42,7 @@ public class SessionAuditDB {
 
     private static Logger log = LoggerFactory.getLogger(SessionAuditDB.class);
 
-    public static final String SORT_BY_FIRST_NM = "first_nm";
+    public static final String SORT_BY_FIRST_NM =    "first_nm";
     public static final String SORT_BY_LAST_NM = "last_nm";
     public static final String SORT_BY_EMAIL = "email";
     public static final String SORT_BY_USERNAME = "username";

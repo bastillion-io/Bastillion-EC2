@@ -32,15 +32,15 @@ import java.util.List;
  */
 public class SystemDB {
 
-    public static final String SORT_BY_NAME = "display_nm";
-    public static final String SORT_BY_USER = "user";
-    public static final String SORT_BY_HOST = "host";
-    public static final String SORT_BY_PORT = "port";
-    public static final String SORT_BY_INSTANCE_ID = "instance_id";
-    public static final String SORT_BY_REGION = "region";
-    public static final String SORT_BY_STATE = "state";
-    public static final String SORT_BY_INSTANCE_STATUS= "instance_status";
-    public static final String SORT_BY_SYSTEM_STATUS= "system_status";
+    public static final String DISPLAY_NM = "display_nm";
+    public static final String USER = "user";
+    public static final String HOST = "host";
+    public static final String PORT = "port";
+    public static final String INSTANCE_ID = "instance_id";
+    public static final String REGION = "region";
+    public static final String STATE = "state";
+    public static final String INSTANCE_STATUS = "instance_status";
+    public static final String SYSTEM_STATUS = "system_status";
     public static final String SORT_BY_ALARMS= "alarms";
 
     private SystemDB() {
@@ -81,16 +81,16 @@ public class SystemDB {
                 while (rs.next()) {
                     HostSystem hostSystem = new HostSystem();
                     hostSystem.setId(rs.getLong("id"));
-                    hostSystem.setDisplayNm(rs.getString("display_nm"));
-                    hostSystem.setInstance(rs.getString("instance_id"));
-                    hostSystem.setUser(rs.getString("user"));
-                    hostSystem.setHost(rs.getString("host"));
-                    hostSystem.setPort(rs.getInt("port"));
+                    hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+                    hostSystem.setInstance(rs.getString(INSTANCE_ID));
+                    hostSystem.setUser(rs.getString(USER));
+                    hostSystem.setHost(rs.getString(HOST));
+                    hostSystem.setPort(rs.getInt(PORT));
                     hostSystem.setKeyId(rs.getLong("key_id"));
-                    hostSystem.setEc2Region(rs.getString("region"));
-                    hostSystem.setState(rs.getString("state"));
-                    hostSystem.setInstanceStatus(rs.getString("instance_status"));
-                    hostSystem.setSystemStatus(rs.getString("system_status"));
+                    hostSystem.setEc2Region(rs.getString(REGION));
+                    hostSystem.setState(rs.getString(STATE));
+                    hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
+                    hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
                     hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
                     hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
                     hostSystem.setMonitorOk(rs.getInt("m_ok"));
@@ -161,14 +161,14 @@ public class SystemDB {
             while (rs.next()) {
                 hostSystem = new HostSystem();
                 hostSystem.setId(rs.getLong("id"));
-                hostSystem.setDisplayNm(rs.getString("display_nm"));
-                hostSystem.setInstance(rs.getString("instance_id"));
-                hostSystem.setUser(rs.getString("user"));
-                hostSystem.setHost(rs.getString("host"));
-                hostSystem.setPort(rs.getInt("port"));
+                hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+                hostSystem.setInstance(rs.getString(INSTANCE_ID));
+                hostSystem.setUser(rs.getString(USER));
+                hostSystem.setHost(rs.getString(HOST));
+                hostSystem.setPort(rs.getInt(PORT));
                 hostSystem.setKeyId(rs.getLong("key_id"));
-                hostSystem.setEc2Region(rs.getString("region"));
-                hostSystem.setState(rs.getString("state"));
+                hostSystem.setEc2Region(rs.getString(REGION));
+                hostSystem.setState(rs.getString(STATE));
                 hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
                 hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
                 hostSystem.setMonitorOk(rs.getInt("m_ok"));
@@ -232,14 +232,14 @@ public class SystemDB {
             while (rs.next()) {
                 hostSystem = new HostSystem();
                 hostSystem.setId(rs.getLong("id"));
-                hostSystem.setDisplayNm(rs.getString("display_nm"));
-                hostSystem.setInstance(rs.getString("instance_id"));
-                hostSystem.setUser(rs.getString("user"));
-                hostSystem.setHost(rs.getString("host"));
-                hostSystem.setPort(rs.getInt("port"));
+                hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+                hostSystem.setInstance(rs.getString(INSTANCE_ID));
+                hostSystem.setUser(rs.getString(USER));
+                hostSystem.setHost(rs.getString(HOST));
+                hostSystem.setPort(rs.getInt(PORT));
                 hostSystem.setKeyId(rs.getLong("key_id"));
-                hostSystem.setEc2Region(rs.getString("region"));
-                hostSystem.setState(rs.getString("state"));
+                hostSystem.setEc2Region(rs.getString(REGION));
+                hostSystem.setState(rs.getString(STATE));
                 hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
                 hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
                 hostSystem.setMonitorOk(rs.getInt("m_ok"));

@@ -31,11 +31,11 @@ import java.util.ArrayList;
 public class ScriptDB {
 
 
-    public static final String SORT_BY_DISPLAY_NM="display_nm";
 
     private ScriptDB() {
     }
 
+    public static final String DISPLAY_NM = "display_nm";
 
     /**
      * returns scripts based on sort order defined
@@ -64,7 +64,7 @@ public class ScriptDB {
             while (rs.next()) {
                 Script script = new Script();
                 script.setId(rs.getLong("id"));
-                script.setDisplayNm(rs.getString("display_nm"));
+                script.setDisplayNm(rs.getString(DISPLAY_NM));
                 script.setScript(rs.getString("script"));
                 script.setUserId(rs.getLong("user_id"));
 
@@ -126,7 +126,7 @@ public class ScriptDB {
             while (rs.next()) {
                 script = new Script();
                 script.setId(rs.getLong("id"));
-                script.setDisplayNm(rs.getString("display_nm"));
+                script.setDisplayNm(rs.getString(DISPLAY_NM));
                 script.setScript(rs.getString("script"));
                 script.setUserId(rs.getLong("user_id"));
             }
