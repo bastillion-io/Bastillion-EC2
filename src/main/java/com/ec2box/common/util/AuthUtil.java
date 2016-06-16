@@ -26,6 +26,11 @@ import java.util.Calendar;
 public class AuthUtil {
 
 
+    public static final String SESSION_ID = "sessionId";
+    public static final String USER_ID = "userId";
+    public static final String AUTH_TOKEN = "authToken";
+    public static final String TIMEOUT = "timeout";
+
     /**
      * query session for OTP shared secret
      *
@@ -69,7 +74,7 @@ public class AuthUtil {
      */
     public static void setSessionId(HttpSession session, Long sessionId) {
         if (sessionId != null) {
-            session.setAttribute("sessionId", EncryptionUtil.encrypt(sessionId.toString()));
+            session.setAttribute(SESSION_ID, EncryptionUtil.encrypt(sessionId.toString()));
         }
     }
 
@@ -81,7 +86,7 @@ public class AuthUtil {
      */
     public static Long getSessionId(HttpSession session) {
         Long sessionId=null;
-        String sessionIdStr = EncryptionUtil.decrypt((String)session.getAttribute("sessionId"));
+        String sessionIdStr = EncryptionUtil.decrypt((String)session.getAttribute(SESSION_ID));
         if(sessionIdStr!=null && !sessionIdStr.trim().equals("")){
             sessionId=Long.parseLong(sessionIdStr);
         }
@@ -96,7 +101,7 @@ public class AuthUtil {
      */
     public static Long getUserId(HttpSession session) {
         Long userId=null;
-        String userIdStr = EncryptionUtil.decrypt((String)session.getAttribute("userId"));
+        String userIdStr = EncryptionUtil.decrypt((String)session.getAttribute(USER_ID));
         if(userIdStr!=null && !userIdStr.trim().equals("")){
             userId=Long.parseLong(userIdStr);
         }
@@ -110,7 +115,7 @@ public class AuthUtil {
      * @return authentication token
      */
     public static String getAuthToken( HttpSession session) {
-        String authToken = (String) session.getAttribute("authToken");
+        String authToken = (String) session.getAttribute(AUTH_TOKEN);
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
     }
@@ -122,7 +127,7 @@ public class AuthUtil {
      * @return timeout string
      */
     public static String getTimeout(HttpSession session) {
-        String timeout = (String) session.getAttribute("timeout");
+        String timeout = (String) session.getAttribute(TIMEOUT);
         return timeout;
     }
 
@@ -146,7 +151,7 @@ public class AuthUtil {
      */
     public static void setUserId(HttpSession session, Long userId) {
         if (userId != null) {
-            session.setAttribute("userId", EncryptionUtil.encrypt(userId.toString()));
+            session.setAttribute(USER_ID, EncryptionUtil.encrypt(userId.toString()));
         }
     }
 
@@ -160,7 +165,7 @@ public class AuthUtil {
      */
     public static void setAuthToken(HttpSession session, String authToken) {
         if (authToken != null && !authToken.trim().equals("")) {
-            session.setAttribute("authToken", EncryptionUtil.encrypt(authToken));
+            session.setAttribute(AUTH_TOKEN, EncryptionUtil.encrypt(authToken));
         }
     }
 
@@ -174,7 +179,7 @@ public class AuthUtil {
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
         Calendar timeout = Calendar.getInstance();
         timeout.add(Calendar.MINUTE, 15);
-        session.setAttribute("timeout", sdf.format(timeout.getTime()));
+        session.setAttribute(TIMEOUT, sdf.format(timeout.getTime()));
     }
 
     /**
@@ -184,10 +189,10 @@ public class AuthUtil {
      */
     public static void deleteAllSession(HttpSession session) {
 
-       session.setAttribute("timeout",null);
-       session.setAttribute("authToken",null);
-       session.setAttribute("userId",null);
-       session.setAttribute("sessionId",null);
+       session.setAttribute(TIMEOUT,null);
+       session.setAttribute(AUTH_TOKEN,null);
+       session.setAttribute(USER_ID,null);
+       session.setAttribute(SESSION_ID,null);
 
       session.invalidate();
     }

@@ -43,6 +43,7 @@ import java.util.*;
  */
 public class EC2KeyAction extends ActionSupport implements ServletResponseAware {
 
+    public static final String REQUIRED = "Required";
     private static Logger log = LoggerFactory.getLogger(EC2KeyAction.class);
 
     EC2Key ec2Key;
@@ -215,19 +216,19 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public void validateImportEC2Key() {
 
         if (ec2Key.getAwsCredId() == null ) {
-            addFieldError("ec2Key.awsCredId", "Required");
+            addFieldError("ec2Key.awsCredId", REQUIRED);
         }
         if (ec2Key.getEc2Region() == null ||
                 ec2Key.getEc2Region().trim().equals("")) {
-            addFieldError("ec2Key.ec2Region", "Required");
+            addFieldError("ec2Key.ec2Region", REQUIRED);
         }
         if (ec2Key.getKeyNm() == null ||
                 ec2Key.getKeyNm().trim().equals("")) {
-            addFieldError("ec2Key.keyNm", "Required");
+            addFieldError("ec2Key.keyNm", REQUIRED);
         }
         if (ec2Key.getPrivateKey() == null ||
                 ec2Key.getPrivateKey().trim().equals("")) {
-            addFieldError("ec2Key.privateKey", "Required");
+            addFieldError("ec2Key.privateKey", REQUIRED);
         }
         if(hasErrors()){
 
@@ -242,11 +243,11 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     public void validateSubmitEC2Key() {
         if (ec2Key.getEc2Region() == null ||
             ec2Key.getEc2Region().trim().equals("")) {
-            addFieldError("ec2Key.ec2Region", "Required");
+            addFieldError("ec2Key.ec2Region", REQUIRED);
         }
         if (ec2Key.getKeyNm() == null ||
             ec2Key.getKeyNm().trim().equals("")) {
-            addFieldError("ec2Key.keyNm", "Required");
+            addFieldError("ec2Key.keyNm", REQUIRED);
         }
         if(hasErrors()){
 

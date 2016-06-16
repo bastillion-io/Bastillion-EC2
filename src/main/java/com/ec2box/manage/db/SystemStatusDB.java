@@ -33,6 +33,8 @@ import java.util.List;
  */
 public class SystemStatusDB {
 
+    public static final String STATUS_CD = "status_cd";
+
     /**
      * set the initial status for selected systems
      *
@@ -213,7 +215,7 @@ public class SystemStatusDB {
 
             while (rs.next()) {
                 HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
                 hostSystemList.add(hostSystem);
             }
             DBUtils.closeRs(rs);
@@ -247,7 +249,7 @@ public class SystemStatusDB {
 
             while (rs.next()) {
                 hostSystem= SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -283,7 +285,7 @@ public class SystemStatusDB {
 
             if (rs.next()) {
                 hostSystem=SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);

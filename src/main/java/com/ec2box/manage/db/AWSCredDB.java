@@ -35,7 +35,8 @@ public class AWSCredDB {
 
     private static Logger log = LoggerFactory.getLogger(AWSCredDB.class);
 
-    public static final String SORT_BY_ACCESS_KEY = "access_key";
+    public static final String ACCESS_KEY = "access_key";
+    public static final String SECRET_KEY = "secret_key";
 
 
     /**
@@ -69,7 +70,7 @@ public class AWSCredDB {
 
                 AWSCred awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
-                awsCred.setAccessKey(rs.getString("access_key"));
+                awsCred.setAccessKey(rs.getString(ACCESS_KEY));
                 //awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
                 awsCredList.add(awsCred);
 
@@ -116,8 +117,8 @@ public class AWSCredDB {
 
                 AWSCred awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
-                awsCred.setAccessKey(rs.getString("access_key"));
-                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
+                awsCred.setAccessKey(rs.getString(ACCESS_KEY));
+                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString(SECRET_KEY)));
                 awsCredList.add(awsCred);
 
             }
@@ -159,8 +160,8 @@ public class AWSCredDB {
 
                 awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
-                awsCred.setAccessKey(rs.getString("access_key"));
-                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
+                awsCred.setAccessKey(rs.getString(ACCESS_KEY));
+                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString(SECRET_KEY)));
 
             }
             DBUtils.closeRs(rs);
@@ -202,7 +203,7 @@ public class AWSCredDB {
                 awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
-                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
+                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString(SECRET_KEY)));
 
             }
             DBUtils.closeRs(rs);

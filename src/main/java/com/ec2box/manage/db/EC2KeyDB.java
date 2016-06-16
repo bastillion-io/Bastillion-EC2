@@ -33,9 +33,9 @@ import java.util.List;
 public class EC2KeyDB {
 
 
-    public static final String SORT_BY_KEY_NM="key_nm";
-    public static final String SORT_BY_EC2_REGION="ec2_region";
-    public static final String SORT_BY_ACCESS_KEY="access_key";
+    public static final String KEY_NM = "key_nm";
+    public static final String EC2_REGION = "ec2_region";
+    public static final String ACCESS_KEY = "access_key";
 
     /**
      * returns private key information for user
@@ -62,10 +62,10 @@ public class EC2KeyDB {
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setKeyNm(rs.getString("key_nm"));
-                ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setKeyNm(rs.getString(KEY_NM));
+                ec2Key.setEc2Region(rs.getString(EC2_REGION));
                 ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
-                ec2Key.setAccessKey(rs.getString("access_key"));
+                ec2Key.setAccessKey(rs.getString(ACCESS_KEY));
                 ec2KeyList.add(ec2Key);
             }
 
@@ -106,8 +106,8 @@ public class EC2KeyDB {
             if(rs.next()) {
                 ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setKeyNm(rs.getString("key_nm"));
-                ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setKeyNm(rs.getString(KEY_NM));
+                ec2Key.setEc2Region(rs.getString(EC2_REGION));
                 ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
                 ec2Key.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
 
@@ -149,8 +149,8 @@ public class EC2KeyDB {
             if (rs.next()) {
                 ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setKeyNm(rs.getString("key_nm"));
-                ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setKeyNm(rs.getString(KEY_NM));
+                ec2Key.setEc2Region(rs.getString(EC2_REGION));
                 ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
             }
 
@@ -186,8 +186,8 @@ public class EC2KeyDB {
             while (rs.next()) {
                 EC2Key ec2Key = new EC2Key();
                 ec2Key.setId(rs.getLong("id"));
-                ec2Key.setKeyNm(rs.getString("key_nm"));
-                ec2Key.setEc2Region(rs.getString("ec2_region"));
+                ec2Key.setKeyNm(rs.getString(KEY_NM));
+                ec2Key.setEc2Region(rs.getString(EC2_REGION));
                 ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
                 ec2KeyList.add(ec2Key);
             }
@@ -333,7 +333,7 @@ public class EC2KeyDB {
             PreparedStatement stmt = con.prepareStatement("select distinct ec2_region from ec2_keys");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ec2RegionList.add(rs.getString("ec2_region"));
+                ec2RegionList.add(rs.getString(EC2_REGION));
 
             }
 

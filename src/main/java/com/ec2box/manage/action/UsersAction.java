@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
+    public static final String REQUIRED = "Required";
     SortedSet sortedSet=new SortedSet();
     User user = new User();
     HttpServletRequest servletRequest;
@@ -99,19 +100,19 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
         if (user == null
                 || user.getUsername() == null
                 || user.getUsername().trim().equals("")) {
-            addFieldError("user.username", "Required");
+            addFieldError("user.username", REQUIRED);
         }
 
         if (user == null
                 || user.getLastNm() == null
                 || user.getLastNm().trim().equals("")) {
-            addFieldError("user.lastNm", "Required");
+            addFieldError("user.lastNm", REQUIRED);
         }
 
         if (user == null
                 || user.getFirstNm() == null
                 || user.getFirstNm().trim().equals("")) {
-            addFieldError("user.firstNm", "Required");
+            addFieldError("user.firstNm", REQUIRED);
         }
         if (user != null
                 && user.getPassword() != null
