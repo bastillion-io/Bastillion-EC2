@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class UserProfileAction extends ActionSupport {
 
-    List<Profile> profileList = new ArrayList<Profile>();
+    List<Profile> profileList = new ArrayList<>();
     User user;
     Long profileId;
 

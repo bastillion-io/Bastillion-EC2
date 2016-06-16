@@ -49,7 +49,7 @@ public class SystemStatusDB {
 
                 //make sure selected instance id is host the user has permission to.
                 List<String> instanceIdList= (List<String>)servletRequest.getSession().getAttribute("instanceIdList");
-                List<Long> systemIdList = new ArrayList<Long>();
+                List<Long> systemIdList = new ArrayList<>();
                 for (HostSystem hostSystem : SystemDB.getSystems(instanceIdList)) {
                     if (systemSelectIds.contains(hostSystem.getId())) {
                         systemIdList.add(hostSystem.getId());
@@ -182,7 +182,7 @@ public class SystemStatusDB {
      */
     public static List<HostSystem> getAllSystemStatus(Long userId) {
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -204,7 +204,7 @@ public class SystemStatusDB {
      */
     private static List<HostSystem> getAllSystemStatus(Connection con, Long userId) {
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         try {
 
             PreparedStatement stmt = con.prepareStatement("select * from status where user_id=? order by id asc");

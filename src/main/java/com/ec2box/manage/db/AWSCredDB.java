@@ -47,7 +47,7 @@ public class AWSCredDB {
     public static SortedSet getAWSCredSet(SortedSet sortedSet) {
 
 
-        List<AWSCred> awsCredList = new ArrayList<AWSCred>();
+        List<AWSCred> awsCredList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -101,7 +101,7 @@ public class AWSCredDB {
     public static List<AWSCred> getAWSCredList() {
 
 
-        List<AWSCred> awsCredList = new ArrayList<AWSCred>();
+        List<AWSCred> awsCredList = new ArrayList<>();
 
 
         Connection con = null;

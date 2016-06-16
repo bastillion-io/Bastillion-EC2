@@ -68,7 +68,7 @@ public class AppConfig {
     public static Map<String,String> getMapProperties(String name) {
 
         String values= prop.getString(name);
-        Map<String,String> map= new LinkedHashMap<String, String>();
+        Map<String,String> map= new LinkedHashMap<>();
 
         for(String set:values.split(";")){
             String key=set.split(",")[0];

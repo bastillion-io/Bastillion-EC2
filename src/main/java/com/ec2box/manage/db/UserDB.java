@@ -48,7 +48,7 @@ public class UserDB {
      */
     public static SortedSet getUserSet(SortedSet sortedSet) {
 
-        ArrayList<User> userList = new ArrayList<User>();
+        ArrayList<User> userList = new ArrayList<>();
 
 
         String orderBy = "";
