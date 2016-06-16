@@ -97,26 +97,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 }
                 Map<String,List<String>> profileTagMap = parseTags(profileTags);
 
-                //set tag from input filter
-                Map<String,List<String>> tagMap = profileTagMap;
-                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
-                    //if manager allow any filter
-                    Map<String,List<String>> filterTags = new HashMap<>();
-                    if(Auth.MANAGER.equals(userType)) {
-                        filterTags.putAll(parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG))));
-                    //check against profile
-                    } else {
-                        Map<String,List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
-                        for(String name : tmpMap.keySet()) {
-                            if(profileTagMap.get(name).containsAll(tmpMap.get(name))) {
-                                filterTags.put(name,tmpMap.get(name));
-                            }
-                        }
-                    }
-                    if(filterTags.size() > 0){
-                        tagMap = filterTags;
-                    }
-                }
+                //set tags from input filters
+                Map<String, List<String>> filterTags = fetchInputFilterTags(userType, profileTagMap);
 
                 //parse out security group list in format group[,group]
                 List<String> securityGroupList = new ArrayList<>();
@@ -163,15 +145,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 describeInstancesRequest.withFilters(groupFilter);
                             }
                             //set name value pair for tag filter
-                            List<String> tagList = new ArrayList<>();
-                            for (String tag : tagMap.keySet()) {
-                                if(tagMap.get(tag) != null) {
-                                    Filter tagValueFilter = new Filter("tag:" + tag, tagMap.get(tag));
-                                    describeInstancesRequest.withFilters(tagValueFilter);
-                                } else {
-                                    tagList.add(tag);
-                                }
-                            }
+                            List<String> tagList = new ArrayList<String>();
+
+                            //always add all profile tags to filter list
+                            addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
+
+                            //add all additional filter tags provided by the user
+                            addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
+
                             if (tagList.size() > 0) {
                                 Filter tagFilter = new Filter("tag-key", tagList);
                                 describeInstancesRequest.withFilters(tagFilter);
@@ -300,23 +281,53 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<>(hostSystemList.keySet()));
 
             }
-        } catch (
-                AmazonServiceException ex
-                )
-
-        {
+        } catch (AmazonServiceException ex) {
             log.error(ex.toString(), ex);
         }
 
 
-        if (script != null && script.getId() != null)
-
-        {
+        if (script != null && script.getId() != null) {
             script = ScriptDB.getScript(script.getId(), userId);
         }
 
-
         return SUCCESS;
+    }
+
+    private Map<String, List<String>> fetchInputFilterTags(String userType, Map<String, List<String>> profileTagMap) {
+        Map<String,List<String>> filterTags = new HashMap<>();
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
+            //if manager allow any filter
+            if(Auth.MANAGER.equals(userType)) {
+                filterTags.putAll(parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG))));
+            //check against profile
+            } else {
+                Map<String,List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
+                for(String name : tmpMap.keySet()) {
+
+                    //if profile tags does not have the filtered tag add to filters and it would be ANDed with profile tags.
+                    if(profileTagMap.get(name) == null) {
+                        filterTags.put(name,tmpMap.get(name));
+                    }
+
+                    //if profile tags have the filtered tag add to filters only if values are contained in allowed list of the user.
+                    if(profileTagMap.get(name) != null && profileTagMap.get(name).containsAll(tmpMap.get(name))) {
+                        filterTags.put(name,tmpMap.get(name));
+                    }
+                }
+            }
+        }
+        return filterTags;
+    }
+
+    private void addTagsToDescribeInstanceRequest(Map<String, List<String>> profileTagMap, DescribeInstancesRequest describeInstancesRequest, List<String> tagList) {
+        for (String tag : profileTagMap.keySet()) {
+            if(profileTagMap.get(tag) != null) {
+                Filter tagValueFilter = new Filter("tag:" + tag, profileTagMap.get(tag));
+                describeInstancesRequest.withFilters(tagValueFilter);
+            } else {
+                tagList.add(tag);
+            }
+        }
     }
 
     @Action(value = "/admin/saveSystem",
