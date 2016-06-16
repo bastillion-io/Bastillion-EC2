@@ -77,7 +77,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         String userType = AuthUtil.getUserType(servletRequest.getSession());
 
         List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
-        List<String> instanceIdList = new ArrayList<String>();
+        List<String> instanceIdList = new ArrayList<>();
         
         //default instance state
         if(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null){
@@ -85,7 +85,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         }
 
         try {
-            Map<String, HostSystem> hostSystemList = new HashMap<String, HostSystem>();
+            Map<String, HostSystem> hostSystemList = new HashMap<>();
 
             //if user profile has been set or user is a manager
             List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
@@ -140,7 +140,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
 
                             //only return systems that have keys set
-                            List<String> keyValueList = new ArrayList<String>();
+                            List<String> keyValueList = new ArrayList<>();
                             for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
                                 keyValueList.add(ec2Key.getKeyNm());
                             }
@@ -152,7 +152,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                             //instance state filter
                             if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE))) {
-                                List<String> instanceStateList = new ArrayList<String>();
+                                List<String> instanceStateList = new ArrayList<>();
                                 instanceStateList.add(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE));
                                 Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
                                 describeInstancesRequest.withFilters(instanceStateFilter);
@@ -163,7 +163,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 describeInstancesRequest.withFilters(groupFilter);
                             }
                             //set name value pair for tag filter
-                            List<String> tagList = new ArrayList<String>();
+                            List<String> tagList = new ArrayList<>();
                             for (String tag : tagMap.keySet()) {
                                 if(tagMap.get(tag) != null) {
                                     Filter tagValueFilter = new Filter("tag:" + tag, tagMap.get(tag));
@@ -213,11 +213,11 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                             if (instanceIdList.size() > 0) {
                                 //set instance id list to check permissions when creating sessions
-                                servletRequest.getSession().setAttribute("instanceIdList", new ArrayList<String>(instanceIdList));
+                                servletRequest.getSession().setAttribute("instanceIdList", new ArrayList<>(instanceIdList));
                                 if(showStatus) {
                                     //make service call 100 instances at a time b/c of AWS limitation
                                     int i = 0;
-                                    List<String> idCallList = new ArrayList<String>();
+                                    List<String> idCallList = new ArrayList<>();
                                     while (!instanceIdList.isEmpty()) {
                                         idCallList.add(instanceIdList.remove(0));
                                         i++;
@@ -297,7 +297,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                 //set ec2 systems
                 SystemDB.setSystems(hostSystemList.values());
-                sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<String>(hostSystemList.keySet()));
+                sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<>(hostSystemList.keySet()));
 
             }
         } catch (

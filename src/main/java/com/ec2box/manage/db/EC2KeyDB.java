@@ -48,7 +48,7 @@ public class EC2KeyDB {
      */
     public static SortedSet getEC2KeySet( SortedSet sortedSet) {
 
-        List<EC2Key> ec2KeyList = new ArrayList<EC2Key>();
+        List<EC2Key> ec2KeyList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -177,7 +177,7 @@ public class EC2KeyDB {
      * @return key information
      */
     public static List<EC2Key> getEC2KeyByRegion(String ec2Region, Long awsCredId) {
-        List<EC2Key> ec2KeyList = new ArrayList<EC2Key>();
+        List<EC2Key> ec2KeyList = new ArrayList<>();
 
         Connection con = null;
         try {
@@ -328,7 +328,7 @@ public class EC2KeyDB {
      */
     public static List<String> getEC2Regions() {
 
-        List<String> ec2RegionList = new ArrayList<String>();
+        List<String> ec2RegionList = new ArrayList<>();
 
         Connection con = null;
         try {

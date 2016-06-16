@@ -102,7 +102,7 @@ public class UserProfileDB {
 
 
         Connection con = null;
-        List<Profile> profileList = new ArrayList<Profile>();
+        List<Profile> profileList = new ArrayList<>();
         try {
             con = DBUtils.getConn();
             profileList = getProfilesByUser(con, userId);
@@ -123,7 +123,7 @@ public class UserProfileDB {
      */
     public static List<Profile> getProfilesByUser(Connection con, Long userId) {
 
-        ArrayList<Profile> profileList = new ArrayList<Profile>();
+        ArrayList<Profile> profileList = new ArrayList<>();
 
 
         try {
@@ -157,7 +157,7 @@ public class UserProfileDB {
 
 
         Connection con = null;
-        List<User> userList = new ArrayList<User>();
+        List<User> userList = new ArrayList<>();
         try {
             con = DBUtils.getConn();
             userList = getUsersByProfile(con, profileId);
@@ -179,7 +179,7 @@ public class UserProfileDB {
      */
     public static List<User> getUsersByProfile(Connection con, Long profileId) {
 
-        ArrayList<User> userList = new ArrayList<User>();
+        ArrayList<User> userList = new ArrayList<>();
 
 
         try {

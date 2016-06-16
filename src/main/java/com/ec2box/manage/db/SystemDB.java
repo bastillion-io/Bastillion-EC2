@@ -55,7 +55,7 @@ public class SystemDB {
      * @return sortedSet with list of host systems
      */
     public static SortedSet getSystemSet(SortedSet sortedSet, List<String> instanceIdList) {
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
 
         if (!instanceIdList.isEmpty()) {
 
@@ -391,7 +391,7 @@ public class SystemDB {
 
         Connection con = null;
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         for(String instanceId: instanceIdList){
 
             try {
