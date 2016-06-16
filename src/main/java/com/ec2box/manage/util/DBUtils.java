@@ -60,7 +60,6 @@ public class DBUtils {
             if (con != null) {
                 con.close();
             }
-            con = null;
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
@@ -78,7 +77,6 @@ public class DBUtils {
             if (stmt != null) {
                 stmt.close();
             }
-            stmt = null;
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
@@ -96,7 +94,6 @@ public class DBUtils {
             if (rs != null) {
                 rs.close();
             }
-            rs = null;
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }

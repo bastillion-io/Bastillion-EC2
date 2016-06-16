@@ -141,7 +141,6 @@ public class SecureShellWS {
                     schSession.setInputToChannel(null);
                     schSession.setCommander(null);
                     schSession.setOutFromChannel(null);
-                    schSession = null;
                     //remove from map
                     schSessionMap.remove(sessionKey);
                 }
