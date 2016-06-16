@@ -80,7 +80,7 @@
 <jsp:include page="../_res/inc/navigation.jsp"/>
 
 <div class="container">
-    <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
+    <s:set var="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
     <s:form action="viewScripts">
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
