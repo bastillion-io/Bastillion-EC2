@@ -89,7 +89,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
             //if user profile has been set or user is a manager
             List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
-            if (profileList.size() > 0 || Auth.MANAGER.equals(userType)) {
+            if (!profileList.isEmpty() || Auth.MANAGER.equals(userType)) {
                 //set tags for profile
                 List<String> profileTags = new ArrayList<>();
                 for (Profile profile : profileList) {
@@ -140,7 +140,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                 describeInstancesRequest.withFilters(instanceStateFilter);
                             }
 
-                            if (securityGroupList.size() > 0) {
+                            if (!securityGroupList.isEmpty()) {
                                 Filter groupFilter = new Filter("group-name", securityGroupList);
                                 describeInstancesRequest.withFilters(groupFilter);
                             }
@@ -153,7 +153,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             //add all additional filter tags provided by the user
                             addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
 
-                            if (tagList.size() > 0) {
+                            if (!tagList.isEmpty()) {
                                 Filter tagFilter = new Filter("tag-key", tagList);
                                 describeInstancesRequest.withFilters(tagFilter);
                             }

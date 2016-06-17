@@ -36,6 +36,7 @@ public class EC2KeyDB {
     public static final String KEY_NM = "key_nm";
     public static final String EC2_REGION = "ec2_region";
     public static final String ACCESS_KEY = "access_key";
+    public static final String AWS_CRED_ID = "aws_cred_id";
 
     private EC2KeyDB() {
     }
@@ -67,7 +68,7 @@ public class EC2KeyDB {
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString(KEY_NM));
                 ec2Key.setEc2Region(rs.getString(EC2_REGION));
-                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+                ec2Key.setAwsCredId(rs.getLong(AWS_CRED_ID));
                 ec2Key.setAccessKey(rs.getString(ACCESS_KEY));
                 ec2KeyList.add(ec2Key);
             }
@@ -111,7 +112,7 @@ public class EC2KeyDB {
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString(KEY_NM));
                 ec2Key.setEc2Region(rs.getString(EC2_REGION));
-                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+                ec2Key.setAwsCredId(rs.getLong(AWS_CRED_ID));
                 ec2Key.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
 
 
@@ -154,7 +155,7 @@ public class EC2KeyDB {
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString(KEY_NM));
                 ec2Key.setEc2Region(rs.getString(EC2_REGION));
-                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+                ec2Key.setAwsCredId(rs.getLong(AWS_CRED_ID));
             }
 
             DBUtils.closeStmt(stmt);
@@ -191,7 +192,7 @@ public class EC2KeyDB {
                 ec2Key.setId(rs.getLong("id"));
                 ec2Key.setKeyNm(rs.getString(KEY_NM));
                 ec2Key.setEc2Region(rs.getString(EC2_REGION));
-                ec2Key.setAwsCredId(rs.getLong("aws_cred_id"));
+                ec2Key.setAwsCredId(rs.getLong(AWS_CRED_ID));
                 ec2KeyList.add(ec2Key);
             }
 

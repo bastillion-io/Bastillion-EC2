@@ -42,6 +42,11 @@ public class SystemDB {
     public static final String INSTANCE_STATUS = "instance_status";
     public static final String SYSTEM_STATUS = "system_status";
     public static final String SORT_BY_ALARMS= "alarms";
+    public static final String KEY_ID = "key_id";
+    public static final String M_ALARM = "m_alarm";
+    public static final String M_INSUFFICIENT_DATA = "m_insufficient_data";
+    public static final String M_OK = "m_ok";
+    public static final String ID = "id";
 
     private SystemDB() {
     }
@@ -80,20 +85,20 @@ public class SystemDB {
 
                 while (rs.next()) {
                     HostSystem hostSystem = new HostSystem();
-                    hostSystem.setId(rs.getLong("id"));
+                    hostSystem.setId(rs.getLong(ID));
                     hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
                     hostSystem.setInstance(rs.getString(INSTANCE_ID));
                     hostSystem.setUser(rs.getString(USER));
                     hostSystem.setHost(rs.getString(HOST));
                     hostSystem.setPort(rs.getInt(PORT));
-                    hostSystem.setKeyId(rs.getLong("key_id"));
+                    hostSystem.setKeyId(rs.getLong(KEY_ID));
                     hostSystem.setEc2Region(rs.getString(REGION));
                     hostSystem.setState(rs.getString(STATE));
                     hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
                     hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
-                    hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
-                    hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
-                    hostSystem.setMonitorOk(rs.getInt("m_ok"));
+                    hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+                    hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+                    hostSystem.setMonitorOk(rs.getInt(M_OK));
                     hostSystemList.add(hostSystem);
                 }
                 DBUtils.closeRs(rs);
@@ -160,18 +165,18 @@ public class SystemDB {
 
             while (rs.next()) {
                 hostSystem = new HostSystem();
-                hostSystem.setId(rs.getLong("id"));
+                hostSystem.setId(rs.getLong(ID));
                 hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
                 hostSystem.setInstance(rs.getString(INSTANCE_ID));
                 hostSystem.setUser(rs.getString(USER));
                 hostSystem.setHost(rs.getString(HOST));
                 hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setKeyId(rs.getLong("key_id"));
+                hostSystem.setKeyId(rs.getLong(KEY_ID));
                 hostSystem.setEc2Region(rs.getString(REGION));
                 hostSystem.setState(rs.getString(STATE));
-                hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
-                hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
-                hostSystem.setMonitorOk(rs.getInt("m_ok"));
+                hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+                hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+                hostSystem.setMonitorOk(rs.getInt(M_OK));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -231,18 +236,18 @@ public class SystemDB {
 
             while (rs.next()) {
                 hostSystem = new HostSystem();
-                hostSystem.setId(rs.getLong("id"));
+                hostSystem.setId(rs.getLong(ID));
                 hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
                 hostSystem.setInstance(rs.getString(INSTANCE_ID));
                 hostSystem.setUser(rs.getString(USER));
                 hostSystem.setHost(rs.getString(HOST));
                 hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setKeyId(rs.getLong("key_id"));
+                hostSystem.setKeyId(rs.getLong(KEY_ID));
                 hostSystem.setEc2Region(rs.getString(REGION));
                 hostSystem.setState(rs.getString(STATE));
-                hostSystem.setMonitorAlarm(rs.getInt("m_alarm"));
-                hostSystem.setMonitorInsufficientData(rs.getInt("m_insufficient_data"));
-                hostSystem.setMonitorOk(rs.getInt("m_ok"));
+                hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+                hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+                hostSystem.setMonitorOk(rs.getInt(M_OK));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
