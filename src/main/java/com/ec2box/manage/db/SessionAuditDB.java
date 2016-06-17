@@ -283,10 +283,12 @@ public class SessionAuditDB {
             stmt.setLong(1, hostSystemId);
             stmt.setLong(2, sessionId);
             ResultSet rs = stmt.executeQuery();
-            String output = "";
+            StringBuilder outputBuilder = new StringBuilder("");
             while (rs.next()) {
-                output = output + rs.getString("output");
+                outputBuilder.append(rs.getString("output"));
             }
+
+            String output = outputBuilder.toString();
 
             output = output.replaceAll("(\\u0007|\u001B\\[K)", "");
             while (output.contains("\b")) {
