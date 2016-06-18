@@ -68,18 +68,18 @@ public class SystemDB {
             if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
                 orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
             }
-            String sql = "select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system  where instance_id in ( ";
+            StringBuilder sqlBuilder = new StringBuilder("select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system  where instance_id in ( ");
             for (int i = 0; i < instanceIdList.size(); i++) {
-                if (i == instanceIdList.size() - 1) sql = sql + "'" + instanceIdList.get(i) + "') ";
-                else sql = sql + "'" + instanceIdList.get(i) + "', ";
+                if (i == instanceIdList.size() - 1) sqlBuilder.append("'").append(instanceIdList.get(i)).append("') ");
+                else sqlBuilder.append("'").append(instanceIdList.get(i)).append("', ");
             }
 
-            sql = sql + orderBy;
+            sqlBuilder.append(orderBy);
 
             Connection con = null;
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement(sql);
+                PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
 
                 ResultSet rs = stmt.executeQuery();
 
