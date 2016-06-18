@@ -281,7 +281,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<>(hostSystemList.keySet()));
 
             }
-        } catch (AmazonServiceException ex) {
+        } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
 
@@ -305,12 +305,12 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 for(String name : tmpMap.keySet()) {
 
                     //if profile tags does not have the filtered tag add to filters and it would be ANDed with profile tags.
-                    if(profileTagMap.get(name) == null) {
+                    if(profileTagMap.get(name) == null && tmpMap.get(name) !=null) {
                         filterTags.put(name,tmpMap.get(name));
                     }
 
                     //if profile tags have the filtered tag add to filters only if values are contained in allowed list of the user.
-                    if(profileTagMap.get(name) != null && profileTagMap.get(name).containsAll(tmpMap.get(name))) {
+                    if(profileTagMap.get(name) != null && tmpMap.get(name) !=null && profileTagMap.get(name).containsAll(tmpMap.get(name))) {
                         filterTags.put(name,tmpMap.get(name));
                     }
                 }
