@@ -129,20 +129,19 @@ public class SessionOutputUtil {
                 //get output chars and set to output
                 try {
                     SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(key);
-                    if (sessionOutput!=null && sessionOutput.getOutput() != null) {
+                    if (sessionOutput!=null && sessionOutput.getOutput() != null
+                            && StringUtils.isNotEmpty(sessionOutput.getOutput())) {
 
-                        if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
-                            outputList.add(sessionOutput);
+                        outputList.add(sessionOutput);
 
-                            //send to audit logger
-                            systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
+                        //send to audit logger
+                        systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
 
-                            if(enableInternalAudit) {
-                                SessionAuditDB.insertTerminalLog(con, sessionOutput);
-                            }
-
-                            userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
+                        if(enableInternalAudit) {
+                            SessionAuditDB.insertTerminalLog(con, sessionOutput);
                         }
+
+                        userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
                     }
                 } catch (Exception ex) {
                     log.error(ex.toString(), ex);

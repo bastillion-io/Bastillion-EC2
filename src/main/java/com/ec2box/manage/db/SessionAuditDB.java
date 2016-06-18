@@ -114,7 +114,7 @@ public class SessionAuditDB {
             while (rs.next()) {
                 SessionAudit sessionAudit = new SessionAudit();
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
+                sessionAudit.setSessionTm(rs.getTimestamp(SORT_BY_SESSION_TM));
                 sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
                 outputList.add(sessionAudit);
 
@@ -366,7 +366,7 @@ public class SessionAuditDB {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
+                sessionAudit.setSessionTm(rs.getTimestamp(SORT_BY_SESSION_TM));
                 sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
                 sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
 

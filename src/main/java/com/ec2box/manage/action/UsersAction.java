@@ -118,12 +118,10 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                 && user.getPassword() != null
                 && !user.getPassword().trim().equals("")) {
             
-            if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
-                if(!user.getPassword().equals(user.getPasswordConfirm())) {
-                    addActionError("Passwords do not match");
-                } else if(!PasswordUtil.isValid(user.getPassword())) {
-                    addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
-                }
+            if(!user.getPassword().equals(user.getPasswordConfirm())) {
+                addActionError("Passwords do not match");
+            } else if(!PasswordUtil.isValid(user.getPassword())) {
+                addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
             }
         }
 
