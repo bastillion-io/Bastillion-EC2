@@ -257,13 +257,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                                         hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
                                                     }
                                                     //check and filter by alarm state
-                                                    if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))) {
-                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                    } else if ("ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0) {
-                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                    } else if ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0) {
-                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                    } else if ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0) {
+                                                    if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))
+                                                            || "ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0
+                                                            || ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0)
+                                                            || ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0)) {
                                                         hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                                     }
                                                 }
@@ -302,16 +299,16 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             //check against profile
             } else {
                 Map<String,List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
-                for(String name : tmpMap.keySet()) {
-
+                for (Map.Entry<String,List<String>> entry: tmpMap.entrySet()) {
+                    String name = entry.getKey();
                     //if profile tags does not have the filtered tag add to filters and it would be ANDed with profile tags.
-                    if(profileTagMap.get(name) == null && tmpMap.get(name) !=null) {
-                        filterTags.put(name,tmpMap.get(name));
+                    if(profileTagMap.get(name) == null && entry.getValue() !=null) {
+                        filterTags.put(name, entry.getValue());
                     }
 
                     //if profile tags have the filtered tag add to filters only if values are contained in allowed list of the user.
-                    if(profileTagMap.get(name) != null && tmpMap.get(name) !=null && profileTagMap.get(name).containsAll(tmpMap.get(name))) {
-                        filterTags.put(name,tmpMap.get(name));
+                    if(profileTagMap.get(name) != null && entry.getValue() !=null && profileTagMap.get(name).containsAll(entry.getValue())) {
+                        filterTags.put(name,entry.getValue());
                     }
                 }
             }
