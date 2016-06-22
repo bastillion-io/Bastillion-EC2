@@ -48,11 +48,6 @@
         <appender-ref ref="login-appender"/>
     </logger>
 
-	<logger name="com.ec2box.common.interceptor.HTTPStrictTransportSecurityInterceptor" additivity="false">
-        <level value="info"/>
-        <appender-ref ref="login-appender"/>
-    </logger>
-
     <root>
         <level value="warn"/>
         <appender-ref ref="console"/>
