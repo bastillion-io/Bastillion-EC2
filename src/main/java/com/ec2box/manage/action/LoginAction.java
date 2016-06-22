@@ -23,6 +23,8 @@ import com.ec2box.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
+import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action to login to ec2box
  */
+@InterceptorRef("ec2boxStack")
 public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     HttpServletRequest servletRequest;

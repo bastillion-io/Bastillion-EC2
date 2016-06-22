@@ -22,6 +22,7 @@ import com.ec2box.manage.model.SortedSet;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Action to audit sessions and terminal history
  */
+@InterceptorRef("ec2boxStack")
 public class SessionAuditAction extends ActionSupport implements ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(SessionAuditAction.class);

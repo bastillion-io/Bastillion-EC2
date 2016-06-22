@@ -21,11 +21,13 @@ import com.ec2box.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 
 
 /**
  * Action to create user profiles
  */
+@InterceptorRef("ec2boxStack")
 public class ProfileAction extends ActionSupport {
     Profile profile;
     SortedSet sortedSet = new SortedSet();

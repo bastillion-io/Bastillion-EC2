@@ -23,6 +23,7 @@ import com.ec2box.manage.model.Profile;
 import com.ec2box.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.List;
 /**
  * Action to assign profiles to users
  */
+@InterceptorRef("ec2boxStack")
 public class UserProfileAction extends ActionSupport {
 
     List<Profile> profileList = new ArrayList<>();

@@ -22,6 +22,7 @@ import com.ec2box.manage.model.*;
 import com.ec2box.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -38,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This action will create composite ssh terminals to be used
  */
+@InterceptorRef("ec2boxStack")
 public class SecureShellAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(SecureShellAction.class);

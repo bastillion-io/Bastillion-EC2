@@ -23,6 +23,7 @@ import com.ec2box.manage.model.User;
 import com.ec2box.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action to manage users
  */
+@InterceptorRef("ec2boxStack")
 public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     public static final String REQUIRED = "Required";

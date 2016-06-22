@@ -33,6 +33,7 @@ import com.ec2box.manage.util.AWSClientConfig;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ import java.util.*;
 /**
  * Action to manage systems
  */
+@InterceptorRef("ec2boxStack")
 public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     private static Logger log = LoggerFactory.getLogger(SystemAction.class);
