@@ -22,7 +22,7 @@ public class ClickjackingInterceptor extends AbstractInterceptor {
 
 	private static final long serialVersionUID = 2438421386123540997L;
 	private static final String HEADER = "X-Frame-Options";
-	private static final String VALUE = "DENY";
+	private static final String VALUE = "SAMEORIGIN";
 	
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
