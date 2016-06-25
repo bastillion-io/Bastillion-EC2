@@ -124,7 +124,7 @@ public class OTPUtil {
         }
 
 
-        return (calculated != -1 && calculated == token);
+        return calculated != -1 && calculated == token;
 
 
     }

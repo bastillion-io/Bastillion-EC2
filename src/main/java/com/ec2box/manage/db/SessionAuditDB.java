@@ -68,7 +68,7 @@ public class SessionAuditDB {
 
             //take today's date and subtract how many days to keep history
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, (-1 * Integer.parseInt(AppConfig.getProperty("deleteAuditLogAfter")))); //subtract
+            cal.add(Calendar.DATE, -1 * Integer.parseInt(AppConfig.getProperty("deleteAuditLogAfter"))); //subtract
             java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
 
 

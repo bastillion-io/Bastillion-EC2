@@ -123,9 +123,9 @@ public class SecureShellWS {
             if (userSchSessions != null) {
                 Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-                for (Integer sessionKey : schSessionMap.keySet()) {
-
-                    SchSession schSession = schSessionMap.get(sessionKey);
+                  for (Map.Entry<Integer, SchSession> entry : schSessionMap.entrySet()) {
+                    Integer sessionKey = entry.getKey();
+                    SchSession schSession = entry.getValue();
 
                     //disconnect ssh session
                     schSession.getChannel().disconnect();

@@ -70,9 +70,8 @@ public class AuthFilter implements Filter {
             String userType = AuthDB.isAuthorized(authToken);
             if (userType != null) {
                 String uri = servletRequest.getRequestURI();
-                if (Auth.MANAGER.equals(userType)) {
-                    isAdmin = true;
-                } else if (uri.matches("^"+servletRequest.getContextPath().replaceAll("/","\\\\/")+"\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
+                if (Auth.MANAGER.equals(userType)
+                        || uri.matches("^"+servletRequest.getContextPath().replaceAll("/","\\\\/")+"\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
                     isAdmin = true;
                 }
                 AuthUtil.setUserType(servletRequest.getSession(), userType);
@@ -106,7 +105,7 @@ public class AuthFilter implements Filter {
         //if not admin redirect to login page
         if (!isAdmin) {
             AuthUtil.deleteAllSession(servletRequest.getSession());
-            servletResponse.sendRedirect((servletRequest.getContextPath() + "/login.action"));
+            servletResponse.sendRedirect(servletRequest.getContextPath() + "/login.action");
         } else {
             chain.doFilter(req, resp);
         }
