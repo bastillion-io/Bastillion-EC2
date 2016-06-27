@@ -30,6 +30,7 @@ import com.ec2box.manage.util.AWSClientConfig;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ import java.util.*;
 /**
  * Action to import private key for EC2 instances
  */
+@InterceptorRef("ec2boxStack")
 public class EC2KeyAction extends ActionSupport implements ServletResponseAware {
 
     public static final String REQUIRED = "Required";

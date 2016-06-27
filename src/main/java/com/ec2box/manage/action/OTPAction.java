@@ -25,6 +25,7 @@ import com.ec2box.manage.db.UserDB;
 import com.ec2box.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -40,6 +41,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Hashtable;
 
+@InterceptorRef("ec2boxStack")
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(OTPAction.class);

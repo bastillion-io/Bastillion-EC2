@@ -26,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AgeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
 
+@InterceptorRef("ec2boxStack")
 public class UploadAndPushAction extends ActionSupport implements ServletRequestAware {
 
 

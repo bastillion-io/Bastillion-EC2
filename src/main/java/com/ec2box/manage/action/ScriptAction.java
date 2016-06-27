@@ -22,6 +22,7 @@ import com.ec2box.manage.model.Script;
 import com.ec2box.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action to manage scripts
  */
+@InterceptorRef("ec2boxStack")
 public class ScriptAction extends ActionSupport implements ServletRequestAware {
 
     SortedSet sortedSet = new SortedSet();
