@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/CIResearchGroup/EC2Box.svg?branch=master)](https://travis-ci.org/CIResearchGroup/EC2Box)
 EC2Box
 ======
 A web-based ssh console to execute commands and manage multiple EC2 instances
