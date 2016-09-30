@@ -19,7 +19,7 @@ import com.ec2box.manage.util.EncryptionUtil;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
+import com.ec2box.common.util.AppConfig;
 /**
  * Utility to obtain the authentication token from the http session and the user id from the auth token
  */
@@ -180,7 +180,7 @@ public class AuthUtil {
         //set session timeout
         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
         Calendar timeout = Calendar.getInstance();
-        timeout.add(Calendar.MINUTE, 15);
+        timeout.add(Calendar.MINUTE, Integer.parseInt(AppConfig.getProperty("TIMEOUT")));
         session.setAttribute(TIMEOUT, sdf.format(timeout.getTime()));
     }
 
