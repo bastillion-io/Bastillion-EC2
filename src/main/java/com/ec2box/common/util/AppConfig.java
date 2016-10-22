@@ -16,6 +16,8 @@
 package com.ec2box.common.util;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -40,6 +42,21 @@ public class AppConfig {
     public static String getProperty(String name) {
 
         return prop.getString(name);
+    }
+
+    /**
+     * gets the property from config
+     *
+     * @param name property name
+     * @param defaultValue default value if property is empty
+     * @return configuration property
+     */
+    public static String getProperty(String name, String defaultValue) {
+        String value = prop.getString(name);
+        if (StringUtils.isEmpty(value)) {
+            value = defaultValue;
+        }
+        return value;
     }
 
     /**
