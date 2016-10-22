@@ -107,8 +107,9 @@ public class SystemDB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            DBUtils.closeConn(con);
-
+            finally {
+                DBUtils.closeConn(con);
+            }
 
             sortedSet.setItemList(hostSystemList);
         }
@@ -138,8 +139,9 @@ public class SystemDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return hostSystem;
     }
@@ -210,8 +212,9 @@ public class SystemDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return hostSystem;
     }
@@ -313,8 +316,9 @@ public class SystemDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -364,7 +368,6 @@ public class SystemDB {
         try {
             con = DBUtils.getConn();
 
-
             //insert new host systems
             for (HostSystem hostSystem : hostSystemList) {
                 HostSystem hostSystemTmp = getSystem(con, hostSystem.getInstance());
@@ -381,7 +384,9 @@ public class SystemDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -408,7 +413,9 @@ public class SystemDB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            DBUtils.closeConn(con);
+            finally {
+                DBUtils.closeConn(con);
+            }
 
         }
 

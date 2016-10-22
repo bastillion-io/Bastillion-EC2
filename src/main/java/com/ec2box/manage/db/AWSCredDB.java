@@ -65,7 +65,6 @@ public class AWSCredDB {
         try {
             con = DBUtils.getConn();
 
-
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
@@ -85,14 +84,13 @@ public class AWSCredDB {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(awsCredList);
 
         return sortedSet;
-
 
     }
 
@@ -111,7 +109,6 @@ public class AWSCredDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
 
             PreparedStatement stmt = con.prepareStatement("select * from aws_credentials");
             ResultSet rs = stmt.executeQuery();
@@ -132,13 +129,11 @@ public class AWSCredDB {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return awsCredList;
-
 
     }
     /**
@@ -174,13 +169,11 @@ public class AWSCredDB {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return awsCred;
-
-
     }
 
     /**
@@ -216,12 +209,11 @@ public class AWSCredDB {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return awsCred;
-
 
     }
 
@@ -248,10 +240,9 @@ public class AWSCredDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -276,11 +267,9 @@ public class AWSCredDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
-
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -305,11 +294,9 @@ public class AWSCredDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
-
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**

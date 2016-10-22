@@ -78,8 +78,10 @@ public class UserThemeDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-        
+        finally {
+            DBUtils.closeConn(con);
+        }
+
         return theme;
 
     }
@@ -125,7 +127,9 @@ public class UserThemeDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 }

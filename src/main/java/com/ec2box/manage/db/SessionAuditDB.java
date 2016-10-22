@@ -117,8 +117,6 @@ public class SessionAuditDB {
                 sessionAudit.setSessionTm(rs.getTimestamp(SORT_BY_SESSION_TM));
                 sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
                 outputList.add(sessionAudit);
-
-
             }
 
 
@@ -127,8 +125,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(outputList);
 
@@ -155,9 +154,10 @@ public class SessionAuditDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        finally {
+            DBUtils.closeConn(con);
+        }
 
-        //close db connection
-        DBUtils.closeConn(con);
         return sessionId;
     }
 
@@ -208,9 +208,10 @@ public class SessionAuditDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        finally {
+            DBUtils.closeConn(con);
+        }
 
-        //close db connection
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -260,9 +261,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return outputList;
     }
@@ -371,18 +372,16 @@ public class SessionAuditDB {
                 sessionAudit.setSessionTm(rs.getTimestamp(SORT_BY_SESSION_TM));
                 sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
                 sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
-
-
             }
-
 
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
 
         return sessionAudit;

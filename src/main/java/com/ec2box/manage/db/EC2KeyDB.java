@@ -78,7 +78,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(ec2KeyList);
 
@@ -115,7 +117,6 @@ public class EC2KeyDB {
                 ec2Key.setAwsCredId(rs.getLong(AWS_CRED_ID));
                 ec2Key.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
 
-
             }
 
             DBUtils.closeStmt(stmt);
@@ -123,8 +124,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return ec2Key;
 
@@ -163,8 +165,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return ec2Key;
 
@@ -201,8 +204,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return ec2KeyList;
 
@@ -236,7 +240,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return ec2KeyId;
 
 
@@ -265,8 +271,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -318,8 +325,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
     /**
@@ -346,7 +354,9 @@ public class EC2KeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
 
         return ec2RegionList;

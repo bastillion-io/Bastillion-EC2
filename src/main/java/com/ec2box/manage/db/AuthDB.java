@@ -63,7 +63,9 @@ public class AuthDB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            DBUtils.closeConn(con);
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
 
         return auth;
@@ -108,8 +110,9 @@ public class AuthDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return authToken;
 
@@ -125,9 +128,9 @@ public class AuthDB {
 
         boolean isAdmin = false;
 
-        Connection con = null;
         if (authToken != null && !authToken.trim().equals("")) {
 
+            Connection con = null;
             try {
                 con = DBUtils.getConn();
                 PreparedStatement stmt = con.prepareStatement(SELECT_FROM_USERS_WITH_AUTH_TOKEN);
@@ -145,8 +148,10 @@ public class AuthDB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
-        DBUtils.closeConn(con);
         return isAdmin;
 
 
@@ -207,7 +212,9 @@ public class AuthDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return success;
     }
 
@@ -258,7 +265,9 @@ public class AuthDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return userId;
 
@@ -273,9 +282,9 @@ public class AuthDB {
 
         String authorized = null;
 
-        Connection con = null;
         if (authToken != null && !authToken.trim().equals("")) {
 
+            Connection con = null;
             try {
                 con = DBUtils.getConn();
                 PreparedStatement stmt = con.prepareStatement(SELECT_FROM_USERS_WITH_AUTH_TOKEN);
@@ -293,8 +302,10 @@ public class AuthDB {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
-        DBUtils.closeConn(con);
         return authorized;
 
 
@@ -324,7 +335,9 @@ public class AuthDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return sharedSecret;
 
@@ -350,8 +363,9 @@ public class AuthDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
 

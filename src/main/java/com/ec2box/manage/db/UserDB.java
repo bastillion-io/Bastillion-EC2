@@ -84,7 +84,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(userList);
         return sortedSet;
@@ -108,7 +110,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return user;
     }
@@ -174,7 +178,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -198,7 +204,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
     /**
      * updates existing user
@@ -223,7 +231,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -244,7 +254,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -263,7 +275,9 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
     /**
      * checks to see if username is unique while ignoring current user
@@ -294,7 +308,9 @@ public class UserDB {
         } catch(Exception ex){
             log.error(ex.toString(), ex);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return isUnique;
 

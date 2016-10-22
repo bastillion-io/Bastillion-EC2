@@ -46,8 +46,8 @@ public class SentOutputTask implements Runnable {
 
     public void run() {
 
-        Connection con = DBUtils.getConn();
         while (session.isOpen()) {
+            Connection con = DBUtils.getConn();
             List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId, user);
             try {
                 if (outputList != null && !outputList.isEmpty()) {
@@ -59,8 +59,9 @@ public class SentOutputTask implements Runnable {
             } catch (Exception ex) {
                 log.error(ex.toString(), ex);
             }
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
-
-        DBUtils.closeConn(con);
     }
 }

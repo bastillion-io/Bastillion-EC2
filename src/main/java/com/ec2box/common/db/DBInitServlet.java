@@ -82,9 +82,11 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
+        finally {
+            DBUtils.closeStmt(statement);
+            DBUtils.closeConn(connection);
+        }
         
-        DBUtils.closeStmt(statement);
-        DBUtils.closeConn(connection);
 
     }
 

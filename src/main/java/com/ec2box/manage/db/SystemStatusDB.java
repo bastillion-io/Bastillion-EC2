@@ -48,7 +48,6 @@ public class SystemStatusDB {
         try {
             con = DBUtils.getConn();
 
-
             if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
 
                 //make sure selected instance id is host the user has permission to.
@@ -81,7 +80,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -149,7 +150,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -195,7 +198,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystemList;
 
     }
@@ -259,10 +264,10 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystem;
-
-
     }
 
 
@@ -295,7 +300,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystem;
 
     }
