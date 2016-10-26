@@ -15,7 +15,7 @@ http://youtu.be/e00UD9dZ-wk
 
 Prerequisites
 -------------
-Java JDK 1.7 or greater
+Java JDK 1.8 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
 Browser with Web Socket support
