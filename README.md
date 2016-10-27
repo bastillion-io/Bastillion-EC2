@@ -9,14 +9,10 @@ terminal sessions and history can be audited.
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/ec2box/terms.png)
 
-Demo
------
-http://youtu.be/e00UD9dZ-wk
-
 Prerequisites
 -------------
 Java JDK 1.8 or greater
-http://www.oracle.com/technetwork/java/javase/overview/index.html
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 Browser with Web Socket support
 http://caniuse.com/websockets
