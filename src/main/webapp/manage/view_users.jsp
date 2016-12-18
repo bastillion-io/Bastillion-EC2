@@ -80,6 +80,7 @@
 
     <div class="container">
         <s:form action="viewUsers">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
@@ -95,17 +96,17 @@
 
                     <tr>
 
-                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@USERNAME"/>" class="sort">Username
                         </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@USER_TYPE"/>" class="sort">User Type
                         </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_LAST_NM"/>" class="sort">Last
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@LAST_NM"/>" class="sort">Last
                             Name
                         </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_FIRST_NM"/>" class="sort">First
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@FIRST_NM"/>" class="sort">First
                             Name
                         </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@SORT_BY_EMAIL"/>" class="sort">Email
+                        <th id="<s:property value="@com.ec2box.manage.db.UserDB@EMAIL"/>" class="sort">Email
                             Address
                         </th>
                         <th>&nbsp;</th>
@@ -119,7 +120,7 @@
                                 <s:property value="username"/>
                             </s:if>
                             <s:else>
-                                <a href="viewUserProfiles.action?user.id=<s:property value="id"/>"
+                                <a href="viewUserProfiles.action?user.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"
                                    title="Manage Profiles for User">
                                     <s:property value="username"/>
                                 </a>
@@ -146,7 +147,7 @@
                                 </s:if>
 
                                 <s:if test="userType==\"A\"">
-                                    <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
+                                    <a href="viewUserProfiles.action?user.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>">
                                         <button id="profile_btn_<s:property value="id"/>" class="btn btn-primary edit_btn spacer spacer-right">Assign Profiles</button>
                                     </a>
                                 </s:if>
@@ -175,6 +176,7 @@
                     <div class="modal-body">
                         <s:actionerror/>
                         <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
+                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                             <s:textfield name="user.username" label="Username" size="15"/>
                             <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                             <s:textfield name="user.firstNm" label="First Name" size="15"/>
@@ -208,6 +210,7 @@
                                 <div class="row">
                                     <s:actionerror/>
                                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
+                                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
                                         <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>

@@ -73,7 +73,7 @@ $(document).ready(function() {
                var id = $(this).attr("id").replace("output_", "");
 
 
-               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&hostSystemId='+id+'&t='+new Date().getTime(), function(data) {
+               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&hostSystemId='+id+'&t='+new Date().getTime() + '&_csrf=<s:property value="#session['_csrf']"/>', function(data) {
                    $.each(data, function(key, val) {
                        if (val.output != '' && val.id !=null) {
 
@@ -160,12 +160,13 @@ $(document).ready(function() {
             <s:if test="pendingSystemStatus==null">
 
             <ul class="nav navbar-nav">
-                 <li><a href="viewSessions.action">Exit Audit</a></li>
+                 <li><a href="viewSessions.action?_csrf=<s:property value="#session['_csrf']"/>">Exit Audit</a></li>
             </ul>
 
 
                 <div class="align-right">
                     <s:form id="filter_frm" theme="simple">
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:label value=""/>
                         <s:textfield name="filter" type="text" class="spacer spacer-right"/><div class="btn btn-primary submit_btn spacer spacer-right">Filter</div><div class="btn btn-primary clear_btn spacer spacer-right">Clear</div>
                     </s:form>

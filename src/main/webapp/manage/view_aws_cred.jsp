@@ -30,7 +30,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteAWSCred.action?awsCred.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteAWSCred.action?awsCred.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add form
             $(".submit_btn").button().click(function() {
@@ -78,6 +78,7 @@
 
     <div class="container">
         <s:form action="viewAWSCred">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
@@ -128,6 +129,7 @@
                         <div class="row">
                             <s:actionerror/>
                             <s:form action="saveAWSCred" class="save_aws_form_add" autocomplete="off">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="awsCred.accessKey" label="Access Key" size="25" />
                                 <s:password name="awsCred.secretKey" label="Secret Key" size="25" />
                                 <s:hidden name="sortedSet.orderByDirection"/>

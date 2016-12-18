@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN" "http://struts.apache.org/dtds/struts-2.5.dtd">
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+		"http://struts.apache.org/dtds/struts-2.5.dtd">
 <struts>
 	<package name="default" namespace="/" extends="struts-default">
 
+		<result-types>
+			<result-type name="redirect" class="com.ec2box.common.result.CSRFRedirectionResult"/>
+		</result-types>
 		<interceptors>
-			<interceptor name="HSTS" class="com.ec2box.common.interceptor.HTTPStrictTransportSecurityInterceptor" />
-			<interceptor name="Clickjacking" class="com.ec2box.common.interceptor.ClickjackingInterceptor" />
-			
+			<interceptor name="CSRFToken" class="com.ec2box.common.interceptor.CSRFInterceptor"/>
+			<interceptor name="HSTS" class="com.ec2box.common.interceptor.HTTPStrictTransportSecurityInterceptor"/>
+			<interceptor name="Clickjacking" class="com.ec2box.common.interceptor.ClickjackingInterceptor"/>
 			<interceptor-stack name="ec2boxStack">
-				<interceptor-ref name="HSTS" />
-				<interceptor-ref name="Clickjacking" />
+				<interceptor-ref name="CSRFToken">
+					<param name="excludeMethods">login,logout</param>
+				</interceptor-ref>
+				<interceptor-ref name="HSTS"/>
+				<interceptor-ref name="Clickjacking"/>
 				<interceptor-ref name="defaultStack"/>
 			</interceptor-stack>
 		</interceptors>
 
+		<global-results>
+			<result name="invalid.token">/</result>
+		</global-results>
+
 	</package>
-	
-    <constant name="struts.convention.default.parent.package" value="default"/>
+
+
+
+	<constant name="struts.convention.default.parent.package" value="default"/>
 </struts>

@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,22 +16,25 @@
 package com.ec2box.common.util;
 
 import com.ec2box.manage.util.EncryptionUtil;
+import org.apache.struts2.util.TokenHelper;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import com.ec2box.common.util.AppConfig;
+
+
 /**
  * Utility to obtain the authentication token from the http session and the user id from the auth token
  */
 public class AuthUtil {
 
-
-    private AuthUtil() {
-    }
     public static final String SESSION_ID = "sessionId";
     public static final String USER_ID = "userId";
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
+    public static final String CSRF_TOKEN_NM = "_csrf";
+
+    private AuthUtil() {
+    }
 
     /**
      * query session for OTP shared secret
@@ -39,10 +42,33 @@ public class AuthUtil {
      * @param session http session
      * @return shared secret
      */
-    public static String getOTPSecret( HttpSession session) {
+    public static String getOTPSecret(HttpSession session) {
         String secret = (String) session.getAttribute("otp_secret");
         secret = EncryptionUtil.decrypt(secret);
         return secret;
+    }
+
+    /**
+     * set authentication type
+     *
+     * @param session http session
+     * @param authType authentication type
+     */
+    public static void setAuthType(HttpSession session, String authType) {
+        if (authType != null) {
+            session.setAttribute("authType", authType);
+        }
+    }
+
+    /**
+     * query authentication type
+     *
+     * @param session http session
+     * @return authentication type
+     */
+    public static String getAuthType(HttpSession session) {
+        String authType = (String) session.getAttribute("authType");
+        return authType;
     }
 
     /**
@@ -64,7 +90,7 @@ public class AuthUtil {
      * @return user type
      */
     public static String getUserType(HttpSession session) {
-        String userType= (String)session.getAttribute("userType");
+        String userType = (String) session.getAttribute("userType");
         return userType;
     }
 
@@ -87,10 +113,10 @@ public class AuthUtil {
      * @return session id
      */
     public static Long getSessionId(HttpSession session) {
-        Long sessionId=null;
-        String sessionIdStr = EncryptionUtil.decrypt((String)session.getAttribute(SESSION_ID));
-        if(sessionIdStr!=null && !sessionIdStr.trim().equals("")){
-            sessionId=Long.parseLong(sessionIdStr);
+        Long sessionId = null;
+        String sessionIdStr = EncryptionUtil.decrypt((String) session.getAttribute(SESSION_ID));
+        if (sessionIdStr != null && !sessionIdStr.trim().equals("")) {
+            sessionId = Long.parseLong(sessionIdStr);
         }
         return sessionId;
     }
@@ -102,10 +128,10 @@ public class AuthUtil {
      * @return user id
      */
     public static Long getUserId(HttpSession session) {
-        Long userId=null;
-        String userIdStr = EncryptionUtil.decrypt((String)session.getAttribute(USER_ID));
-        if(userIdStr!=null && !userIdStr.trim().equals("")){
-            userId=Long.parseLong(userIdStr);
+        Long userId = null;
+        String userIdStr = EncryptionUtil.decrypt((String) session.getAttribute(USER_ID));
+        if (userIdStr != null && !userIdStr.trim().equals("")) {
+            userId = Long.parseLong(userIdStr);
         }
         return userId;
     }
@@ -116,7 +142,7 @@ public class AuthUtil {
      * @param session http session
      * @return authentication token
      */
-    public static String getAuthToken( HttpSession session) {
+    public static String getAuthToken(HttpSession session) {
         String authToken = (String) session.getAttribute(AUTH_TOKEN);
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
@@ -134,6 +160,17 @@ public class AuthUtil {
     }
 
     /**
+     * query csrf token for session
+     *
+     * @param session http session
+     * @return token string
+     */
+    public static String getCSRFToken(HttpSession session) {
+        String token = (String) session.getAttribute(CSRF_TOKEN_NM);
+        return token;
+    }
+
+    /**
      * set session OTP shared secret
      *
      * @param session http session
@@ -144,6 +181,7 @@ public class AuthUtil {
             session.setAttribute("otp_secret", EncryptionUtil.encrypt(secret));
         }
     }
+
 
     /**
      * set session user id
@@ -156,8 +194,6 @@ public class AuthUtil {
             session.setAttribute(USER_ID, EncryptionUtil.encrypt(userId.toString()));
         }
     }
-
-
 
     /**
      * set session authentication token
@@ -185,18 +221,28 @@ public class AuthUtil {
     }
 
     /**
+     * generate csrf token for session
+     *
+     * @param session http session
+     */
+    public static void generateCSRFToken(HttpSession session) {
+        session.setAttribute(CSRF_TOKEN_NM, TokenHelper.generateGUID());
+    }
+
+    /**
      * delete all session information
      *
      * @param session
      */
     public static void deleteAllSession(HttpSession session) {
 
-       session.setAttribute(TIMEOUT,null);
-       session.setAttribute(AUTH_TOKEN,null);
-       session.setAttribute(USER_ID,null);
-       session.setAttribute(SESSION_ID,null);
+        session.setAttribute(CSRF_TOKEN_NM, null);
+        session.setAttribute(TIMEOUT, null);
+        session.setAttribute(AUTH_TOKEN, null);
+        session.setAttribute(USER_ID, null);
+        session.setAttribute(SESSION_ID, null);
 
-      session.invalidate();
+        session.invalidate();
     }
 
 }

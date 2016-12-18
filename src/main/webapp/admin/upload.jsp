@@ -44,6 +44,7 @@
 
 <s:if test="idList!= null && !idList.isEmpty()">
     <s:form action="upload" method="post" enctype="multipart/form-data">
+        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
         <s:file name="upload" label="File"/>
         <s:textfield name="pushDir" label="Destination Directory"/>
 

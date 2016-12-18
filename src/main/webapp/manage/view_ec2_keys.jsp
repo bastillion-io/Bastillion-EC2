@@ -25,7 +25,7 @@
     <script type="text/javascript">
 
         function populateKeyNames() {
-            $.getJSON('getKeyPairJSON.action?ec2Key.awsCredId='+$("#importEC2Key_ec2Key_awsCredId").val()+'&ec2Key.ec2Region='+$("#importEC2Key_ec2Key_ec2Region").val(), function(result) {
+            $.getJSON('getKeyPairJSON.action?_csrf=<s:property value="#session['_csrf']"/>&ec2Key.awsCredId='+$("#importEC2Key_ec2Key_awsCredId").val()+'&ec2Key.ec2Region='+$("#importEC2Key_ec2Key_ec2Region").val(), function(result) {
 
               $("#importEC2Key_ec2Key_keyNm option").remove();
                 var options = $("#importEC2Key_ec2Key_keyNm");
@@ -49,7 +49,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteEC2Key.action?ec2Key.id='+ id +'&ec2Key.ec2Region=<s:property value="ec2Key.ec2Region" />&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteEC2Key.action?_csrf=<s:property value="#session['_csrf']"/>&ec2Key.id='+ id +'&ec2Key.ec2Region=<s:property value="ec2Key.ec2Region" />&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
@@ -58,7 +58,7 @@
 
 
             $(".sort,.sortAsc,.sortDesc").click(function() {
-                var id = $(this).attr('id')
+                var id = $(this).attr('id');
 
                 if ($('#viewEC2Keys_sortedSet_orderByDirection').attr('value') == 'asc') {
                     $('#viewEC2Keys_sortedSet_orderByDirection').attr('value', 'desc');
@@ -110,7 +110,7 @@
      <s:if test="awsCredList.isEmpty()">
         <div class="actionMessage">
             <p class="error">
-         EC2 Keys not available (<a href="viewAWSCred.action">Set AWS Credentials</a>).
+         EC2 Keys not available (<a href="viewAWSCred.action?_csrf=<s:property value="#session['_csrf']"/>">Set AWS Credentials</a>).
             </p>
         </div>
     </s:if>
@@ -119,6 +119,7 @@
 
             <p>
             <s:form action="viewEC2Keys">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
             </s:form>
@@ -130,10 +131,10 @@
                     <thead>
                     <tr>
 
-                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_KEY_NM"/>" class="sort">Key Name</th>
-                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_EC2_REGION"/>" class="sort">EC2 Region</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@KEY_NM"/>" class="sort">Key Name</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@EC2_REGION"/>" class="sort">EC2 Region</th>
                         <s:if test="awsCredList.size()>1">
-                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@SORT_BY_ACCESS_KEY"/>" class="sort">Access Key</th>
+                        <th id="<s:property value="@com.ec2box.manage.db.EC2KeyDB@ACCESS_KEY"/>" class="sort">Access Key</th>
                         </s:if>
                         <th>&nbsp;</th>
                     </tr>
@@ -178,6 +179,7 @@
                         <div class="row">
                             <s:actionerror/>
                             <s:form action="importEC2Key" class="save_ec2Key_form_import">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:if test="awsCredList.size()==1">
                                     <s:hidden name="ec2Key.awsCredId" value="%{awsCredList.get(0).getId()}"/>
                                 </s:if>

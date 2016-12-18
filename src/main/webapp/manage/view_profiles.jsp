@@ -27,7 +27,7 @@
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteProfile.action?profile.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteProfile.action?profile.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
@@ -76,6 +76,7 @@
 
 <div class="container">
     <s:form action="viewProfiles">
+        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
         <s:if test="script!=null">
@@ -86,7 +87,7 @@
 
     <h3>Manage Instance Profiles</h3>
 
-    <p>Profiles use tags to control user access and can be assigned to users (<a href="../manage/viewUsers.action">View Users</a>).</p>
+    <p>Profiles use tags to control user access and can be assigned to users (<a href="../manage/viewUsers.action?_csrf=<s:property value="#session['_csrf']"/>">View Users</a>).</p>
 
 
     <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
@@ -142,6 +143,7 @@
                 </div>
                 <div class="modal-body">
                     <s:form action="saveProfile" class="save_profile_form_add">
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:textfield name="profile.nm" label="Name" size="15"/>
                         <s:textfield name="profile.tag" placeholder="tag-name[=value[,tag-name[=value]]"
                                      size="25" label="Tag"/>
@@ -168,6 +170,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveProfile" id="save_profile_form_edit_%{id}">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
                                 <s:textfield name="profile.tag" placeholder="tag-name[=value[,tag-name[=value]]"
                                              size="25" label="Tag" value="%{tag}"/>

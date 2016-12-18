@@ -59,7 +59,7 @@
 
                     <div class="panel panel-default">
                         <div class="panel-body" >
-                            <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
+                            <img src="qrImage.action?qrImage=<s:property value="qrImage"/>&_csrf=<s:property value="#session['_csrf']"/>" alt="<s:property value="qrImage"/>"/>
                         </div>
                         <div class="panel-footer">
                             <label>Can't scan QR code?</label>&nbsp;&nbsp;<a href="#" onclick="$('#shared-secret').toggleClass('hidden');">Show secret</a>
@@ -106,8 +106,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                    <button onclick="window.location = 'menu.action?_csrf=<s:property value="#session['_csrf']"/>'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
                     <s:form action="otpSubmit" theme="simple" >
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:hidden name="sharedSecret"/>
                         <s:submit cssClass="btn btn-primary spacer spacer-right" value="Got It!"/>
                     </s:form>

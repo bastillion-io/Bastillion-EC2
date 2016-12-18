@@ -55,6 +55,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     )
     public String login() {
 
+        AuthUtil.generateCSRFToken(servletRequest.getSession());
         return SUCCESS;
     }
 

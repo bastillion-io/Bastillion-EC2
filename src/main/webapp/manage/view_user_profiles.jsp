@@ -28,7 +28,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteProfileFromUser.action?user.id=<s:property value="user.id"/>&profileId=' + id;
+                window.location = 'deleteProfileFromUser.action?user.id=<s:property value="user.id"/>&profileId=' + id + '&_csrf=<s:property value="#session['_csrf']"/>';
             });
 
             //submit add or edit form
@@ -49,7 +49,7 @@
 
 <div class="container">
     <h3>Grant System Access</h3>
-    <p>Add / Delete profiles to be assigned to the current user (<a href="../manage/viewProfiles.action">View Profiles</a>).</p>
+    <p>Add / Delete profiles to be assigned to the current user (<a href="../manage/viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">View Profiles</a>).</p>
 
     <h4><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property value="user.firstNm"/>
         &nbsp;(<s:property value="user.email"/>)
@@ -108,6 +108,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="addProfileToUser">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
                                           listKey="id" listValue="%{nm}"/>
                                 <s:hidden name="user.id"/>
@@ -123,7 +124,7 @@
         </div>
     </s:if>
     <s:else>
-        <div class="error">There are no profiles defined (<a href="../manage/viewProfiles.action">View Profiles</a>).</div>
+        <div class="error">There are no profiles defined (<a href="../manage/viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">View Profiles</a>).</div>
     </s:else>
 
 
