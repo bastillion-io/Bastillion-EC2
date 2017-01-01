@@ -1,42 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE project [
-        <!ELEMENT project (modelVersion|groupId|artifactId|version|packaging|name|properties|dependencies|build)*>
-        <!ATTLIST project
-                xmlns CDATA #REQUIRED
-                xmlns:xsi CDATA #REQUIRED
-                xsi:schemaLocation CDATA #REQUIRED>
-        <!ELEMENT modelVersion (#PCDATA)>
-        <!ELEMENT groupId (#PCDATA)>
-        <!ELEMENT artifactId (#PCDATA)>
-        <!ELEMENT version (#PCDATA)>
-        <!ELEMENT packaging (#PCDATA)>
-        <!ELEMENT name (#PCDATA)>
-        <!ELEMENT properties (project.build.sourceEncoding)*>
-        <!ELEMENT project.build.sourceEncoding (#PCDATA)>
-        <!ELEMENT dependencies (dependency)*>
-        <!ELEMENT dependency (groupId|artifactId|version|scope)*>
-        <!ELEMENT scope (#PCDATA)>
-        <!ELEMENT build (resources|plugins)*>
-        <!ELEMENT resources (resource)*>
-        <!ELEMENT resource (directory|includes|filtering)*>
-        <!ELEMENT directory (#PCDATA)>
-        <!ELEMENT includes (include)*>
-        <!ELEMENT include (#PCDATA)>
-        <!ELEMENT filtering (#PCDATA)>
-        <!ELEMENT plugins (plugin)*>
-        <!ELEMENT plugin (artifactId|version|configuration|groupId)*>
-        <!ELEMENT configuration (source|target|jettyXml|scanIntervalSeconds)*>
-        <!ELEMENT source (#PCDATA)>
-        <!ELEMENT target (#PCDATA)>
-        <!ELEMENT jettyXml (#PCDATA)>
-        <!ELEMENT scanIntervalSeconds (#PCDATA)>
-        ]>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>0.30.00-SNAPSHOT</version>
+    <version>0.30.00</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
     <properties>
