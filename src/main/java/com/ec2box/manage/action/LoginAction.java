@@ -46,6 +46,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
     private final String AUTH_SUCCESS="Authentication Successful";
+    String _csrf;
 
 
     @Action(value = "/login",
@@ -54,8 +55,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             }
     )
     public String login() {
-
-        AuthUtil.generateCSRFToken(servletRequest.getSession());
+        _csrf = AuthUtil.generateCSRFToken(servletRequest.getSession());
         return SUCCESS;
     }
 
@@ -176,5 +176,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     public void setOtpEnabled(boolean otpEnabled) {
         this.otpEnabled = otpEnabled;
+    }
+
+    public String get_csrf() {
+        return _csrf;
+    }
+
+    public void set_csrf(String _csrf) {
+        this._csrf = _csrf;
     }
 }
