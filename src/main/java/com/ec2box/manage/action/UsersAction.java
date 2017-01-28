@@ -39,6 +39,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     User user = new User();
     HttpServletRequest servletRequest;
     boolean resetSharedSecret=false;
+    Long userId;
 
     @Action(value = "/manage/viewUsers",
             results = {
@@ -46,11 +47,8 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             }
     )
     public String viewUsers() {
-        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        userId = AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
-        
-        user.setId(userId);
-
         return SUCCESS;
     }
 
@@ -136,6 +134,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             addActionError("Username has been taken");
         }
         if (!this.getFieldErrors().isEmpty()||!this.getActionErrors().isEmpty()) {
+            userId = AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = UserDB.getUserSet(sortedSet);
         }
 
@@ -173,5 +172,13 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     public void setResetSharedSecret(boolean resetSharedSecret) {
         this.resetSharedSecret = resetSharedSecret;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

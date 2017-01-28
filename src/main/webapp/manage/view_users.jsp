@@ -142,7 +142,7 @@
 
                                 <button class="btn btn-primary spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
 
-                                <s:if test="%{user.id != id}">
+                                <s:if test="%{userId != id}">
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-middle">Delete</button>
                                 </s:if>
 
