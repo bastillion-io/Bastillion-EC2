@@ -216,94 +216,98 @@
         </table>
 
 
-
         <s:if test="(sortedSet.itemList!= null && !sortedSet.itemList.isEmpty())">
-        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
-        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
-        <s:if test="script!=null && script.id!=null">
-            <s:hidden name="script.id"/>
-        </s:if>
-        <s:hidden name="showStatus"/>
-        <div class="scrollWrapper">
-            <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
-                <thead>
-                <tr>
-                    <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
-                                    theme="simple"/></th>
+            <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
+                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+                <s:if test="script!=null && script.id!=null">
+                    <s:hidden name="script.id"/>
+                </s:if>
+                <s:hidden name="showStatus"/>
+                <div class="scrollWrapper">
+                    <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
+                        <thead>
+                        <tr>
+                            <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
+                                            theme="simple"/></th>
 
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display
-                        Name
-                    </th>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">
+                                Display
+                                Name
+                            </th>
 
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_ID"/>" class="sort">
-                        Instance Id
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_PORT"/>" class="sort">Port
-                    </th>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_STATE"/>" class="sort">State
-                    </th>
-                    <s:if test="showStatus">
-                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS"/>"
-                            class="sort">I-Status
-                        </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS"/>"
-                            class="sort">S-Status
-                        </th>
-                        <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_ALARMS"/>" class="sort">
-                            Alarms
-                        </th>
-                    </s:if>
-                    <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_REGION"/>" class="sort">
-                        Region
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <s:iterator var="system" value="sortedSet.itemList" status="stat">
-                    <tr>
-                        <td>
-                            <s:if test="state=='running' && host!=''">
-                                <s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
-                                                theme="simple"/>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_ID"/>"
+                                class="sort">
+                                Instance Id
+                            </th>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User
+                            </th>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
+                            </th>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_PORT"/>" class="sort">Port
+                            </th>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_STATE"/>" class="sort">
+                                State
+                            </th>
+                            <s:if test="showStatus">
+                                <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS"/>"
+                                    class="sort">I-Status
+                                </th>
+                                <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS"/>"
+                                    class="sort">S-Status
+                                </th>
+                                <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_ALARMS"/>"
+                                    class="sort">
+                                    Alarms
+                                </th>
                             </s:if>
-                        </td>
+                            <th id="<s:property value="@com.ec2box.manage.db.SystemDB@SORT_BY_REGION"/>" class="sort">
+                                Region
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <s:iterator var="system" value="sortedSet.itemList" status="stat">
+                            <tr>
+                                <td>
+                                    <s:if test="state=='running' && host!=''">
+                                        <s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
+                                                        theme="simple"/>
+                                    </s:if>
+                                </td>
 
-                        <td>
-                            <s:property value="displayNm"/>
-                        </td>
-                        <td><s:property value="instance"/></td>
-                        <td>
+                                <td>
+                                    <s:property value="displayNm"/>
+                                </td>
+                                <td><s:property value="instance"/></td>
+                                <td>
 
-                            <a id="edit_btn_<s:property value="id"/>" title="Update System Properties"
-                               class="edit_btn" href="#">
-                                <s:property value="user"/>
-                            </a>
-                        </td>
-                        <td><s:property value="host"/></td>
-                        <td>
-                            <a id="edit_btn_<s:property value="id"/>" title="Update System Properties"
-                               class="edit_btn" href="#">
-                                <s:property value="port"/>
-                            </a>
-                        </td>
-                        <td><s:property value="state"/></td>
-                        <s:if test="showStatus">
-                            <td><s:property value="instanceStatus"/></td>
-                            <td><s:property value="systemStatus"/></td>
-                            <td><span class="text-success"><s:property value="monitorOk"/></span> / <span
-                                    class="text-warning"><s:property value="monitorInsufficientData"/></span> / <span
-                                    class="text-danger"><s:property value="monitorAlarm"/></span>
-                            </td>
-                        </s:if>
-                        <td><s:property value="ec2Region"/></td>
-                    </tr>
-                </s:iterator>
-                </tbody>
-            </table>
+                                    <a id="edit_btn_<s:property value="id"/>" title="Update System Properties"
+                                       class="edit_btn" href="#">
+                                        <s:property value="user"/>
+                                    </a>
+                                </td>
+                                <td><s:property value="host"/></td>
+                                <td>
+                                    <a id="edit_btn_<s:property value="id"/>" title="Update System Properties"
+                                       class="edit_btn" href="#">
+                                        <s:property value="port"/>
+                                    </a>
+                                </td>
+                                <td><s:property value="state"/></td>
+                                <s:if test="showStatus">
+                                    <td><s:property value="instanceStatus"/></td>
+                                    <td><s:property value="systemStatus"/></td>
+                                    <td><span class="text-success"><s:property value="monitorOk"/></span> / <span
+                                            class="text-warning"><s:property value="monitorInsufficientData"/></span> / <span
+                                            class="text-danger"><s:property value="monitorAlarm"/></span>
+                                    </td>
+                                </s:if>
+                                <td><s:property value="ec2Region"/></td>
+                            </tr>
+                        </s:iterator>
+                        </tbody>
+                    </table>
+                </div>
             </s:form>
             <s:if test="script!=null && script.id!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Execute Script</div>
@@ -311,69 +315,68 @@
             <s:else>
                 <div class="btn btn-primary select_frm_btn spacer spacer-bottom">Create SSH Terminals</div>
             </s:else>
-            </s:if>
-            <s:else>
-                <div class="actionMessage">
-                    <p class="error">No instances available. Try changing the filter values above
-                        <s:if test="%{#session.userType==\"M\"}">
-                            or importing the corresponding EC2 Keys (<a href="../manage/viewEC2Keys.action?_csrf=<s:property value="#session['_csrf']"/>">Set EC2 Keys</a>).
-                        </s:if>
-                    </p>
-                </div>
-            </s:else>
+        </s:if>
+        <s:else>
+            <div class="actionMessage">
+                <p class="error">No instances available. Try changing the filter values above
+                    <s:if test="%{#session.userType==\"M\"}">
+                        or importing the corresponding EC2 Keys (<a href="../manage/viewEC2Keys.action?_csrf=<s:property
+                            value="#session['_csrf']"/>">Set EC2 Keys</a>).
+                    </s:if>
+                </p>
+            </div>
+        </s:else>
 
-            <s:iterator var="system" value="sortedSet.itemList" status="stat">
+        <s:iterator var="system" value="sortedSet.itemList" status="stat">
 
-                <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                                <h4 class="modal-title">Set Properties: <s:property
-                                        value="hostSystem.displayLabel"/></h4>
+            <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Set Properties: <s:property
+                                    value="hostSystem.displayLabel"/></h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+                                    <s:textfield name="hostSystem.user" value="%{user}" label="System User"
+                                                 size="10"/>
+                                    <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
+                                    <s:hidden name="hostSystem.id" value="%{id}"/>
+                                    <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
+                                    <s:hidden name="hostSystem.host" value="%{host}"/>
+                                    <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
+                                    <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
+                                    <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
+                                    <s:hidden name="hostSystem.state" value="%{state}"/>
+                                    <s:hidden name="hostSystem.instance" value="%{instance}"/>
+                                    <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
+                                    <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:hidden name="sortedSet.orderByField"/>
+                                    <s:hidden name="selectForm"/>
+                                    <s:if test="script!=null && script.id!=null">
+                                        <s:hidden name="script.id"/>
+                                    </s:if>
+                                    <s:hidden name="showStatus"/>
+                                </s:form>
                             </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
-                                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
-                                        <s:textfield name="hostSystem.user" value="%{user}" label="System User"
-                                                     size="10"/>
-                                        <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
-                                        <s:hidden name="hostSystem.id" value="%{id}"/>
-                                        <s:hidden name="hostSystem.displayNm" value="%{displayNm}"/>
-                                        <s:hidden name="hostSystem.host" value="%{host}"/>
-                                        <s:hidden name="hostSystem.keyId" value="%{keyId}"/>
-                                        <s:hidden name="hostSystem.displayLabel" value="%{displayLabel}"/>
-                                        <s:hidden name="hostSystem.ec2Region" value="%{ec2Region}"/>
-                                        <s:hidden name="hostSystem.state" value="%{state}"/>
-                                        <s:hidden name="hostSystem.instance" value="%{instance}"/>
-                                        <s:hidden name="hostSystem.instanceStatus" value="%{instanceStatus}"/>
-                                        <s:hidden name="hostSystem.systemStatus" value="%{systemStatus}"/>
-                                        <s:hidden name="sortedSet.orderByDirection"/>
-                                        <s:hidden name="sortedSet.orderByField"/>
-                                        <s:hidden name="selectForm"/>
-                                        <s:if test="script!=null && script.id!=null">
-                                            <s:hidden name="script.id"/>
-                                        </s:if>
-                                        <s:hidden name="showStatus"/>
-                                    </s:form>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel
-                                </button>
-                                <button type="button" class="btn btn-primary submit_btn">Submit</button>
-                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary submit_btn">Submit</button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-
-            </s:iterator>
-
-
-        </div>
+        </s:iterator>
 
     </div>
+
+</div>
 </body>
 </html>
