@@ -23,7 +23,7 @@ Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
 
-* Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
+* Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
     | Application          | Android                                                                                             | iOS                                                                        |             
     |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
