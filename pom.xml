@@ -96,7 +96,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>EC2BoxConfig.properties</include>
+                    <include>VERSION.txt</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
