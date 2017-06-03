@@ -55,7 +55,7 @@
         <p>
         <s:actionerror/>
         <s:form action="loginSubmit"  autocomplete="off">
-            <s:if test="%{#session['_csrf']}">
+            <s:if test="#session['_csrf'] != null">
                 <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             </s:if>
             <s:else>
