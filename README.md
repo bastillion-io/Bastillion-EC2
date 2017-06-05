@@ -37,7 +37,7 @@ If you're not big on the idea of building from source...
 
 Download ec2box-jetty-vXX.XX.tar.gz
 
-https://github.com/skavanagh/EC2Box/releases
+http://sshkeybox.com/latest-release.html#ec2box
 
 Export environment variables
 
