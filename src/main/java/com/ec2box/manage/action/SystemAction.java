@@ -187,6 +187,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                     for (Tag tag : instance.getTags()) {
                                         if ("Name".equals(tag.getKey())) {
                                             hostSystem.setDisplayNm(tag.getValue());
+                                        } else if  (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
+                                            hostSystem.setUser(tag.getValue());
                                         }
                                     }
                                     instanceIdList.add(hostSystem.getInstance());
