@@ -170,7 +170,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                     hostSystem.setInstance(instance.getInstanceId());
 
                                     //check for public dns if doesn't exist set to ip or pvt dns
-                                    if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                    if ("true".equals(AppConfig.getProperty("useEC2PvtIP"))) {
+                                        hostSystem.setHost(instance.getPrivateIpAddress());
+                                    } else if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
                                         hostSystem.setHost(instance.getPublicDnsName());
                                     } else if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
                                         hostSystem.setHost(instance.getPublicIpAddress());
