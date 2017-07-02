@@ -149,8 +149,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             //set name value pair for tag filter
                             List<String> tagList = new ArrayList<String>();
 
-                            //always add all profile tags to filter list
-                            addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
+                            //add profile tags to filter list if not manager
+                            if (!Auth.MANAGER.equals(userType)) {
+                                addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
+                            }
 
                             //add all additional filter tags provided by the user
                             addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
