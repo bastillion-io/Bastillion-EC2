@@ -541,7 +541,7 @@
 
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/_40x40.png" alt="ec2box"/>
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="ec2box"/>
                 </div>
                 EC2Box
             </div>
