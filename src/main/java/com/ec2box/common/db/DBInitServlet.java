@@ -61,13 +61,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             String dbPasswordConfirm = null;
             //prompt for password and confirmation
             while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
-                if(System.console() == null) {
-                    Scanner in = new Scanner(System.in);
-                    System.out.println("Please enter database password: ");
-                    dbPassword = in.nextLine();
-                    System.out.println("Please confirm database password: ");
-                    dbPasswordConfirm = in.nextLine();
-                } else {
+                if(System.console() != null) {
                     dbPassword = new String(System.console().readPassword("Please enter database password: "));
                     dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
                 }
