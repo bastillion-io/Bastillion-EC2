@@ -125,7 +125,7 @@ public class SystemDB {
     public static SortedSet getSystemSet(SortedSet sortedSet, List<String> instanceIdList) {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        if (!instanceIdList.isEmpty()) {
+        if (instanceIdList != null && !instanceIdList.isEmpty()) {
 
             String orderBy = "";
             if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -465,21 +465,22 @@ public class SystemDB {
         Connection con = null;
 
         List<HostSystem> hostSystemList = new ArrayList<>();
-        for(String instanceId: instanceIdList){
+        if(instanceIdList != null) {
+            for (String instanceId : instanceIdList) {
 
-            try {
-                con = DBUtils.getConn();
+                try {
+                    con = DBUtils.getConn();
 
-                hostSystemList.add(getSystem(con, instanceId));
+                    hostSystemList.add(getSystem(con, instanceId));
 
 
-            } catch (Exception e) {
-                log.error(e.toString(), e);
+                } catch (Exception e) {
+                    log.error(e.toString(), e);
+                } finally {
+                    DBUtils.closeConn(con);
+                }
+
             }
-            finally {
-                DBUtils.closeConn(con);
-            }
-
         }
 
         return hostSystemList;

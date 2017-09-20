@@ -196,6 +196,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                             hostSystem.setUser(tag.getValue());
                                         }
                                     }
+                                    //if no display name set to host
+                                    if (StringUtils.isEmpty(hostSystem.getDisplayNm())) {
+                                        hostSystem.setDisplayNm(hostSystem.getHost());
+                                    }
                                     instanceIdList.add(hostSystem.getInstance());
                                     hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                 }

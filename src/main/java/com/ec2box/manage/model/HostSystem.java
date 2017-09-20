@@ -99,7 +99,7 @@ public class HostSystem {
 
 
     public String getDisplayLabel() {
-        if (this.displayNm != null && !this.displayNm.trim().equals(""))
+        if (this.displayNm != null && !this.displayNm.trim().equals("") && !this.displayNm.equals(this.host))
             return getDisplayNm() + " - ( " + getHost() + " )";
         else {
             return getHost();
