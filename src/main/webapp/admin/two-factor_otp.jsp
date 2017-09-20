@@ -34,7 +34,7 @@
             });
 
         </script>
-        <title>KeyBox - One-Time Password Setup</title>
+        <title>EC2Box - One-Time Password Setup</title>
     </head>
     <body>
 

@@ -15,12 +15,10 @@
  */
 package com.ec2box.manage.util;
 
-import org.apache.commons.dbcp.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ec2box.common.util.AppConfig;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
  * Class to create a pooling data source object using commons DBCP
@@ -30,14 +28,14 @@ public class DSPool {
 
     private static Logger log = LoggerFactory.getLogger(DSPool.class);
 
-    private static PoolingDataSource dsPool;
+    private static BasicDataSource dsPool =  null;
 
-    private static String DB_PATH = AppConfig.getProperty("dbPath");
-    private static int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
-    private static boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
-    private static  int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
-    private static int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
-    private static String DB_OPTIONS = AppConfig.getProperty("dbOptions");
+    private static final String BASE_DIR = DBUtils.class.getClassLoader().getResource(".").getPath();
+    private static final String DB_DRIVER = AppConfig.getProperty("dbDriver");
+    private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
+    private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
+    private static final int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
+    private static final int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
 
     private DSPool() {
     }
@@ -49,9 +47,8 @@ public class DSPool {
      * @return data source pool
      */
 
-    public static org.apache.commons.dbcp.PoolingDataSource getDataSource() {
+    public static BasicDataSource getDataSource() {
         if (dsPool == null) {
-
             dsPool = registerDataSource();
         }
         return dsPool;
@@ -64,51 +61,33 @@ public class DSPool {
      * @return pooling database object
      */
 
-    private static PoolingDataSource registerDataSource() {
-
+    private static BasicDataSource registerDataSource() {
+        System.setProperty("h2.baseDir", BASE_DIR);
 
         // create a database connection
-        String user="ec2box";
-        String password="filepwd 0WJLnwhpA47EepT1A4drVnDn3vYRvJhpZi0sVdvN9SmlbKw";
-        String connectionURI = "jdbc:h2:" + getDBPath() + "/ec2box;CIPHER=AES;";
+        String user = AppConfig.getProperty("dbUser");
+        String password = AppConfig.decryptProperty("dbPassword");
+        String connectionURL = AppConfig.getProperty("dbConnectionURL");
 
-        if (StringUtils.isNotEmpty(DB_OPTIONS)) {
-            connectionURI = connectionURI + DB_OPTIONS;
+        if(connectionURL != null && connectionURL.contains("CIPHER=")) {
+            password = "filepwd " + password;
         }
 
         String validationQuery = "select 1";
 
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException ex) {
-            log.error(ex.toString(), ex);
-        }
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(DB_DRIVER);
+        dataSource.setMaxTotal(MAX_ACTIVE);
+        dataSource.setTestOnBorrow(TEST_ON_BORROW);
+        dataSource.setMinIdle(MIN_IDLE);
+        dataSource.setMaxWaitMillis(MAX_WAIT);
+        dataSource.setValidationQuery(validationQuery);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        dataSource.setUrl(connectionURL);
 
+        return dataSource;
 
-        GenericObjectPool connectionPool = new GenericObjectPool(null);
-
-        connectionPool.setMaxActive(MAX_ACTIVE);
-        connectionPool.setTestOnBorrow(TEST_ON_BORROW);
-        connectionPool.setMinIdle(MIN_IDLE);
-        connectionPool.setMaxWait(MAX_WAIT);
-        connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
-
-
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, user, password);
-
-
-        new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
-
-        return new PoolingDataSource(connectionPool);
-
-    }
-
-    private static String getDBPath() {
-        if(StringUtils.isEmpty(DB_PATH)){
-            //system path to the H2 DB
-            return DBUtils.class.getClassLoader().getResource("ec2db").getPath();
-        }
-        return DB_PATH;
     }
 
 }

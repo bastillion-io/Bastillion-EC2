@@ -238,7 +238,7 @@ public class AWSCredDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -265,7 +265,7 @@ public class AWSCredDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -292,7 +292,7 @@ public class AWSCredDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);

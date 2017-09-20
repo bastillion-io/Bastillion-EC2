@@ -163,8 +163,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, servletRequest);
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-            AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
+            User user = UserDB.getUser(userId);
+            user.setIpAddress(AuthUtil.getClientIPAddress(servletRequest));
 
+            AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(user));
 
         }
         return SUCCESS;
@@ -291,7 +293,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                             schSession.getCommander().println(line);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error(e.toString(), e);
 
                     }
                 }

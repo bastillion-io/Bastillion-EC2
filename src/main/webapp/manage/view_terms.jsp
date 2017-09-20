@@ -37,12 +37,12 @@ $(document).ready(function() {
 
 
     $(".clear_btn").button().click(function() {
-        $('#filter_frm_filter').val('');
+        $('#filter').val('');
         filterTerms();
     });
 
     function filterTerms() {
-        var filterVal=$('#filter_frm_filter').val();
+        var filterVal=$('#filter').val();
 
         if(filterVal!=null && filterVal!='') {
             $(".output > .terminal > pre").each(function (index, value){
@@ -60,29 +60,22 @@ $(document).ready(function() {
 
    }
 
-
-
-
-
-
-
   function loadTerms(){
 
         $(".output").each(function (index, value){
 
                var id = $(this).attr("id").replace("output_", "");
 
-
-               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&hostSystemId='+id+'&t='+new Date().getTime() + '&_csrf=<s:property value="#session['_csrf']"/>', function(data) {
+               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&instanceId='+id+'&t='+new Date().getTime() +'&_csrf=<s:property value="#session['_csrf']"/>', function(data) {
                    $.each(data, function(key, val) {
-                       if (val.output != '' && val.id !=null) {
+                       if (val.output != '' && val.instanceId!=null) {
 
-                               $("#output_"+val.id+"> .terminal").empty();
+                               $("#output_"+val.instanceId+"> .terminal").empty();
                                var output=val.output;
                                output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
                                var outputList = output.split('\r\n');
                                for(var i=0; i<outputList.length;i++){
-                                   $("#output_"+val.id+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
+                                   $("#output_"+val.instanceId+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
                                }
 
 
@@ -134,12 +127,12 @@ $(document).ready(function() {
 
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container" >
 
         <div class="navbar-header">
             <div class="navbar-brand" >
-            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="keybox"/></div>
+            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="ec2box"/></div>
              EC2Box</div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -157,16 +150,13 @@ $(document).ready(function() {
 
 
                 <div class="align-right">
-                    <s:form id="filter_frm" theme="simple">
-                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:label value=""/>
-                        <s:textfield name="filter" type="text" class="spacer spacer-right"/><div class="btn btn-primary submit_btn spacer spacer-right">Filter</div><div class="btn btn-primary clear_btn spacer spacer-right">Clear</div>
-                    </s:form>
+                        <s:textfield name="filter" type="text" class="spacer spacer-left"/><div class="btn btn-primary submit_btn spacer spacer-middle">Filter</div><div class="btn btn-primary clear_btn spacer spacer-right">Clear</div>
                 </div>
                 <div class="align-right" style="padding-top: 15px">
-                    <b>Audit  ( <s:property value="sessionAudit.user.username"/>
-                    <s:if test="sessionAudit.user!=null && sessionAudit.user.lastNm!=null">
-                        - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>
+                    <b>Audit  ( <s:property value="sessionAudit.username"/>
+                    <s:if test="sessionAudit.lastNm!=null">
+                        - <s:property value="sessionAudit.lastNm"/>, <s:property value="sessionAudit.firstNm"/>
                     </s:if> ) </b>
                 </div>
             <div class="clear"></div>
@@ -184,12 +174,12 @@ $(document).ready(function() {
 
             <div class="termwrapper">
                 <s:iterator value="sessionAudit.hostSystemList">
-                    <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
+                    <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
 
                         <h6 class="term-header"><s:property value="displayLabel"/></h6>
 
                         <div id="term" class="term">
-                            <div id="output_<s:property value="id"/>" class="output">
+                            <div id="output_<s:property value="instanceId"/>" class="output">
                             <div class="terminal" >
                             </div>
                             </div>

@@ -18,6 +18,8 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,7 +34,11 @@ import java.util.List;
  */
 public class SystemDB {
 
+
+    private static Logger log = LoggerFactory.getLogger(SystemDB.class);
+
     public static final String DISPLAY_NM = "display_nm";
+    public static final String SORT_BY_NAME = DISPLAY_NM;
     public static final String USER = "user";
     public static final String HOST = "host";
     public static final String PORT = "port";
@@ -51,6 +57,63 @@ public class SystemDB {
     private SystemDB() {
     }
 
+
+    /**
+     * method to do order by based on the sorted set object for systems. only selects instance IDs in provided list.
+     *
+     * @param sortedSet      sorted set object
+     * @return sortedSet with list of host systems
+     */
+    public static SortedSet getSystemSet(SortedSet sortedSet) {
+        List<HostSystem> hostSystemList = new ArrayList<>();
+
+
+            String orderBy = "";
+            if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+                orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+            }
+            StringBuilder sqlBuilder = new StringBuilder("select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system");
+            sqlBuilder.append(orderBy);
+
+            Connection con = null;
+            try {
+                con = DBUtils.getConn();
+                PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
+
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    HostSystem hostSystem = new HostSystem();
+                    hostSystem.setId(rs.getLong(ID));
+                    hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+                    hostSystem.setInstance(rs.getString(INSTANCE_ID));
+                    hostSystem.setUser(rs.getString(USER));
+                    hostSystem.setHost(rs.getString(HOST));
+                    hostSystem.setPort(rs.getInt(PORT));
+                    hostSystem.setKeyId(rs.getLong(KEY_ID));
+                    hostSystem.setEc2Region(rs.getString(REGION));
+                    hostSystem.setState(rs.getString(STATE));
+                    hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
+                    hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
+                    hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+                    hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+                    hostSystem.setMonitorOk(rs.getInt(M_OK));
+                    hostSystemList.add(hostSystem);
+                }
+                DBUtils.closeRs(rs);
+                DBUtils.closeStmt(stmt);
+
+            } catch (Exception e) {
+                log.error(e.toString(), e);
+            }
+            finally {
+                DBUtils.closeConn(con);
+            }
+
+            sortedSet.setItemList(hostSystemList);
+        return sortedSet;
+
+    }
 
     /**
      * method to do order by based on the sorted set object for systems. only selects instance IDs in provided list.
@@ -105,7 +168,7 @@ public class SystemDB {
                 DBUtils.closeStmt(stmt);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.toString(), e);
             }
             finally {
                 DBUtils.closeConn(con);
@@ -137,7 +200,7 @@ public class SystemDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -184,7 +247,7 @@ public class SystemDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -210,7 +273,7 @@ public class SystemDB {
             hostSystem = getSystem(con, instanceId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -256,7 +319,7 @@ public class SystemDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -292,7 +355,7 @@ public class SystemDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
     }
@@ -314,7 +377,7 @@ public class SystemDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -352,7 +415,7 @@ public class SystemDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
     }
@@ -382,7 +445,7 @@ public class SystemDB {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -411,7 +474,7 @@ public class SystemDB {
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.toString(), e);
             }
             finally {
                 DBUtils.closeConn(con);

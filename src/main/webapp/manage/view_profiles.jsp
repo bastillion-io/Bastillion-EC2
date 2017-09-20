@@ -118,8 +118,10 @@
 
                     <td>
                         <div style="width:240px">
-                            <button class="btn btn-primary spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" >Edit</button>
-                            <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-right" >Delete</button>
+                            <a href="viewProfileUsers.action?profile.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>">
+                                <button id="user_assign_btn_<s:property value="id"/>" class="btn btn-primary edit_btn spacer spacer-left">Assign Users</button></a>
+                            <button class="btn btn-primary spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                            <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-right">Delete</button>
                             <div style="clear:both"/>
                         </div>
                     </td>

@@ -19,6 +19,8 @@ import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
@@ -32,6 +34,8 @@ import java.util.List;
  * DAO used to keep track of the status when uploading files or connectiong to instances to systems
  */
 public class SystemStatusDB {
+
+    private static Logger log = LoggerFactory.getLogger(SystemStatusDB.class);
 
     private SystemStatusDB() {
     }
@@ -78,7 +82,7 @@ public class SystemStatusDB {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -101,7 +105,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
     }
@@ -127,7 +131,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -148,7 +152,7 @@ public class SystemStatusDB {
             updateSystemStatus(con, hostSystem, userId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -176,7 +180,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -196,7 +200,7 @@ public class SystemStatusDB {
             hostSystemList = getAllSystemStatus(con, userId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -229,7 +233,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return hostSystemList;
 
@@ -262,7 +266,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -298,7 +302,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);

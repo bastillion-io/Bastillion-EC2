@@ -15,13 +15,11 @@
  */
 package com.ec2box.manage.util;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,8 +39,9 @@ public class DBUtils {
      */
     public static Connection getConn() {
         Connection con = null;
-        try {
+        try{
             con=DSPool.getDataSource().getConnection();
+
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }

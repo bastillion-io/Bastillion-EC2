@@ -19,13 +19,15 @@ import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.model.User;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,11 +37,14 @@ public class UserDB {
 
     private static Logger log = LoggerFactory.getLogger(UserDB.class);
 
+    public static final String PASSWORD = "password";
     public static final String FIRST_NM = "first_nm";
     public static final String LAST_NM = "last_nm";
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
     public static final String USER_TYPE = "user_type";
+    public static final String AUTH_TYPE = "auth_type";
+    public static final String PROFILE_ID = "profile_id";
 
     private UserDB() {
     }
@@ -58,14 +63,13 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users where enabled=true " + orderBy;
+        String sql = "select * from  users " + orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
@@ -73,7 +77,8 @@ public class UserDB {
                 user.setLastNm(rs.getString(LAST_NM));
                 user.setEmail(rs.getString(EMAIL));
                 user.setUsername(rs.getString(USERNAME));
-                user.setPassword(rs.getString("password"));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
                 userList.add(user);
 
@@ -82,7 +87,62 @@ public class UserDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
+        }
+        finally {
+            DBUtils.closeConn(con);
+        }
+
+        sortedSet.setItemList(userList);
+        return sortedSet;
+    }
+
+    /**
+     * returns all admin users based on sort order defined
+     * @param sortedSet object that defines sort order
+     * @profileId check if user is apart of given profile
+     * @return sorted user list
+     */
+    public static SortedSet getAdminUserSet(SortedSet sortedSet, Long profileId) {
+
+        ArrayList<User> userList = new ArrayList<>();
+
+
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+        }
+        String sql = "select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id and m.profile_id = ? where u.user_type like '" + User.ADMINISTRATOR + "'" + orderBy;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1, profileId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setFirstNm(rs.getString(FIRST_NM));
+                user.setLastNm(rs.getString(LAST_NM));
+                user.setEmail(rs.getString(EMAIL));
+                user.setUsername(rs.getString(USERNAME));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
+                user.setUserType(rs.getString(USER_TYPE));
+                if (profileId != null && profileId.equals(rs.getLong(PROFILE_ID))) {
+                    user.setChecked(true);
+                } else {
+                    user.setChecked(false);
+                }
+                userList.add(user);
+
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -108,7 +168,7 @@ public class UserDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -138,7 +198,8 @@ public class UserDB {
                 user.setLastNm(rs.getString(LAST_NM));
                 user.setEmail(rs.getString(EMAIL));
                 user.setUsername(rs.getString(USERNAME));
-                user.setPassword(rs.getString("password"));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
                 user.setSalt(rs.getString("salt"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
@@ -147,7 +208,7 @@ public class UserDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return user;
@@ -155,32 +216,66 @@ public class UserDB {
 
     /**
      * inserts new user
+     *
      * @param user user object
      */
-    public static void insertUser(User user) {
+    public static Long insertUser(User user) {
 
-
+        Long userId = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            String salt=EncryptionUtil.generateSalt();
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password, salt) values (?,?,?,?,?,?,?)");
-            stmt.setString(1, user.getFirstNm());
-            stmt.setString(2, user.getLastNm());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getUsername());
-            stmt.setString(5, user.getUserType());
-            stmt.setString(6, EncryptionUtil.hash(user.getPassword() + salt));
-            stmt.setString(7, salt);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
+            userId = insertUser(con, user);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
         }
+
+        return userId;
+
+    }
+
+    /**
+     * inserts new user
+     *
+     * @param con DB connection 
+     * @param user user object
+     */
+    public static Long insertUser(Connection con, User user) {
+
+        Long userId=null;
+
+        try {
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, user.getFirstNm());
+            stmt.setString(2, user.getLastNm());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getUsername());
+            stmt.setString(5, user.getAuthType());
+            stmt.setString(6, user.getUserType());
+            if(StringUtils.isNotEmpty(user.getPassword())) {
+                String salt=EncryptionUtil.generateSalt();
+                stmt.setString(7, EncryptionUtil.hash(user.getPassword() + salt));
+                stmt.setString(8, salt);
+            }else {
+                stmt.setString(7, null);
+                stmt.setString(8, null);
+            }
+            stmt.execute();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs != null && rs.next()) {
+                userId = rs.getLong(1);
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+
+        return userId;
 
     }
 
@@ -189,6 +284,8 @@ public class UserDB {
      * @param user user object
      */
     public static void updateUserNoCredentials(User user) {
+
+
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -201,18 +298,23 @@ public class UserDB {
             stmt.setLong(6, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
+
+
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
         }
     }
+
     /**
      * updates existing user
      * @param user user object
      */
     public static void updateUserCredentials(User user) {
+
+
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -223,13 +325,14 @@ public class UserDB {
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getUsername());
             stmt.setString(5, user.getUserType());
-            stmt.setString(6, EncryptionUtil.hash(user.getPassword() + salt));
+            stmt.setString(6, EncryptionUtil.hash(user.getPassword()+salt));
             stmt.setString(7, salt);
             stmt.setLong(8, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -237,27 +340,26 @@ public class UserDB {
     }
 
     /**
-     * disables users
+     * deletes user
      * @param userId user id
      */
-    public static void disableUser(Long userId) {
+    public static void deleteUser(Long userId) {
 
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update users set enabled=false where id=?");
+            PreparedStatement stmt = con.prepareStatement("delete from users where id=?");
             stmt.setLong(1, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
         }
-
     }
 
     /**
@@ -265,6 +367,8 @@ public class UserDB {
      * @param userId user id
      */
     public static void resetSharedSecret(Long userId) {
+
+
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -272,13 +376,15 @@ public class UserDB {
             stmt.setLong(1, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
         }
     }
+
     /**
      * checks to see if username is unique while ignoring current user
      *
@@ -296,7 +402,7 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and lower(username) like lower(?) and id != ?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where lower(username) like lower(?) and id != ?");
             stmt.setString(1,username);
             stmt.setLong(2, userId);
             ResultSet rs = stmt.executeQuery();
@@ -315,6 +421,7 @@ public class UserDB {
         return isUnique;
 
     }
+
 
 
 }

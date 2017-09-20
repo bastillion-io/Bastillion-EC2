@@ -17,13 +17,13 @@ package com.ec2box.manage.util;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to encrypt, decrypt, and hash
@@ -33,7 +33,10 @@ public class EncryptionUtil {
     private static Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     //secret key
-    private static final byte[] key = new byte[]{'t', '3', '2', 'm', 'p', 'd', 'M', 'O', 'i', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
+    private static final byte[] key = KeyStoreUtil.getSecretBytes(KeyStoreUtil.ENCRYPTION_KEY_ALIAS);
+
+    public static final String CRYPT_ALGORITHM = "AES";
+    public static final String HASH_ALGORITHM = "SHA-256";
 
     private EncryptionUtil() {
     }
@@ -60,14 +63,14 @@ public class EncryptionUtil {
     public static String hash(String str, String salt) {
         String hash = null;
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
             if (StringUtils.isNotEmpty(salt)) {
                 md.update(Base64.decodeBase64(salt.getBytes()));
             }
             md.update(str.getBytes("UTF-8"));
             hash = new String(Base64.encodeBase64(md.digest()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return hash;
     }
@@ -93,8 +96,8 @@ public class EncryptionUtil {
         String retVal = null;
         if (str != null && str.length() > 0) {
             try {
-                Cipher c = Cipher.getInstance("AES");
-                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
+                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
                 byte[] encVal = c.doFinal(str.getBytes());
                 retVal = new String(Base64.encodeBase64(encVal));
             } catch (Exception ex) {
@@ -115,8 +118,8 @@ public class EncryptionUtil {
         String retVal = null;
         if (str != null && str.length() > 0) {
             try {
-                Cipher c = Cipher.getInstance("AES");
-                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
+                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
                 byte[] decodedVal = Base64.decodeBase64(str.getBytes());
                 retVal = new String(c.doFinal(decodedVal));
             } catch (Exception ex) {

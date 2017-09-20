@@ -1,4 +1,4 @@
-<%
+<z%
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
@@ -34,7 +34,6 @@
             $(".submit_btn").button().click(function() {
                 $(this).parents('.modal').find('form').submit();
             });
-
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
@@ -49,11 +48,24 @@
                 $("#viewUsers").submit();
 
             });
-            <s:if test="sortedSet.orderByField!= null">
+            <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
+            $('.auth_type').change(function() {
+                hideShowPassword($(this).val());
+            });
+
         });
+
+        //hide show passwords
+        function hideShowPassword(val){
+            if(val=='EXTERNAL'){
+                $('.password').closest('tr').hide();
+            }else {
+                $('.password').closest('tr').show();
+            }
+        }
     </script>
 
     <s:if test="fieldErrors.size > 0 || actionErrors.size > 0">
@@ -64,9 +76,10 @@
                 </s:if>
                 <s:else>
                 $("#add_dialog").modal();
+                <s:if test="%{@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                    hideShowPassword($('.auth_type:checked').val());
+                </s:if>
                 </s:else>
-
-
             });
         </script>
     </s:if>
@@ -75,6 +88,7 @@
 
 </head>
 <body>
+
 
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
@@ -87,19 +101,22 @@
 
         <h3>Manage Users</h3>
 
-        <p>Add / Delete users or select a user below to assign profile</p>
+        <p>Add / Delete users below so that system profiles may be set for users (<a href="viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Profiles</a>).</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="scrollWrapper">
-                <table class="table-striped scrollableTable" style="min-width: 80%">
+                <table class="table-striped  scrollableTable">
+
                     <thead>
-
                     <tr>
-
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@USERNAME"/>" class="sort">Username
                         </th>
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@USER_TYPE"/>" class="sort">User Type
                         </th>
+                        <s:if test="%{@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                            <th id="<s:property value="@com.ec2box.manage.db.UserDB@AUTH_TYPE"/>" class="sort">Auth Type
+                            </th>
+                        </s:if>
                         <th id="<s:property value="@com.ec2box.manage.db.UserDB@LAST_NM"/>" class="sort">Last
                             Name
                         </th>
@@ -116,51 +133,51 @@
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                            <s:if test="userType==\"M\"">
-                                <s:property value="username"/>
-                            </s:if>
-                            <s:else>
-                                <a href="viewUserProfiles.action?user.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"
-                                   title="Manage Profiles for User">
-                                    <s:property value="username"/>
-                                </a>
-                            </s:else>
+                         <s:if test="userType==\"M\"">
+                            <s:property value="username"/>
+                         </s:if>
+                         <s:else>
+                            <s:property value="username"/>
+                         </s:else>
                         </td>
                         <td>
-                            <s:if test="userType==\"A\"">
-                                Administrative Only
-                            </s:if>
-                            <s:else>
-                                Full Access
-                            </s:else>
+                         <s:if test="userType==\"A\"">
+                            Administrative Only
+                         </s:if>
+                         <s:else>
+                            Full Access
+                         </s:else>
                         </td>
+                        <s:if test="%{@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                            <td>
+                                <s:if test="authType==\"BASIC\"">
+                                    Basic
+                                </s:if>
+                                <s:else>
+                                    External
+                                </s:else>
+                            </td>
+                        </s:if>
                         <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
-                        <td>
-                            <div style="width:235px">
+                            <td>
+                                <div style="width:235px">
 
-                                <button class="btn btn-primary spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button class="btn btn-primary spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <s:if test="%{userId != id}">
+                                        <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-middle">Delete</button>
+                                    </s:if>
 
-                                <s:if test="%{userId != id}">
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-middle">Delete</button>
-                                </s:if>
-
-                                <s:if test="userType==\"A\"">
-                                    <a href="viewUserProfiles.action?user.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>">
-                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-primary edit_btn spacer spacer-right">Assign Profiles</button>
-                                    </a>
-                                </s:if>
                                 <div style="clear:both"></div>
-                            </div>
-                        </td>
+                                </div>
+                            </td>
                     </tr>
                     </s:iterator>
                     </tbody>
                 </table>
-            </div>
+                </div>
         </s:if>
-
 
 
 
@@ -174,20 +191,25 @@
                         <h4 class="modal-title">Add User</h4>
                     </div>
                     <div class="modal-body">
-                        <s:actionerror/>
-                        <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
-                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
-                            <s:textfield name="user.username" label="Username" size="15"/>
-                            <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
-                            <s:textfield name="user.firstNm" label="First Name" size="15"/>
-                            <s:textfield name="user.lastNm" label="Last Name" size="15"/>
-                            <s:textfield name="user.email" label="Email Address" size="25"/>
-                            <s:password name="user.password" value="" label="Password" size="15"/>
-                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
-		                    <s:hidden name="resetSharedSecret"/>
-                            <s:hidden name="sortedSet.orderByDirection"/>
-                            <s:hidden name="sortedSet.orderByField"/>
-                        </s:form>
+                        <div class="row">
+                            <s:actionerror/>
+                            <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+                                <s:textfield name="user.username" label="Username" size="15"/>
+                                <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                <s:if test="%{@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                    <s:radio name="user.authType" label="Authentication Type" list="#{'BASIC':'Basic', 'EXTERNAL':'External'}" cssClass="auth_type"/>
+                                </s:if>
+                                <s:textfield name="user.firstNm" label="First Name" size="15"/>
+                                <s:textfield name="user.lastNm" label="Last Name" size="15"/>
+                                <s:textfield name="user.email" label="Email Address" size="25"/>
+                                <s:password name="user.password" value="" label="Password" size="15" cssClass="password"/>
+                                <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" cssClass="password"/>
+                                <s:hidden name="resetSharedSecret"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                            </s:form>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
@@ -213,12 +235,28 @@
                                         <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
                                         <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                        <s:if test="%{@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                            <s:hidden name="user.authType" value="%{authType}"/>
+                                            <tr>
+                                                <td class="tdLabel"><label class="label">Authentication Type</label></td>
+                                                <td>
+                                                    <s:if test="authType==\"BASIC\"">
+                                                        Basic
+                                                    </s:if>
+                                                    <s:else>
+                                                        External
+                                                    </s:else>
+                                                </td>
+                                            </tr>
+                                        </s:if>
                                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
                                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
-                                        <s:password name="user.password" value="" label="Password" size="15"/>
-                                        <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
-					                    <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
+                                        <s:if test="%{!@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled || #user.authType==\"BASIC\"}">
+                                            <s:password name="user.password" value="" label="Password" size="15"/>
+                                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                        </s:if>
+                                        <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
                                         <s:hidden name="user.id" value="%{id}"/>
                                         <s:hidden name="sortedSet.orderByDirection"/>
                                         <s:hidden name="sortedSet.orderByField"/>
@@ -232,10 +270,10 @@
                         </div>
                     </div>
                 </div>
-
             </s:iterator>
 
 
     </div>
+
 </body>
 </html>

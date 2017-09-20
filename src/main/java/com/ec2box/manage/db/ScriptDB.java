@@ -19,6 +19,8 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.Script;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
  */
 public class ScriptDB {
 
-
+    private static Logger log = LoggerFactory.getLogger(ScriptDB.class);
 
     private ScriptDB() {
     }
@@ -75,7 +77,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -102,7 +104,7 @@ public class ScriptDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -138,7 +140,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return script;
@@ -162,7 +164,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -189,7 +191,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -214,7 +216,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);

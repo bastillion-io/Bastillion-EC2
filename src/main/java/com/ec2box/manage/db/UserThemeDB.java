@@ -18,6 +18,8 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.UserSettings;
 import com.ec2box.manage.util.DBUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +29,9 @@ import java.sql.ResultSet;
  * DAO to manage user themes 
  */
 public class UserThemeDB {
+
+    private static Logger log = LoggerFactory.getLogger(UserThemeDB.class);
+
 
     private UserThemeDB() {
     }
@@ -76,7 +81,7 @@ public class UserThemeDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -125,7 +130,7 @@ public class UserThemeDB {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);

@@ -201,7 +201,7 @@
             });
 
             $(document).click(function (e) {
-                if (termFocus) {
+                if (termFocus && !$('body').hasClass('modal-open')) {
                     $('#dummy').focus();
                 }
                 //always change focus unless in match sort
@@ -232,7 +232,7 @@
                     $("#run_cmd_"+ids[i]).height(346 + y_offset);
                     resize($("#run_cmd_"+ids[i]));
                 }
-                
+
             });
 
             //resize element during drag event. Makes call to set pty width and height
@@ -246,7 +246,7 @@
                     termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
 
                     $.ajax({
-                        url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height +'&_csrf=<s:property value="#session['_csrf']"/>',
+                        url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=<s:property value="#session['_csrf']"/>',
                         cache: false
                     });
                 }
@@ -279,12 +279,12 @@
                             termMap[val.instanceId].write(val.output);
                         }
                     }
-                        
+
                 });
 
-                
+
             };
-            
+
             function  createTermMap(id, output){
 
                 termMap[id] = new Terminal({
@@ -308,14 +308,14 @@
                     termMap[id].colors[257] = '<s:property value="userSettings.fg"/>';
                 </s:if>
                 termMap[id].open($("#run_cmd_" + id).find('.output'));
-                    
+
                 resize($("#run_cmd_" + id));
-                    
+
                 termMap[id].write(output);
 
-                
+
             }
-          
+
 
             $('#match_btn').off().click(function () {
                 $('#match_frm').submit();
@@ -409,14 +409,14 @@
                 $(".output").mouseup(function (e) {
                     if(window.getSelection().toString()) {
                         termFocus = false;
-                     } else {
+                    } else {
                         termFocus = true;
-                     }
+                    }
                 });
-                
+
                 $(".output").bind('copy', function () {
                     setTimeout(function () {
-                    termFocus = true;
+                        termFocus = true;
                         window.getSelection().removeAllRanges();
                     }, 100);
                 });
@@ -429,7 +429,7 @@
                     }
                 });
             }
-            
+
             //returns div for newly created terminal element
             function createTermElement(instanceId, hostId, displayLabel){
                 var instance =
@@ -457,12 +457,12 @@
                     $(createTermElement(newInstanceId,hostId,displayLabel)).insertAfter($('#run_cmd_'+instanceId));
 
                     setTerminalEvents($("#run_cmd_"+newInstanceId));
-                    
-                    
-                    //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId +'&_csrf=<s:property value="#session['_csrf']"/>');
 
-                   
+
+                    //call server to create instances - returned the new cloned instance id
+                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId + '&_csrf=<s:property value="#session['_csrf']"/>');
+
+
                 }
 
             });
@@ -476,14 +476,14 @@
 
                 $(createTermElement(newInstanceId,hostId,displayLabel)).prependTo(".termwrapper");
 
-                setTerminalEvents($("#run_cmd_"+newInstanceId)); 
+                setTerminalEvents($("#run_cmd_"+newInstanceId));
 
                 //call server to create instances - returned the new cloned instance id
                 $.getJSON('../admin/createSession.action?systemSelectId=' + hostId + '&_csrf=<s:property value="#session['_csrf']"/>');
 
 
             });
-            
+
             //returns next instance id
             function getNextInstanceId() {
                 var newInstanceId=1;
@@ -530,7 +530,7 @@
 
     </style>
 
-    <title>KeyBox - Composite Terms</title>
+    <title>EC2Box - Composite Terms</title>
 
 </head>
 <body>
@@ -541,7 +541,8 @@
 
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="keybox"/></div>
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/_40x40.png" alt="ec2box"/>
+                </div>
                 EC2Box
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -588,7 +589,7 @@
                     <textarea name="dummy" id="dummy" size="1"
                               style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
                     <input type="text" name="dummy2" id="dummy2" size="1"
-                              style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+                           style="border:none;color:#FFFFFF;width:1px;height:1px"/>
                 </div>
             </s:if>
         </div>
@@ -620,7 +621,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
                     <h4 class="modal-title">Connect to Host</h4>
                 </div>
                 <div class="modal-body">

@@ -15,7 +15,6 @@
  */
 package com.ec2box.manage.model;
 
-
 import java.util.List;
 
 /**
@@ -25,9 +24,9 @@ public class User extends Auth {
     String firstNm;
     String lastNm;
     String email;
+    String ipAddress;
     boolean checked=false;
     List<Profile> profileList;
-
 
     public boolean getChecked() {
         return checked;
@@ -60,6 +59,7 @@ public class User extends Auth {
     public void setEmail(String email) {
         this.email = email;
     }
+
     public List<Profile> getProfileList() {
         return profileList;
     }
@@ -68,5 +68,11 @@ public class User extends Auth {
         this.profileList = profileList;
     }
 
+    public String getIpAddress() {
+        return ipAddress;
+    }
 
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 }

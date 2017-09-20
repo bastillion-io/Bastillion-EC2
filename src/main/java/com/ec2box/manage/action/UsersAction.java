@@ -15,9 +15,9 @@
  */
 package com.ec2box.manage.action;
 
-
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.UserDB;
+import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.model.User;
 import com.ec2box.manage.util.PasswordUtil;
@@ -26,6 +26,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -40,6 +41,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     HttpServletRequest servletRequest;
     boolean resetSharedSecret=false;
     Long userId;
+
 
     @Action(value = "/manage/viewUsers",
             results = {
@@ -60,7 +62,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String saveUser() {
 
-
         if (user.getId() != null) {
             if(user.getPassword()==null || user.getPassword().trim().equals("")){
                 UserDB.updateUserNoCredentials(user);
@@ -76,6 +77,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             UserDB.insertUser(user);
         }
 
+
         return SUCCESS;
     }
 
@@ -86,8 +88,8 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String deleteUser() {
 
-        if (user.getId() != null && user.getId()!=AuthUtil.getUserId(servletRequest.getSession())) {
-            UserDB.disableUser(user.getId());
+        if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(servletRequest.getSession()))) {
+            UserDB.deleteUser(user.getId());
         }
         return SUCCESS;
     }
@@ -96,7 +98,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
      * Validates all fields for adding a user
      */
     public void validateSaveUser() {
-
         if (user == null
                 || user.getUsername() == null
                 || user.getUsername().trim().equals("")) {
@@ -114,19 +115,16 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                 || user.getFirstNm().trim().equals("")) {
             addFieldError("user.firstNm", REQUIRED);
         }
-        if (user != null
-                && user.getPassword() != null
-                && !user.getPassword().trim().equals("")) {
-            
+
+        if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
+
             if(!user.getPassword().equals(user.getPasswordConfirm())) {
                 addActionError("Passwords do not match");
             } else if(!PasswordUtil.isValid(user.getPassword())) {
                 addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
             }
         }
-
-        if(user!=null && user.getId()==null && (user.getPassword()==null || user.getPassword().trim().equals(""))){
-            
+        if(user!=null && user.getId()==null && !Auth.AUTH_EXTERNAL.equals(user.getAuthType()) && (user.getPassword()==null || user.getPassword().trim().equals(""))){
             addActionError("Password is required");
         }
 
@@ -137,8 +135,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             userId = AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = UserDB.getUserSet(sortedSet);
         }
-
-
     }
 
 

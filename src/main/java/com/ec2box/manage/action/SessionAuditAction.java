@@ -15,20 +15,23 @@
  */
 package com.ec2box.manage.action;
 
-import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.SessionAuditDB;
+import com.ec2box.manage.db.SystemDB;
+import com.ec2box.manage.db.UserDB;
+import com.ec2box.manage.model.HostSystem;
 import com.ec2box.manage.model.SessionAudit;
 import com.ec2box.manage.model.SortedSet;
 import com.google.gson.Gson;
+import com.ec2box.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Action to audit sessions and terminal history
@@ -40,10 +43,11 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
     SortedSet sortedSet=new SortedSet();
     Long sessionId;
-    Long hostSystemId;
+    Integer instanceId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
-    String enableAudit = AppConfig.getProperty("enableInternalAudit");
+    List<HostSystem> systemList= SystemDB.getSystemSet(new SortedSet(SystemDB.SORT_BY_NAME)).getItemList();
+    List<User> userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
 
     @Action(value = "/manage/viewSessions",
             results = {
@@ -53,7 +57,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     public String viewSessions() {
 
         if (sortedSet.getOrderByField() == null || sortedSet.getOrderByField().trim().equals("")) {
-          sortedSet.setOrderByField(SessionAuditDB.SORT_BY_SESSION_TM);
+            sortedSet.setOrderByField(SessionAuditDB.SORT_BY_SESSION_TM);
             sortedSet.setOrderByDirection("desc");
         }
 
@@ -73,9 +77,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     )
     public String getTermsForSession() {
 
-
         sessionAudit=SessionAuditDB.getSessionsTerminals(sessionId);
-
         return SUCCESS;
 
     }
@@ -83,7 +85,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     @Action(value = "/manage/getJSONTermOutputForSession")
     public String getJSONTermOutputForSession() {
 
-        String json=new Gson().toJson(SessionAuditDB.getTerminalLogsForSession(sessionId, hostSystemId));
+        String json=new Gson().toJson(SessionAuditDB.getTerminalLogsForSession(sessionId, instanceId));
         try {
             servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
@@ -92,6 +94,22 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
         return null;
 
+    }
+
+    public List<HostSystem> getSystemList() {
+        return systemList;
+    }
+
+    public void setSystemList(List<HostSystem> systemList) {
+        this.systemList = systemList;
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
     }
 
     public SortedSet getSortedSet() {
@@ -126,19 +144,11 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         this.servletResponse = servletResponse;
     }
 
-    public Long getHostSystemId() {
-        return hostSystemId;
+    public Integer getInstanceId() {
+        return instanceId;
     }
 
-    public void setHostSystemId(Long hostSystemId) {
-        this.hostSystemId = hostSystemId;
-    }
-
-    public String getEnableAudit() {
-        return enableAudit;
-    }
-
-    public void setEnableAudit(String enableAudit) {
-        this.enableAudit = enableAudit;
+    public void setInstanceId(Integer instanceId) {
+        this.instanceId = instanceId;
     }
 }

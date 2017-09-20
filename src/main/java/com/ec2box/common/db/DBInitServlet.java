@@ -15,9 +15,12 @@
  */
 package com.ec2box.common.db;
 
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,7 @@ import javax.servlet.annotation.WebServlet;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 
 /**
  * Initial startup task.  Creates an H2 DB.
@@ -50,13 +54,47 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
         Connection connection = null;
         Statement statement = null;
+
+        //if DB password is empty generate a random
+        if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
+            String dbPassword = null;
+            String dbPasswordConfirm = null;
+            //prompt for password and confirmation
+            while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
+                if(System.console() == null) {
+                    Scanner in = new Scanner(System.in);
+                    System.out.println("Please enter database password: ");
+                    dbPassword = in.nextLine();
+                    System.out.println("Please confirm database password: ");
+                    dbPasswordConfirm = in.nextLine();
+                } else {
+                    dbPassword = new String(System.console().readPassword("Please enter database password: "));
+                    dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
+                }
+                if (!dbPassword.equals(dbPasswordConfirm)) {
+                    System.out.println("Passwords do not match");
+                }
+            }
+            //set password
+            if(StringUtils.isNotEmpty(dbPassword)) {
+                AppConfig.encryptProperty("dbPassword", dbPassword);
+                //if password not set generate a random
+            } else {
+                System.out.println("Generating random database password");
+                AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+            }
+            //else encrypt password if plain-text
+        } else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
+            AppConfig.encryptProperty("dbPassword", AppConfig.getProperty("dbPassword"));
+        }
+
         try {
             connection = DBUtils.getConn();
             statement = connection.createStatement();
 
             ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
-                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
+                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null unique, password varchar, auth_token varchar, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
                 statement.executeUpdate("create table if not exists user_theme (user_id INTEGER PRIMARY KEY, bg varchar(7), fg varchar(7), d1 varchar(7), d2 varchar(7), d3 varchar(7), d4 varchar(7), d5 varchar(7), d6 varchar(7), d7 varchar(7), d8 varchar(7), b1 varchar(7), b2 varchar(7), b3 varchar(7), b4 varchar(7), b5 varchar(7), b6 varchar(7), b7 varchar(7), b8 varchar(7), foreign key (user_id) references users(id) on delete cascade) ");
                 statement.executeUpdate("create table if not exists aws_credentials (id INTEGER PRIMARY KEY AUTO_INCREMENT, access_key varchar not null, secret_key varchar not null)");
                 statement.executeUpdate("create table if not exists ec2_keys (id INTEGER PRIMARY KEY AUTO_INCREMENT, key_nm varchar not null, ec2_region varchar not null, private_key varchar not null, aws_cred_id INTEGER, foreign key (aws_cred_id) references aws_credentials(id) on delete cascade)");
@@ -67,8 +105,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists status (id INTEGER, user_id INTEGER, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade, foreign key (user_id) references users(id) on delete cascade)");
                 statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (user_id) references users(id) on delete cascade)");
 
-                statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, session_tm timestamp default CURRENT_TIMESTAMP, foreign key (user_id) references users(id) on delete cascade )");
-                statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, system_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, foreign key (session_id) references session_log(id) on delete cascade, foreign key (system_id) references system(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, session_tm timestamp default CURRENT_TIMESTAMP, first_nm varchar, last_nm varchar, username varchar not null, ip_address varchar)");
+                statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
 
                 //insert default admin user
                 String salt = EncryptionUtil.generateSalt();

@@ -29,6 +29,15 @@
                 window.location = 'getTermsForSession.action?sessionId=' + id + '&_csrf=<s:property value="#session['_csrf']"/>';
             });
 
+            $("#view_btn").button().click(function () {
+                $("#viewSessions").submit();
+            });
+
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                $(this).parents('form:first').submit();
+            });
+
             $(".sort,.sortAsc,.sortDesc").click(function () {
                 var id = $(this).attr('id')
 
@@ -43,9 +52,11 @@
                 $("#viewSessions").submit();
 
             });
-            <s:if test="sortedSet.orderByField!= null">
+            <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
+
+
 
         });
     </script>
@@ -55,26 +66,55 @@
 </head>
 <body>
 
+
 <jsp:include page="../_res/inc/navigation.jsp"/>
 
 <div class="container">
 
 
-    <s:form action="viewSessions" theme="simple">
-        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
-        <s:hidden name="sortedSet.orderByDirection"/>
-        <s:hidden name="sortedSet.orderByField"/>
-    </s:form>
-
     <h3>Audit Sessions</h3>
-    <s:if test="enableAudit=='true'">
 
+           Audit sessions below
+                <table>
+                    <tr>
+                        <td class="align_left">
+                            <s:form id="viewSessions" action="viewSessions" theme="simple">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                                <table>
+                                <tr>
+                                    <s:if test="userList!= null && !userList.isEmpty()">
+                                        <td class="align_left">
+                                           <s:select name="sortedSet.filterMap['%{@com.ec2box.manage.db.SessionAuditDB@FILTER_BY_USER}']" listKey="username" listValue="username"
+                                           class="view_frm_select"
+                                            list="userList"
+                                            headerKey=""
+                                            headerValue="-Select User-"/>
+                                        </td>
+                                     </s:if>
+                                    <s:if test="systemList!= null && !systemList.isEmpty()">
+                                            <td class="align_left">
+                                            <s:select name="sortedSet.filterMap['%{@com.ec2box.manage.db.SessionAuditDB@FILTER_BY_SYSTEM}']" listKey="displayNm" listValue="displayLabel"
+                                            class="view_frm_select"
+                                            list="systemList"
+                                            headerKey=""
+                                            headerValue="-Select System-"/>
+                                        </td>
+                                    </s:if>
+                                    <td style="padding:5px 5px 0px 5px;">
+                                        <div id="view_btn" class="btn btn-primary">Filter</div>
+                                    </td>
+                                </tr>
+                                </table>
+                            </s:form>
+                        </td>
+                    </tr>
+               </table>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <p>Select a session to audit below</p>
-
-        <div class="scrollWrapper">
-            <table class="table-striped scrollableTable" style="min-width:80%">
+    <div class="scrollWrapper">
+            <table class="table-striped scrollableTable" >
                 <thead>
                 <tr>
 
@@ -89,6 +129,9 @@
                     <th id="<s:property value="@com.ec2box.manage.db.SessionAuditDB@SORT_BY_FIRST_NM"/>" class="sort">
                         First Name
                     </th>
+                    <th id="<s:property value="@com.ec2box.manage.db.SessionAuditDB@SORT_BY_IP_ADDRESS"/>" class="sort">
+                       IP Address
+                    </th>
                     <th id="<s:property value="@com.ec2box.manage.db.SessionAuditDB@SORT_BY_SESSION_TM"/>" class="sort">
                         Session Time
                     </th>
@@ -100,9 +143,10 @@
                 <s:iterator var="session" value="sortedSet.itemList" status="stat">
                     <tr>
 
-                        <td><s:property value="user.username"/></td>
-                        <td><s:property value="user.lastNm"/></td>
-                        <td><s:property value="user.firstNm"/></td>
+                        <td><s:property value="username"/></td>
+                        <td><s:property value="lastNm"/></td>
+                        <td><s:property value="firstNm"/></td>
+                        <td><s:property value="ipAddress"/></td>
                         <td><s:date name="sessionTm"/></td>
                         <td>
                             <div id="terminals_btn_<s:property value='id'/>" class="btn btn-primary terminals_btn">
@@ -116,18 +160,15 @@
                 </s:iterator>
                 </tbody>
             </table>
-            </div>
-
+        </div>
         </s:if>
         <s:else>
             <p class="error">No session audits available</p>
         </s:else>
-    </s:if>
-    <s:else>
-        <p class="error">Session audits are disabled.<br/>Edit the EC2Box configuration properties to enable.</p>
-    </s:else>
+
 
 </div>
+
 
 </body>
 </html>

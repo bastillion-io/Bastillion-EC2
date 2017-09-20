@@ -29,6 +29,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -37,6 +39,7 @@ import java.util.*;
 @InterceptorRef("ec2boxStack")
 public class UploadAndPushAction extends ActionSupport implements ServletRequestAware {
 
+    private static Logger log = LoggerFactory.getLogger(UploadAndPushAction.class);
 
     File upload;
     String uploadContentType;
@@ -85,7 +88,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
             return INPUT;
         }
 
@@ -156,7 +159,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return SUCCESS;

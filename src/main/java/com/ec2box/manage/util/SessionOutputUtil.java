@@ -15,17 +15,17 @@
  */
 package com.ec2box.manage.util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.SessionAuditDB;
 import com.ec2box.manage.model.AuditWrapper;
 import com.ec2box.manage.model.SessionOutput;
 import com.ec2box.manage.model.User;
 import com.ec2box.manage.model.UserSessionsOutput;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.util.*;
@@ -38,15 +38,13 @@ public class SessionOutputUtil {
 
     private static Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
 
-
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
-    public static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
+    public final static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
     private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
     private static Logger systemAuditLogger = LoggerFactory.getLogger("com.ec2box.manage.util.SystemAudit");
 
     private SessionOutputUtil() {
     }
-
 
     /**
      * removes session for user session
@@ -89,6 +87,8 @@ public class SessionOutputUtil {
             userSessionsOutput = userSessionsOutputMap.get(sessionOutput.getSessionId());
         }
         userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), sessionOutput);
+
+
     }
 
 
@@ -103,7 +103,6 @@ public class SessionOutputUtil {
      */
     public static void addToOutput(Long sessionId, Integer instanceId, char value[], int offset, int count) {
 
-
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
             userSessionsOutput.getSessionOutputMap().get(instanceId).getOutput().append(value, offset, count);
@@ -116,6 +115,7 @@ public class SessionOutputUtil {
      * returns list of output lines
      *
      * @param sessionId session id object
+     * @param user user auth object
      * @return session output list
      */
     public static List<SessionOutput> getOutput(Connection con, Long sessionId, User user) {

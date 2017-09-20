@@ -19,35 +19,37 @@ import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.model.Auth;
+import com.ec2box.manage.model.User;
 import com.ec2box.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
-import org.apache.struts2.convention.annotation.InterceptorRefs;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * Action to login to ec2box
+ * Action to auth to ec2box
  */
 @InterceptorRef("ec2boxStack")
-public class LoginAction extends ActionSupport implements ServletRequestAware {
+public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
-    HttpServletRequest servletRequest;
     private static Logger loginAuditLogger = LoggerFactory.getLogger("com.ec2box.manage.action.LoginAudit");
+    HttpServletResponse servletResponse;
+    HttpServletRequest servletRequest;
     Auth auth;
-    //check if otp is enabled
-    boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
-    private final String AUTH_SUCCESS="Authentication Successful";
+    private final String AUTH_ERROR_NO_PROFILE="Authentication Failed : There are no profiles assigned to this account";
+    //check if otp is enabled
+    boolean otpEnabled = ("required".equals(AppConfig.getProperty("oneTimePassword")) || "optional".equals(AppConfig.getProperty("oneTimePassword")));
     String _csrf;
-
 
     @Action(value = "/login",
             results = {
@@ -80,47 +82,50 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     )
     public String loginSubmit() {
         String retVal = SUCCESS;
-        //get client IP
-        String clientIP = null;
-        if (StringUtils.isNotEmpty(AppConfig.getProperty("clientIPHeader"))) {
-            clientIP = servletRequest.getHeader(AppConfig.getProperty("clientIPHeader"));
-        }
-        if (StringUtils.isEmpty(clientIP)) {
-            clientIP = servletRequest.getRemoteAddr();
-        }
 
-        String authToken = AuthDB.loginAdmin(auth);
+        String authToken = AuthDB.login(auth);
+
+        //get client IP
+        String clientIP = AuthUtil.getClientIPAddress(servletRequest);
         if (authToken != null) {
-            Long userId = AuthDB.getUserIdByAuthToken(authToken);
-            String sharedSecret = null;
-            if (otpEnabled) {
-                sharedSecret = AuthDB.getSharedSecret(userId);
-                if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
-                    addActionError(AUTH_ERROR);
+
+            User user = AuthDB.getUserByAuthToken(authToken);
+            if(user!=null) {
+                String sharedSecret = null;
+                if (otpEnabled) {
+                    sharedSecret = AuthDB.getSharedSecret(user.getId());
+                    if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
+                        loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
+                        addActionError(AUTH_ERROR);
+                        return INPUT;
+                    }
+                }
+                //check to see if admin has any assigned profiles
+                if(!User.MANAGER.equals(user.getUserType()) && (user.getProfileList()==null || user.getProfileList().size()<=0)){
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_NO_PROFILE);
+                    addActionError(AUTH_ERROR_NO_PROFILE);
                     return INPUT;
                 }
-            }
 
-            AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
-            AuthUtil.setUserId(servletRequest.getSession(), AuthDB.getUserIdByAuthToken(authToken));
-            AuthUtil.setTimeout(servletRequest.getSession());
-            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_SUCCESS);
+                AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
+                AuthUtil.setUserId(servletRequest.getSession(), user.getId());
+                AuthUtil.setAuthType(servletRequest.getSession(), user.getAuthType());
+                AuthUtil.setTimeout(servletRequest.getSession());
 
-            //for first time login redirect to set OTP
-            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
-                return "otp";
-            }
-            else if ("changeme".equals(auth.getPassword())) {
-                retVal = "change_password";
+                //for first time login redirect to set OTP
+                if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+                    retVal = "otp";
+                } else if ("changeme".equals(auth.getPassword())  && Auth.AUTH_BASIC.equals(user.getAuthType())) {
+                    retVal = "change_password";
+                }
+                loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - Authentication Success");
             }
 
         } else {
-            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
+            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
             addActionError(AUTH_ERROR);
             retVal = INPUT;
         }
-
 
         return retVal;
     }
@@ -135,10 +140,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 
-
-
     /**
-     * Validates fields for login submit
+     * Validates fields for auth submit
      */
     public void validateLoginSubmit() {
         if (auth.getUsername() == null ||
@@ -154,6 +157,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     }
 
 
+    public boolean isOtpEnabled() {
+        return otpEnabled;
+    }
+
+    public void setOtpEnabled(boolean otpEnabled) {
+        this.otpEnabled = otpEnabled;
+    }
+
     public Auth getAuth() {
         return auth;
     }
@@ -162,20 +173,20 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         this.auth = auth;
     }
 
+    public HttpServletResponse getServletResponse() {
+        return servletResponse;
+    }
+
+    public void setServletResponse(HttpServletResponse servletResponse) {
+        this.servletResponse = servletResponse;
+    }
+
     public HttpServletRequest getServletRequest() {
         return servletRequest;
     }
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
-    }
-
-    public boolean isOtpEnabled() {
-        return otpEnabled;
-    }
-
-    public void setOtpEnabled(boolean otpEnabled) {
-        this.otpEnabled = otpEnabled;
     }
 
     public String get_csrf() {

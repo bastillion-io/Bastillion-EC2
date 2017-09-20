@@ -18,6 +18,8 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.Profile;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +33,7 @@ import java.util.List;
  */
 public class ProfileDB {
 
+    private static Logger log = LoggerFactory.getLogger(ProfileDB.class);
     public static final String SORT_BY_PROFILE_NM="nm";
 
     private ProfileDB() {
@@ -68,7 +71,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -105,7 +108,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -128,7 +131,7 @@ public class ProfileDB {
             con = DBUtils.getConn();
            profile=getProfile(con, profileId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -163,7 +166,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return profile;
@@ -187,7 +190,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -214,7 +217,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
@@ -238,7 +241,7 @@ public class ProfileDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         finally {
             DBUtils.closeConn(con);
