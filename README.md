@@ -61,10 +61,10 @@ for Windows
 
         startEC2Box.bat
 
-How to Configure SSL in Jetty
+How to [Configure SSL in Jetty](http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html)
 (it is a good idea to add or generate your own unique certificate)
 
-http://wiki.eclipse.org/Jetty/Howto/Configure_SSL
+http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
 
 To Build from Source 
 ------
@@ -95,6 +95,56 @@ or multiple
 
     tag-name1,tag-name2
     tag-name1=mytag1,tag-name2=mytag2
+
+External Authentication
+------
+External Authentication can be enabled through the EC2BoxConfig.properties.
+
+For example:
+
+	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
+	jaasModule=ldap-ol
+    
+Connection details need to be set in the jaas.conf file
+
+    ldap-ol {
+    	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
+    	userProvider="ldap://hostname:389/ou=example,dc=ec2box,dc=com"
+    	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
+    	authzIdentity="{cn}"
+    	useSSL=false
+    	debug=false;
+    };
+    
+
+Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
+
+User LDAP roles can be mapped to profiles defined in KeyBox through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
+
+    ldap-ol-with-roles {
+        //openldap auth with roles that can map to profiles
+        org.eclipse.jetty.jaas.spi.LdapLoginModule required
+        debug="false"
+        useLdaps="false"
+        contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
+        hostname="<SERVER>"
+        port="389"
+        bindDn="<BIND-DN>"
+        bindPassword="<BIND-DN PASSWORD>"
+        authenticationMethod="simple"
+        forceBindingLogin="true"
+        userBaseDn="ou=users,dc=ec2box,dc=com"
+        userRdnAttribute="uid"
+        userIdAttribute="uid"
+        userPasswordAttribute="userPassword"
+        userObjectClass="inetOrgPerson"
+        roleBaseDn="ou=groups,dc=ec2box,dc=com"
+        roleNameAttribute="cn"
+        roleMemberAttribute="member"
+        roleObjectClass="groupOfNames";
+    };
+
+Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
 
 Using EC2Box
 ------
