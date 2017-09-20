@@ -111,9 +111,9 @@
                             <td>
                                 <div style="width:240px">
 
-                                    <a href="viewSystems.action?script.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Execute Script</button></a>
-                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                                    <a href="viewSystems.action?script.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-primary edit_btn spacer spacer-left">Execute Script</button></a>
+                                    <button class="btn btn-primary spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"></div>
 
                                 </div>
@@ -126,7 +126,7 @@
                 </div>
         </s:if>
 
-        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Script</button>
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Script</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -146,8 +146,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
                     </div>
                 </div>
             </div>
@@ -174,8 +174,8 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-default submit_btn">Submit</button>
+                                <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary submit_btn">Submit</button>
                             </div>
                         </div>
                     </div>
