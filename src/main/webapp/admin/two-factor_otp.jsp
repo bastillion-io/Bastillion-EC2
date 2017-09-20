@@ -43,7 +43,7 @@
 
                 <div class="navbar-header">
                     <div class="navbar-brand" >
-                        <div class="nav-img"><img src="<%= request.getContextPath()%>/img/keybox_40x40.png" alt="keybox"/></div>
+                        <div class="nav-img"><img src="<%= request.getContextPath()%>/img/ec2box_40x40.png" alt="ec2box"/></div>
                         EC2Box</div>
                 </div>
                 <!--/.nav-collapse -->
@@ -106,7 +106,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button onclick="window.location = 'menu.action?_csrf=<s:property value="#session['_csrf']"/>'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                    <s:if test="%{!@com.ec2box.manage.action.OTPAction@requireOTP}">
+                        <button onclick="window.location = 'menu.action?_csrf=<s:property value="#session['_csrf']"/>'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                    </s:if>
                     <s:form action="otpSubmit" theme="simple" >
                         <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:hidden name="sharedSecret"/>

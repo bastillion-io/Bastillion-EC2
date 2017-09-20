@@ -17,7 +17,6 @@ package com.ec2box.manage.util;
 
 import com.ec2box.common.util.AppConfig;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

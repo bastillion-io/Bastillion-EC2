@@ -19,6 +19,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
 import com.ec2box.manage.db.UserDB;
@@ -29,8 +30,6 @@ import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -40,11 +39,14 @@ import java.awt.image.BufferedImage;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Hashtable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @InterceptorRef("ec2boxStack")
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(OTPAction.class);
+    public final static boolean requireOTP = "required".equals(AppConfig.getProperty("oneTimePassword"));
 
     //QR image size
     private static final int QR_IMAGE_WIDTH = 325;
@@ -62,11 +64,11 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
             }
     )
     public String viewOTP() {
-        
+
         sharedSecret = OTPUtil.generateSecret();
-        
+
         AuthUtil.setOTPSecret(servletRequest.getSession(), sharedSecret);
-        
+
         this.setQrImage(Long.toString(new Date().getTime()) + ".png");
 
         return SUCCESS;
@@ -82,6 +84,10 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     public String otpSubmit() {
 
         AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(servletRequest.getSession()));
+
+        if (requireOTP) {
+            AuthUtil.deleteAllSession(servletRequest.getSession());
+        }
         return SUCCESS;
 
     }
@@ -93,7 +99,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
         String username = UserDB.getUser(AuthUtil.getUserId(servletRequest.getSession())).getUsername();
 
         String secret = AuthUtil.getOTPSecret(servletRequest.getSession());
-        
+
         AuthUtil.setOTPSecret(servletRequest.getSession(), null);
 
         try {
@@ -124,14 +130,13 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
                 }
             }
             ImageIO.write(image, "png", servletResponse.getOutputStream());
-            
+
             servletResponse.getOutputStream().flush();
             servletResponse.getOutputStream().close();
-            
+
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-
 
         return null;
 
