@@ -37,6 +37,7 @@ public class AWSCredDB {
 
     public static final String ACCESS_KEY = "access_key";
     public static final String SECRET_KEY = "secret_key";
+    public static final String SORT_BY_ACCESS_KEY = ACCESS_KEY;
 
     private AWSCredDB() {
     }

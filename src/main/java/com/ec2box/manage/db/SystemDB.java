@@ -38,7 +38,6 @@ public class SystemDB {
     private static Logger log = LoggerFactory.getLogger(SystemDB.class);
 
     public static final String DISPLAY_NM = "display_nm";
-    public static final String SORT_BY_NAME = DISPLAY_NM;
     public static final String USER = "user";
     public static final String HOST = "host";
     public static final String PORT = "port";
@@ -47,12 +46,22 @@ public class SystemDB {
     public static final String STATE = "state";
     public static final String INSTANCE_STATUS = "instance_status";
     public static final String SYSTEM_STATUS = "system_status";
-    public static final String SORT_BY_ALARMS= "alarms";
     public static final String KEY_ID = "key_id";
     public static final String M_ALARM = "m_alarm";
     public static final String M_INSUFFICIENT_DATA = "m_insufficient_data";
     public static final String M_OK = "m_ok";
     public static final String ID = "id";
+
+    public static final String SORT_BY_NAME = DISPLAY_NM;
+    public static final String SORT_BY_INSTANCE_ID = INSTANCE_ID;
+    public static final String SORT_BY_USER = USER;
+    public static final String SORT_BY_HOST = HOST;
+    public static final String SORT_BY_PORT = PORT;
+    public static final String SORT_BY_STATE = STATE;
+    public static final String SORT_BY_INSTANCE_STATUS = INSTANCE_STATUS;
+    public static final String SORT_BY_SYSTEM_STATUS = SYSTEM_STATUS;
+    public static final String SORT_BY_ALARMS= "alarms";
+    public static final String SORT_BY_REGION = REGION;
 
     private SystemDB() {
     }
