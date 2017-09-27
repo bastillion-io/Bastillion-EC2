@@ -64,9 +64,9 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 if(System.console() != null) {
                     dbPassword = new String(System.console().readPassword("Please enter database password: "));
                     dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
-                }
-                if (!dbPassword.equals(dbPasswordConfirm)) {
-                    System.out.println("Passwords do not match");
+                    if (!dbPassword.equals(dbPasswordConfirm)) {
+                        System.out.println("Passwords do not match");
+                    }
                 }
             }
             //set password
