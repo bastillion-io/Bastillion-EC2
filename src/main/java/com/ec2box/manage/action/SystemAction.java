@@ -173,18 +173,17 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
                                     // (optionally) use private_ip configured, otherwise
                                     // check for public dns if doesn't exist set to ip or pvt dns
-                                    if ("true".equals(AppConfig.getProperty("useEC2PvtIP"))) {
+                                    if ("true".equals(AppConfig.getProperty("useEC2PvtIP")) && StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
                                         hostSystem.setHost(instance.getPrivateIpAddress());
-                                    } else if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
-                                        hostSystem.setHost(instance.getPublicDnsName());
-                                    } else if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
-                                        hostSystem.setHost(instance.getPublicIpAddress());
-                                    } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
+                                    } else if ("true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
                                         hostSystem.setHost(instance.getPrivateDnsName());
+                                    } else if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                        hostSystem.setHost(instance.getPublicDnsName());
+                                    } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
+                                        hostSystem.setHost(instance.getPublicIpAddress());
                                     } else {
                                         hostSystem.setHost(instance.getPrivateIpAddress());
                                     }
-
 
                                     hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
                                     hostSystem.setEc2Region(ec2Region);
