@@ -19,6 +19,7 @@ import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -59,11 +61,19 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
         if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
             String dbPassword = null;
             String dbPasswordConfirm = null;
-            //prompt for password and confirmation
-            while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
-                if(System.console() != null) {
-                    dbPassword = new String(System.console().readPassword("Please enter database password: "));
-                    dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
+            if(!"true".equals(System.getProperty("GEN_DB_PASS"))) {
+                //prompt for password and confirmation
+                while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
+                    if (System.console() == null) {
+                        Scanner in = new Scanner(System.in);
+                        System.out.println("Please enter database password: ");
+                        dbPassword = in.nextLine();
+                        System.out.println("Please confirm database password: ");
+                        dbPasswordConfirm = in.nextLine();
+                    } else {
+                        dbPassword = new String(System.console().readPassword("Please enter database password: "));
+                        dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
+                    }
                     if (!dbPassword.equals(dbPasswordConfirm)) {
                         System.out.println("Passwords do not match");
                     }
@@ -75,7 +85,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 //if password not set generate a random
             } else {
                 System.out.println("Generating random database password");
-                AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+                AppConfig.encryptProperty("dbPassword", RandomStringUtils.random(32, true, true));
             }
             //else encrypt password if plain-text
         } else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
@@ -102,9 +112,19 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, session_tm timestamp default CURRENT_TIMESTAMP, first_nm varchar, last_nm varchar, username varchar not null, ip_address varchar)");
                 statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
 
-                //insert default admin user
+                //if exists readfile to set default password
                 String salt = EncryptionUtil.generateSalt();
-                statement.executeUpdate("insert into users (username, password, user_type, salt) values('admin', '" + EncryptionUtil.hash("changeme" + salt) + "','"+ Auth.MANAGER+"','"+ salt+"')");
+                String defaultPassword = EncryptionUtil.hash("changeme" + salt);
+                File file = new File("/opt/ec2box/instance_id");
+                if (file.exists()) {
+                    String str = FileUtils.readFileToString(file, "UTF-8");
+                    if(StringUtils.isNotEmpty(str)) {
+                        defaultPassword = EncryptionUtil.hash(str.trim() + salt);
+                    }
+                }
+
+                //insert default admin user
+                statement.executeUpdate("insert into users (username, password, user_type, salt) values('admin', '" + defaultPassword + "','"+ Auth.MANAGER+"','"+ salt+"')");
 
             }
 
