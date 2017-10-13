@@ -30,7 +30,7 @@ http://maven.apache.org
     | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
     | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
-AMI in AWS Marketplace
+AMI in the AWS Marketplace
 ------
 The simplest way to get started is to run the AMI from the AWS marketplace.
 http://aws.amazon.com/marketplace/pp/B076D7XMK6
