@@ -30,6 +30,11 @@ http://maven.apache.org
     | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
     | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
+AMI in AWS Marketplace
+------
+The simplest way to get started is to run the AMI from the AWS marketplace.
+http://aws.amazon.com/marketplace/pp/B076D7XMK6
+
 
 To Run Bundled with Jetty
 ------
@@ -154,6 +159,8 @@ Login with
 
 	username:admin 
 	password:changeme
+	
+Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443
 
 Steps:
 
