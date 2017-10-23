@@ -7,21 +7,32 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-![Terminals](http://sshkeybox.com/img/screenshots/medium/ec2box/terms.png)
+![Terminals](http://sshkeybox.com/img/500x300/ec2box.png)
+
+AMI in the AWS Marketplace
+------
+The simplest way to get started is to run the AMI from the AWS marketplace.
+
+http://aws.amazon.com/marketplace/pp/B076D7XMK6
+
+Once the EC2Box instance is up and running, open your browser to https://\<EC2 Instance IP\>:443
+
+Login with 
+
+	username:admin 
+	password:<Instance ID>
 
 Prerequisites
 -------------
-Java JDK 1.8 or greater
+* Java JDK 1.8 or greater
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-Browser with Web Socket support
-http://caniuse.com/websockets
+* Browser with Web Socket support
+http://caniuse.com/websockets  *(Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+Select 'Show Certificate' -> 'Always Trust' when prompted in Safari)*
 
-**Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
-Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
-
-Maven 3 or greater  ( Only needed if building from source )
-http://maven.apache.org
+* Maven 3 or greater 
+http://maven.apache.org  *(Only needed if building from source)*
 
 * Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
@@ -30,19 +41,11 @@ http://maven.apache.org
     | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
     | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
-AMI in the AWS Marketplace
-------
-The simplest way to get started is to run the AMI from the AWS marketplace.
-http://aws.amazon.com/marketplace/pp/B076D7XMK6
-
-
 To Run Bundled with Jetty
 ------
-If you're not big on the idea of building from source...
-
 Download ec2box-jetty-vXX.XX.tar.gz
 
-http://sshkeybox.com/latest-release.html#ec2box
+https://github.com/skavanagh/EC2Box/releases
 
 Export environment variables
 
@@ -67,7 +70,7 @@ for Windows
         startEC2Box.bat
 
 How to [Configure SSL in Jetty](http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html)
-(it is a good idea to add or generate your own unique certificate)
+(You should add or generate your own unique certificate for Jetty)
 
 http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
 
@@ -83,7 +86,26 @@ In the directory that contains the pom.xml run
 
 	mvn package jetty:run
 
-**Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
+*Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+
+Using EC2Box
+------
+Open browser to https://\<whatever ip\>:8443
+
+Login with 
+
+	username:admin 
+	password:changeme
+	
+*Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
+
+Steps:
+
+1. Set your AWS credentials
+2. Import the private key used on your EC2 systems *(Note: The EC2 server will only show if the private key has been imported)*
+3. Start composite-ssh sessions or create and execute a script across multiple sessions
+4. Add instance administrator accounts
+5. Audit sessions for instance administrators
 
 Restricting User Access
 ------
@@ -151,25 +173,6 @@ User LDAP roles can be mapped to profiles defined in KeyBox through the use of t
 
 Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
 
-Using EC2Box
-------
-Open browser to https://\<whatever ip\>:8443
-
-Login with 
-
-	username:admin 
-	password:changeme
-	
-Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443
-
-Steps:
-
-1. Set your AWS credentials
-2. Import the private key used on your EC2 systems (note: The EC2 server will only show if the private key has been imported)
-3. Start composite-ssh sessions or create and execute a script across multiple sessions
-4. Add instance administrator accounts
-5. Audit sessions for instance administrators
-
 Screenshots
 -----------
 ![Two-Factor](http://sshkeybox.com/img/screenshots/medium/ec2box/two-factor.png)
@@ -193,9 +196,15 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Author
 ------
-**Sean Kavanagh** 
+**Sean Kavanagh**
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
 (Follow me on twitter for release updates, but mostly nonsense)
+
+Donate
+------
+Dontations are always welcome!
+
+<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KKRTX5GB9GDF8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
