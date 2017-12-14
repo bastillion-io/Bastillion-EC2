@@ -53,11 +53,10 @@
                 }
             });
             $(".sort,.sortAsc,.sortDesc").click(function () {
-                var id = $(this).attr('id')
+                var id = $(this).attr('id');
 
                 if ($('#viewSystems_sortedSet_orderByDirection').attr('value') == 'asc') {
                     $('#viewSystems_sortedSet_orderByDirection').attr('value', 'desc');
-
                 } else {
                     $('#viewSystems_sortedSet_orderByDirection').attr('value', 'asc');
                 }
@@ -66,7 +65,7 @@
                 $("#viewSystems").submit();
 
             });
-            <s:if test="sortedSet.orderByField!= null">
+            <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
