@@ -7,7 +7,7 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-![Terminals](http://sshkeybox.com/img/500x300/ec2box.png)
+![Terminals](http://sshkeybox.com/images/500x300/ec2box.png)
 
 AMI in the AWS Marketplace
 ------
@@ -21,6 +21,14 @@ Login with
 
 	username:admin 
 	password:<Instance ID>
+
+EC2Box Releases
+------
+EC2Box releases with Jetty are no longer available on Github. Releases and upgrades are available via subscription through the following link: 
+
+https://sshkeybox.com/subscription
+
+Feel free to try out EC2Box using the build instructions below!
 
 Prerequisites
 -------------
@@ -41,40 +49,7 @@ http://maven.apache.org  *(Only needed if building from source)*
     | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
     | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
-To Run Bundled with Jetty
-------
-Download ec2box-jetty-vXX.XX.tar.gz
-
-https://github.com/skavanagh/EC2Box/releases
-
-Export environment variables
-
-for Linux/Unix/OSX
-
-     export JAVA_HOME=/path/to/jdk
-     export PATH=$JAVA_HOME/bin:$PATH
-
-for Windows
-
-     set JAVA_HOME=C:\path\to\jdk
-     set PATH=%JAVA_HOME%\bin;%PATH%
-
-Start EC2Box
-
-for Linux/Unix/OSX
-
-        ./startEC2Box.sh
-
-for Windows
-
-        startEC2Box.bat
-
-How to [Configure SSL in Jetty](http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html)
-(You should add or generate your own unique certificate for Jetty)
-
-http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
-
-To Build from Source 
+Build from Source
 ------
 Export environment variables
 
@@ -146,7 +121,7 @@ Connection details need to be set in the jaas.conf file
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
-User LDAP roles can be mapped to profiles defined in KeyBox through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
+User LDAP roles can be mapped to profiles defined in EC2Box through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
 
     ldap-ol-with-roles {
         //openldap auth with roles that can map to profiles
@@ -175,17 +150,17 @@ Users will be added/removed from defined profiles as they login and when the rol
 
 Screenshots
 -----------
-![Two-Factor](http://sshkeybox.com/img/screenshots/medium/ec2box/two-factor.png)
+![Two-Factor](http://sshkeybox.com/images/screenshots/medium/ec2box/two-factor.png)
 
-![Importing Keys](http://sshkeybox.com/img/screenshots/medium/ec2box/importing_keys.png)
+![Importing Keys](http://sshkeybox.com/images/screenshots/medium/ec2box/importing_keys.png)
 
-![Select Instances](http://sshkeybox.com/img/screenshots/medium/ec2box/select_instances.png)
+![Select Instances](http://sshkeybox.com/images/screenshots/medium/ec2box/select_instances.png)
 
-![More Terminals](http://sshkeybox.com/img/screenshots/medium/ec2box/more_terms.png)
+![More Terminals](http://sshkeybox.com/images/screenshots/medium/ec2box/more_terms.png)
 
-![Upload Files](http://sshkeybox.com/img/screenshots/medium/ec2box/upload_files.png)
+![Upload Files](http://sshkeybox.com/images/screenshots/medium/ec2box/upload_files.png)
 
-![Disconnect](http://sshkeybox.com/img/screenshots/medium/ec2box/disconnect.png)
+![Disconnect](http://sshkeybox.com/images/screenshots/medium/ec2box/disconnect.png)
 
 Acknowledgments
 ------
@@ -196,15 +171,9 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Author
 ------
-**Sean Kavanagh**
+**Loophole, LLC - Sean Kavanagh**
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
 (Follow me on twitter for release updates, but mostly nonsense)
-
-Donate
-------
-Dontations are always welcome!
-
-<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KKRTX5GB9GDF8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
