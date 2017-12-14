@@ -15,9 +15,10 @@
  */
 package com.ec2box.manage.action;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.model.AWSCred;
 import com.ec2box.manage.model.SortedSet;
@@ -26,9 +27,6 @@ import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.SessionAware;
-
-import java.util.Map;
 
 /**
  * Action to set aws credentials
@@ -93,10 +91,13 @@ public class AWSCredAction extends ActionSupport {
             try {
                 //check if credential are valid
                 BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-                AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
+                AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                        .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                        .withClientConfiguration(AWSClientConfig.getClientConfig()).build();
 
                 service.describeKeyPairs();
             } catch (Exception ex) {
+                ex.printStackTrace();
                 addActionError("Invalid Credentials");
             }
         }

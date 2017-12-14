@@ -16,11 +16,13 @@
 package com.ec2box.manage.action;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
-import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.db.AWSCredDB;
 import com.ec2box.manage.db.EC2KeyDB;
 import com.ec2box.manage.model.AWSCred;
@@ -29,6 +31,7 @@ import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
@@ -51,7 +54,17 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     EC2Key ec2Key;
     SortedSet sortedSet = new SortedSet();
     HttpServletResponse servletResponse;
-    static Map<String, String> ec2RegionMap = AppConfig.getMapProperties("ec2Regions");
+    static Map<String, String> ec2RegionMap = new LinkedHashMap<>();
+
+    static {
+        AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
+
+        DescribeRegionsResult regionResponse = ec2.describeRegions();
+        for(Region region : regionResponse.getRegions()) {
+            ec2RegionMap.put(region.getEndpoint(), region.getRegionName());
+        }
+    }
+
     List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
 
 
@@ -81,9 +94,10 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
 
         //set  AWS credentials for service
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-        AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-
-        service.setEndpoint(ec2Key.getEc2Region());
+        AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withClientConfiguration(AWSClientConfig.getClientConfig())
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Key.getEc2Region(), ec2RegionMap.get(ec2Key.getEc2Region()))).build();
 
         DescribeKeyPairsRequest describeKeyPairsRequest = new DescribeKeyPairsRequest();
 
@@ -119,8 +133,10 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 
             //create service
-            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-            service.setEndpoint(ec2Key.getEc2Region());
+            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withClientConfiguration(AWSClientConfig.getClientConfig())
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Key.getEc2Region(), ec2RegionMap.get(ec2Key.getEc2Region()))).build();
 
             //create key pair request
             CreateKeyPairRequest createKeyPairRequest = new CreateKeyPairRequest();
@@ -166,8 +182,10 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 
             //create service
-            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-            service.setEndpoint(ec2Key.getEc2Region());
+            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withClientConfiguration(AWSClientConfig.getClientConfig())
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Key.getEc2Region(), ec2RegionMap.get(ec2Key.getEc2Region()))).build();
 
             //describe key pair request
             DescribeKeyPairsRequest describeKeyPairsRequest = new DescribeKeyPairsRequest();

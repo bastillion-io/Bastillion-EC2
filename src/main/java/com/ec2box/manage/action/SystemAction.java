@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +16,18 @@
 package com.ec2box.manage.action;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
 import com.amazonaws.services.cloudwatch.model.Dimension;
 import com.amazonaws.services.cloudwatch.model.MetricAlarm;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
@@ -52,21 +57,21 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
-    boolean showStatus=false;
+    boolean showStatus = false;
     Script script = null;
     HttpServletRequest servletRequest;
     static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
     static Map<String, String> systemStatusMap = AppConfig.getMapProperties("systemStatus");
     static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
     static Map<String, String> instanceStateMap = AppConfig.getMapProperties("instanceState");
-    
+
     public static final String FILTER_BY_ALARM_STATE = "alarm_state";
-    public static final String FILTER_BY_INSTANCE_STATUS= "instance_status";
-    public static final String FILTER_BY_SYSTEM_STATUS= "system_status";
-    public static final String FILTER_BY_INSTANCE_STATE= "instance_state";
-    public static final String FILTER_BY_SECURITY_GROUP= "security_group";
-    public static final String FILTER_BY_TAG= "tag";
-    
+    public static final String FILTER_BY_INSTANCE_STATUS = "instance_status";
+    public static final String FILTER_BY_SYSTEM_STATUS = "system_status";
+    public static final String FILTER_BY_INSTANCE_STATE = "instance_state";
+    public static final String FILTER_BY_SECURITY_GROUP = "security_group";
+    public static final String FILTER_BY_TAG = "tag";
+
 
     @Action(value = "/admin/viewSystems",
             results = {
@@ -80,10 +85,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
         List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
         List<String> instanceIdList = new ArrayList<>();
-        
+
         //default instance state
-        if(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null){
-            sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE,AppConfig.getProperty("defaultInstanceState"));  
+        if (sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null) {
+            sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE, AppConfig.getProperty("defaultInstanceState"));
         }
 
         try {
@@ -97,7 +102,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                 for (Profile profile : profileList) {
                     profileTags.add(profile.getTag());
                 }
-                Map<String,List<String>> profileTagMap = parseTags(profileTags);
+                Map<String, List<String>> profileTagMap = parseTags(profileTags);
 
                 //set tags from input filters
                 Map<String, List<String>> filterTags = fetchInputFilterTags(userType, profileTagMap);
@@ -119,8 +124,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                         for (String ec2Region : ec2RegionList) {
                             //create service
 
-                            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-                            service.setEndpoint(ec2Region);
+                            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                                    .withClientConfiguration(AWSClientConfig.getClientConfig())
+                                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region, EC2KeyAction.ec2RegionMap.get(ec2Region))).build();
 
 
                             //only return systems that have keys set
@@ -191,7 +198,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                                     for (Tag tag : instance.getTags()) {
                                         if ("Name".equals(tag.getKey())) {
                                             hostSystem.setDisplayNm(tag.getValue());
-                                        } else if  (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
+                                        } else if (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
                                             hostSystem.setUser(tag.getValue());
                                         }
                                     }
@@ -207,7 +214,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
                             if (instanceIdList.size() > 0) {
                                 //set instance id list to check permissions when creating sessions
                                 servletRequest.getSession().setAttribute("instanceIdList", new ArrayList<>(instanceIdList));
-                                if(showStatus) {
+                                if (showStatus) {
                                     //make service call 100 instances at a time b/c of AWS limitation
                                     int i = 0;
                                     List<String> idCallList = new ArrayList<>();
@@ -248,10 +255,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
 
                                     //check alarms for ec2 instances
-                                    AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(awsCredentials, AWSClientConfig.getClientConfig());
-                                    cloudWatchClient.setEndpoint(ec2Region.replace("ec2", "monitoring"));
-
-
+                                    AmazonCloudWatch cloudWatchClient = AmazonCloudWatchClientBuilder.standard()
+                                            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                                            .withClientConfiguration(AWSClientConfig.getClientConfig())
+                                            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region.replace("ec2", "monitoring"), EC2KeyAction.ec2RegionMap.get(ec2Region))).build();
                                     DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
 
                                     for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
@@ -303,24 +310,24 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     }
 
     private Map<String, List<String>> fetchInputFilterTags(String userType, Map<String, List<String>> profileTagMap) {
-        Map<String,List<String>> filterTags = new HashMap<>();
+        Map<String, List<String>> filterTags = new HashMap<>();
         if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
             //if manager allow any filter
-            if(Auth.MANAGER.equals(userType)) {
+            if (Auth.MANAGER.equals(userType)) {
                 filterTags.putAll(parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG))));
-            //check against profile
+                //check against profile
             } else {
-                Map<String,List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
-                for (Map.Entry<String,List<String>> entry: tmpMap.entrySet()) {
+                Map<String, List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
+                for (Map.Entry<String, List<String>> entry : tmpMap.entrySet()) {
                     String name = entry.getKey();
                     //if profile tags does not have the filtered tag add to filters and it would be ANDed with profile tags.
-                    if(profileTagMap.get(name) == null && entry.getValue() !=null) {
+                    if (profileTagMap.get(name) == null && entry.getValue() != null) {
                         filterTags.put(name, entry.getValue());
                     }
 
                     //if profile tags have the filtered tag add to filters only if values are contained in allowed list of the user.
-                    if(profileTagMap.get(name) != null && entry.getValue() !=null && profileTagMap.get(name).containsAll(entry.getValue())) {
-                        filterTags.put(name,entry.getValue());
+                    if (profileTagMap.get(name) != null && entry.getValue() != null && profileTagMap.get(name).containsAll(entry.getValue())) {
+                        filterTags.put(name, entry.getValue());
                     }
                 }
             }
@@ -330,7 +337,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     private void addTagsToDescribeInstanceRequest(Map<String, List<String>> profileTagMap, DescribeInstancesRequest describeInstancesRequest, List<String> tagList) {
         for (String tag : profileTagMap.keySet()) {
-            if(profileTagMap.get(tag) != null) {
+            if (profileTagMap.get(tag) != null) {
                 Filter tagValueFilter = new Filter("tag:" + tag, profileTagMap.get(tag));
                 describeInstancesRequest.withFilters(tagValueFilter);
             } else {
@@ -354,15 +361,15 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 
-	/**
+    /**
      *  Parse out tags in format tag-name[=value[,tag-name[=value]]
      *
      * @param tags list of unparsed tags
      * @return map of tags
      */
-    private Map<String,List<String>> parseTags(List<String> tags) {
-        Map<String,List<String>> tagMap = new HashMap<>();
-        for(String tag : tags) {
+    private Map<String, List<String>> parseTags(List<String> tags) {
+        Map<String, List<String>> tagMap = new HashMap<>();
+        for (String tag : tags) {
             String[] tagArr1 = tag.split(",");
             if (tagArr1.length > 0) {
                 for (String tag1 : tagArr1) {
