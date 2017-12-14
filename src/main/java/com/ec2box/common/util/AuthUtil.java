@@ -32,6 +32,7 @@ public class AuthUtil {
 
     public static final String SESSION_ID = "sessionId";
     public static final String USER_ID = "userId";
+    public static final String USERNAME = "username";
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
     public static final String CSRF_TOKEN_NM = "_csrf";
@@ -140,6 +141,16 @@ public class AuthUtil {
     }
 
     /**
+     * query session for the username
+     *
+     * @param session http session
+     * @return username
+     */
+    public static String getUsername(HttpSession session) {
+        return (String) session.getAttribute(USERNAME);
+    }
+
+    /**
      * query session for authentication token
      *
      * @param session http session
@@ -195,6 +206,18 @@ public class AuthUtil {
     public static void setUserId(HttpSession session, Long userId) {
         if (userId != null) {
             session.setAttribute(USER_ID, EncryptionUtil.encrypt(userId.toString()));
+        }
+    }
+
+    /**
+     * set session username
+     *
+     * @param session  http session
+     * @param username username
+     */
+    public static void setUsername(HttpSession session, String username) {
+        if (username != null) {
+            session.setAttribute(USERNAME, username);
         }
     }
 

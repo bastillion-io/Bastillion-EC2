@@ -71,8 +71,17 @@
                         <li><a href="../manage/viewSessions.action?_csrf=<s:property value="#session['_csrf']"/>">Audit Sessions</a></li>
                     </s:if>
                 </s:if>
-                <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>
-                <li><a href="../logout.action">Logout</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <s:property value="#session['username']"/><b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>
+                        <li><a href="../logout.action">Logout</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
         <!--/.nav-collapse -->
