@@ -7,7 +7,7 @@ have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-![Terminals](http://sshkeybox.com/images/500x300/ec2box.png)
+![Terminals](https://www.sshkeybox.com/images/500x300/ec2box.png)
 
 AMI in the AWS Marketplace
 ------
@@ -26,7 +26,7 @@ EC2Box Releases
 ------
 EC2Box releases with Jetty are no longer available on Github. Releases and upgrades are available via subscription through the following link: 
 
-https://sshkeybox.com/subscription
+https://www.sshkeybox.com/subscription
 
 Feel free to try out EC2Box using the build instructions below!
 
@@ -150,17 +150,17 @@ Users will be added/removed from defined profiles as they login and when the rol
 
 Screenshots
 -----------
-![Two-Factor](http://sshkeybox.com/images/screenshots/medium/ec2box/two-factor.png)
+![Two-Factor](https://www.sshkeybox.com/images/screenshots/medium/ec2box/two-factor.png)
 
-![Importing Keys](http://sshkeybox.com/images/screenshots/medium/ec2box/importing_keys.png)
+![Importing Keys](https://www.sshkeybox.com/images/screenshots/medium/ec2box/importing_keys.png)
 
-![Select Instances](http://sshkeybox.com/images/screenshots/medium/ec2box/select_instances.png)
+![Select Instances](https://www.sshkeybox.com/images/screenshots/medium/ec2box/select_instances.png)
 
-![More Terminals](http://sshkeybox.com/images/screenshots/medium/ec2box/more_terms.png)
+![More Terminals](https://www.sshkeybox.com/images/screenshots/medium/ec2box/more_terms.png)
 
-![Upload Files](http://sshkeybox.com/images/screenshots/medium/ec2box/upload_files.png)
+![Upload Files](https://www.sshkeybox.com/images/screenshots/medium/ec2box/upload_files.png)
 
-![Disconnect](http://sshkeybox.com/images/screenshots/medium/ec2box/disconnect.png)
+![Disconnect](https://www.sshkeybox.com/images/screenshots/medium/ec2box/disconnect.png)
 
 Acknowledgments
 ------
