@@ -20,7 +20,6 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import com.ec2box.manage.db.AWSCredDB;
@@ -31,7 +30,6 @@ import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
 import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
@@ -57,11 +55,20 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     static Map<String, String> ec2RegionMap = new LinkedHashMap<>();
 
     static {
-        AmazonEC2 ec2 = AmazonEC2ClientBuilder.defaultClient();
 
-        DescribeRegionsResult regionResponse = ec2.describeRegions();
-        for(Region region : regionResponse.getRegions()) {
-            ec2RegionMap.put(region.getEndpoint(), region.getRegionName());
+        for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
+            //set  AWS credentials for service
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
+
+            //create service
+            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withClientConfiguration(AWSClientConfig.getClientConfig()).build();
+
+            DescribeRegionsResult regionResponse = service.describeRegions();
+            for(Region region : regionResponse.getRegions()) {
+                ec2RegionMap.put(region.getEndpoint(), region.getRegionName());
+            }
         }
     }
 
