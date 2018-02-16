@@ -54,7 +54,16 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
     HttpServletResponse servletResponse;
     static Map<String, String> ec2RegionMap = new LinkedHashMap<>();
 
-    static {
+    List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
+
+
+    @Action(value = "/manage/viewEC2Keys",
+            results = {
+                    @Result(name = "success", location = "/manage/view_ec2_keys.jsp")
+            }
+    )
+    public String viewEC2Keys() {
+
 
         for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
             //set  AWS credentials for service
@@ -70,18 +79,6 @@ public class EC2KeyAction extends ActionSupport implements ServletResponseAware 
                 ec2RegionMap.put(region.getEndpoint(), region.getRegionName());
             }
         }
-    }
-
-    List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
-
-
-    @Action(value = "/manage/viewEC2Keys",
-            results = {
-                    @Result(name = "success", location = "/manage/view_ec2_keys.jsp")
-            }
-    )
-    public String viewEC2Keys() {
-
 
         sortedSet = EC2KeyDB.getEC2KeySet(sortedSet);
 
