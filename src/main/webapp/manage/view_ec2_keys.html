@@ -1,0 +1,252 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function populateKeyNames() {
+            $.getJSON('getKeyPairJSON.ktrl?_csrf=' + [[${session._csrf}]]
+                + '&ec2Key.awsCredId=' + $("#importEC2Key_ec2Key_awsCredId").val()
+                + '&ec2Key.ec2Region=' + $("#importEC2Key_ec2Key_ec2Region").val(), function (result) {
+
+                    $("#importEC2Key_ec2Key_keyNm option").remove();
+                    var options = $("#importEC2Key_ec2Key_keyNm");
+                    options.append($("<option />").val('').text('-Select Key Name-'));
+                    $.each(result, function () {
+                        if (this.keyName != null) {
+                            options.append($("<option />").val(this.keyName).text(this.keyName));
+                        }
+                    });
+                    $("#importEC2Key_ec2Key_keyNm option[value='" + [[${ec2Key.keyNm}]] + "']").attr("selected", true);
+                }
+            );
+        }
+
+        $(document).ready(function () {
+
+            //call delete action
+            $(".del_btn").button().click(function () {
+                var id = $(this).attr('id').replace("del_btn_", "");
+                window.location = 'deleteEC2Key.ktrl?ec2Key.id=' + id
+                    + '&ec2Key.ec2Region=' + /*[[${ec2Key.ec2Region}]]*/ ''
+                    + '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
+                    + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
+                    + '&_csrf=' + [[${session._csrf}]];
+            });
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                $(this).parents('.modal').find('form').submit();
+            });
+
+
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id');
+
+                var orderDirection = $('#viewEC2Keys_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewEC2Keys_sortedSet_orderByField').attr('value', id);
+                $("#viewEC2Keys").submit();
+
+            });
+
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+            $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            populateKeyNames();
+
+            [# th:if= "${ec2Key.privateKey!=null}"]
+            $("#import_dialog").modal();
+            [/]
+        });
+        /*]]>*/
+    </script>
+
+
+    <title>EC2Box - Manage EC2 Keys</title>
+
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+
+    <h3>Manage EC2 Keys</h3>
+
+    <div class="actionMessage" th:if="${awsCredList.empty}">
+        <p class="error">
+            EC2 Keys not available (<a th:href="'viewAWSCred.ktrl?_csrf=' + ${session._csrf}">Set AWS
+            Credentials</a>).
+        </p>
+    </div>
+    <template th:if="${!awsCredList.empty}" th:remove="tag">
+
+        <p>Import and register EC2 keys below. An EC2 server will only show after its private key has been imported</p>
+
+        <p></p>
+        <form id="viewEC2Keys" th:action="@{/manage/viewEC2Keys.ktrl}" method="get">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+            <input type="hidden" id="viewEC2Keys_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+                   th:value="${sortedSet.orderByDirection}"/>
+            <input type="hidden" id="viewEC2Keys_sortedSet_orderByField" name="sortedSet.orderByField"
+                   th:value="${sortedSet.orderByField}"/>
+        </form>
+
+        <div class="scrollWrapper" th:if="${sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()}">
+            <table class="table-striped scrollableTable">
+                <thead>
+                <tr>
+
+                    <th th:id="${@com.ec2box.manage.db.EC2KeyDB@KEY_NM}" class="sort">Key Name</th>
+                    <th th:id="${@com.ec2box.manage.db.EC2KeyDB@EC2_REGION}" class="sort">EC2 Region</th>
+                    <th th:if="${awsCredList.size>1}" th:id="${@com.ec2box.manage.db.EC2KeyDB@ACCESS_KEY}" class="sort">
+                        Access Key
+                    </th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="k : ${sortedSet.itemList}">
+                    <td th:text="${k.keyNm}"></td>
+                    <td th:text="${#strings.toUpperCase(ec2RegionMap.get(k.ec2Region))}"></td>
+                    <td th:if="${awsCredList.size>1}" th:text="${k.accessKey}"></td>
+                    <td>
+                        <div th:id="'del_btn_' + ${k.id}" class="btn btn-primary del_btn spacer spacer-left">
+                            Delete
+                        </div>
+                        <div style="clear:both"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#import_dialog">
+            Import Private Key
+        </button>
+        <div id="import_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Import Existing EC2 Key</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div th:replace="_res/inc/errors"></div>
+
+                            <form th:action="@{/manage/importEC2Key.ktrl}" class="save_ec2Key_form_import" method="post"
+                                  autocomplete="off">
+                                <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                                <input type="hidden" th:if="${awsCredList.size()==1}" id="importEC2Key_ec2Key_awsCredId" name="ec2Key.awsCredId"
+                                       th:value="${awsCredList[0].getId()}"/>
+                                <table>
+                                    <tr th:if="${awsCredList.size()>1}">
+                                        <td><strong>Access Key</strong></td>
+                                        <td>
+                                            <select id="importEC2Key_ec2Key_awsCredId" name="ec2Key.awsCredId"
+                                                    title="Access Key">
+                                                <option th:each="k : ${awsCredList}"
+                                                        th:value="${k.id}" th:text="${k.accessKey}"
+                                                        th:selected="${#strings.equals(k.id, ec2Key.awsCredId)}"></option>
+                                            </select>
+                                            <span class="error" th:text="${fieldErrors.get('ec2Key.awsCredId')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>EC2 Region</strong></td>
+                                        <td>
+
+                                            <select id="importEC2Key_ec2Key_ec2Region" name="ec2Key.ec2Region" title="EC2 Region"
+                                                    onchange="populateKeyNames();">
+                                                <option value="">-Select-</option>
+                                                <option th:each="r : ${ec2RegionMap}"
+                                                        th:value="${r.key}" th:text="${#strings.toUpperCase(r.value)}"
+                                                        th:selected="${#strings.equals(r.key, ec2Key.ec2Region)}"></option>
+                                            </select>
+                                            <span class="error" th:text="${fieldErrors.get('ec2Key.ec2Region')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Key Name</strong></td>
+                                        <td>
+                                            <select id="importEC2Key_ec2Key_keyNm" name="ec2Key.keyNm" title="Key Name">
+                                                <option value="">-Select Region Above-</option>
+                                            </select>
+                                            <span class="error" th:text="${fieldErrors.get('ec2Key.keyNm')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Private Key Value</strong></td>
+                                        <td>
+                                            <textarea name="ec2Key.privateKey" title="Private Key Value" rows="15" cols="35"
+                                                wrap="soft" th:text="${ec2Key.privateKey}"></textarea>
+                                            <span class="error" th:text="${fieldErrors.get('ec2Key.privateKey')}"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <input type="hidden" name="sortedSet.orderByDirection"
+                                       th:value="${sortedSet.orderByDirection}"/>
+                                <input type="hidden" name="sortedSet.orderByField"
+                                       th:value="${sortedSet.orderByField}"/>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </template>
+</div>
+</body>
+</html>

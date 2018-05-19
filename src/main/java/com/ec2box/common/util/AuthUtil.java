@@ -1,23 +1,34 @@
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
  */
 package com.ec2box.common.util;
 
 import com.ec2box.manage.util.EncryptionUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.util.TokenHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -35,7 +46,6 @@ public class AuthUtil {
     public static final String USERNAME = "username";
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
-    public static final String CSRF_TOKEN_NM = "_csrf";
 
     private AuthUtil() {
     }
@@ -55,7 +65,7 @@ public class AuthUtil {
     /**
      * set authentication type
      *
-     * @param session http session
+     * @param session  http session
      * @param authType authentication type
      */
     public static void setAuthType(HttpSession session, String authType) {
@@ -78,7 +88,7 @@ public class AuthUtil {
     /**
      * set user type
      *
-     * @param session http session
+     * @param session  http session
      * @param userType user type
      */
     public static void setUserType(HttpSession session, String userType) {
@@ -101,7 +111,7 @@ public class AuthUtil {
     /**
      * set session id
      *
-     * @param session http session
+     * @param session   http session
      * @param sessionId session id
      */
     public static void setSessionId(HttpSession session, Long sessionId) {
@@ -174,21 +184,10 @@ public class AuthUtil {
     }
 
     /**
-     * query csrf token for session
-     *
-     * @param session http session
-     * @return token string
-     */
-    public static String getCSRFToken(HttpSession session) {
-        String token = (String) session.getAttribute(CSRF_TOKEN_NM);
-        return token;
-    }
-
-    /**
      * set session OTP shared secret
      *
      * @param session http session
-     * @param secret shared secret
+     * @param secret  shared secret
      */
     public static void setOTPSecret(HttpSession session, String secret) {
         if (secret != null && !secret.trim().equals("")) {
@@ -201,13 +200,14 @@ public class AuthUtil {
      * set session user id
      *
      * @param session http session
-     * @param userId user id
+     * @param userId  user id
      */
     public static void setUserId(HttpSession session, Long userId) {
         if (userId != null) {
             session.setAttribute(USER_ID, EncryptionUtil.encrypt(userId.toString()));
         }
     }
+
 
     /**
      * set session username
@@ -221,10 +221,11 @@ public class AuthUtil {
         }
     }
 
+
     /**
      * set session authentication token
      *
-     * @param session http session
+     * @param session   http session
      * @param authToken authentication token
      */
     public static void setAuthToken(HttpSession session, String authToken) {
@@ -246,17 +247,6 @@ public class AuthUtil {
         session.setAttribute(TIMEOUT, sdf.format(timeout.getTime()));
     }
 
-    /**
-     * generate csrf token for session
-     *
-     * @param session http session
-     * @return _csrf token
-     */
-    public static String generateCSRFToken(HttpSession session) {
-        String _csrf = TokenHelper.generateGUID();
-        session.setAttribute(CSRF_TOKEN_NM, _csrf);
-        return _csrf;
-    }
 
     /**
      * delete all session information
@@ -265,7 +255,6 @@ public class AuthUtil {
      */
     public static void deleteAllSession(HttpSession session) {
 
-        session.setAttribute(CSRF_TOKEN_NM, null);
         session.setAttribute(TIMEOUT, null);
         session.setAttribute(AUTH_TOKEN, null);
         session.setAttribute(USER_ID, null);

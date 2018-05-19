@@ -1,17 +1,29 @@
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *    Copyright (C) 2013 Loophole, LLC
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
  */
 package com.ec2box.manage.db;
 
@@ -19,13 +31,13 @@ package com.ec2box.manage.db;
 import com.ec2box.manage.model.Script;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.DBUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage scripts
@@ -34,11 +46,12 @@ public class ScriptDB {
 
     private static Logger log = LoggerFactory.getLogger(ScriptDB.class);
 
+    public static final String DISPLAY_NM = "display_nm";
+    public static final String SORT_BY_DISPLAY_NM= DISPLAY_NM;
+
     private ScriptDB() {
     }
 
-    public static final String DISPLAY_NM = "display_nm";
-    public static final String SORT_BY_DISPLAY_NM = DISPLAY_NM;
 
     /**
      * returns scripts based on sort order defined
@@ -55,7 +68,7 @@ public class ScriptDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from scripts where user_id =? " + orderBy;
+        String sql = "select * from scripts where user_id=? " + orderBy;
 
         Connection con = null;
         try {
@@ -69,7 +82,6 @@ public class ScriptDB {
                 script.setId(rs.getLong("id"));
                 script.setDisplayNm(rs.getString(DISPLAY_NM));
                 script.setScript(rs.getString("script"));
-                script.setUserId(rs.getLong("user_id"));
 
                 scriptList.add(script);
 
@@ -135,7 +147,6 @@ public class ScriptDB {
                 script.setId(rs.getLong("id"));
                 script.setDisplayNm(rs.getString(DISPLAY_NM));
                 script.setScript(rs.getString("script"));
-                script.setUserId(rs.getLong("user_id"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -150,8 +161,9 @@ public class ScriptDB {
     /**
      * inserts new script
      * @param script script object
+     * @param userId user id
      */
-    public static void insertScript(Script script) {
+    public static void insertScript(Script script, Long userId) {
 
 
         Connection con = null;
@@ -160,7 +172,7 @@ public class ScriptDB {
             PreparedStatement stmt = con.prepareStatement("insert into scripts (display_nm, script, user_id) values (?,?,?)");
             stmt.setString(1, script.getDisplayNm());
             stmt.setString(2, script.getScript());
-            stmt.setLong(3, script.getUserId());
+            stmt.setLong(3, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -170,14 +182,14 @@ public class ScriptDB {
         finally {
             DBUtils.closeConn(con);
         }
-
     }
 
     /**
      * updates existing script
      * @param script script object
+     * @param userId user id
      */
-    public static void updateScript(Script script) {
+    public static void updateScript(Script script, Long userId) {
 
 
         Connection con = null;
@@ -187,7 +199,7 @@ public class ScriptDB {
             stmt.setString(1, script.getDisplayNm());
             stmt.setString(2, script.getScript());
             stmt.setLong(3, script.getId());
-            stmt.setLong(4, script.getUserId());
+            stmt.setLong(4, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -206,7 +218,6 @@ public class ScriptDB {
      */
     public static void deleteScript(Long scriptId, Long userId) {
 
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -223,6 +234,4 @@ public class ScriptDB {
             DBUtils.closeConn(con);
         }
     }
-
-
 }

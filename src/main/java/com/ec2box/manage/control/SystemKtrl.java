@@ -1,0 +1,411 @@
+/**
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * As a special exception, the copyright holders give permission to link the
+ * code of portions of this program with the OpenSSL library under certain
+ * conditions as described in each individual source file and distribute
+ * linked combinations including the program with the OpenSSL library. You
+ * must comply with the GNU Affero General Public License in all respects for
+ * all of the code used other than as permitted herein. If you modify file(s)
+ * with this exception, you may extend this exception to your version of the
+ * file(s), but you are not obligated to do so. If you do not wish to do so,
+ * delete this exception statement from your version. If you delete this
+ * exception statement from all source files in the program, then also delete
+ * it in the license file.
+ */
+package com.ec2box.manage.control;
+
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
+import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
+import com.amazonaws.services.cloudwatch.model.Dimension;
+import com.amazonaws.services.cloudwatch.model.MetricAlarm;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.*;
+import com.ec2box.common.util.AppConfig;
+import com.ec2box.common.util.AuthUtil;
+import com.ec2box.manage.db.*;
+import com.ec2box.manage.model.*;
+import com.ec2box.manage.model.SortedSet;
+import com.ec2box.manage.util.AWSClientConfig;
+import loophole.mvc.annotation.Kontrol;
+import loophole.mvc.annotation.MethodType;
+import loophole.mvc.annotation.Model;
+import loophole.mvc.base.BaseKontroller;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+
+/**
+ * Action to manage systems
+ */
+public class SystemKtrl extends BaseKontroller {
+
+    public static final String FILTER_BY_ALARM_STATE = "alarm_state";
+    public static final String FILTER_BY_INSTANCE_STATUS = "instance_status";
+    public static final String FILTER_BY_SYSTEM_STATUS = "system_status";
+    public static final String FILTER_BY_INSTANCE_STATE = "instance_state";
+    public static final String FILTER_BY_SECURITY_GROUP = "security_group";
+    public static final String FILTER_BY_TAG = "tag";
+    @Model(name = "alarmStateMap")
+    static Map<String, String> alarmStateMap = AppConfig.getMapProperties("alarmState");
+    @Model(name = "systemStatusMap")
+    static Map<String, String> systemStatusMap = AppConfig.getMapProperties("systemStatus");
+    @Model(name = "instanceStatusMap")
+    static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
+    @Model(name = "instanceStateMap")
+    static Map<String, String> instanceStateMap = AppConfig.getMapProperties("instanceState");
+    private static Logger log = LoggerFactory.getLogger(SystemKtrl.class);
+    @Model(name = "sortedSet")
+    SortedSet sortedSet = new SortedSet();
+    @Model(name = "hostSystem")
+    HostSystem hostSystem = new HostSystem();
+    @Model(name = "showStatus")
+    Boolean showStatus = false;
+    @Model(name = "script")
+    Script script = new Script();
+
+    public SystemKtrl(HttpServletRequest request, HttpServletResponse response) {
+        super(request, response);
+    }
+
+
+    @Kontrol(path = "/admin/viewSystems", method = MethodType.GET)
+    public String viewSystems() {
+
+        Long userId = AuthUtil.getUserId(getRequest().getSession());
+        String userType = AuthUtil.getUserType(getRequest().getSession());
+
+        List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
+        List<String> instanceIdList = new ArrayList<>();
+
+        //default instance state
+        if (sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null) {
+            sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE, AppConfig.getProperty("defaultInstanceState"));
+        }
+
+        try {
+            Map<String, HostSystem> hostSystemList = new HashMap<>();
+
+            //if user profile has been set or user is a manager
+            List<Profile> profileList = UserProfileDB.getProfilesByUser(userId);
+            if (!profileList.isEmpty() || Auth.MANAGER.equals(userType)) {
+                //set tags for profile
+                List<String> profileTags = new ArrayList<>();
+                for (Profile profile : profileList) {
+                    profileTags.add(profile.getTag());
+                }
+                Map<String, List<String>> profileTagMap = parseTags(profileTags);
+
+                //set tags from input filters
+                Map<String, List<String>> filterTags = fetchInputFilterTags(userType, profileTagMap);
+
+                //parse out security group list in format group[,group]
+                List<String> securityGroupList = new ArrayList<>();
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SECURITY_GROUP))) {
+                    securityGroupList = Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_SECURITY_GROUP).split(","));
+                }
+
+
+                //get AWS credentials from DB
+                for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
+
+                    if (awsCred != null) {
+                        //set  AWS credentials for service
+                        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
+
+                        for (String ec2Region : ec2RegionList) {
+                            //create service
+
+                            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                                    .withClientConfiguration(AWSClientConfig.getClientConfig())
+                                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region, EC2KeyKtrl.ec2RegionMap.get(ec2Region))).build();
+
+
+                            //only return systems that have keys set
+                            List<String> keyValueList = new ArrayList<>();
+                            for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
+                                keyValueList.add(ec2Key.getKeyNm());
+                            }
+
+                            DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
+
+                            Filter keyNmFilter = new Filter("key-name", keyValueList);
+                            describeInstancesRequest.withFilters(keyNmFilter);
+
+                            //instance state filter
+                            if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE))) {
+                                List<String> instanceStateList = new ArrayList<>();
+                                instanceStateList.add(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE));
+                                Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
+                                describeInstancesRequest.withFilters(instanceStateFilter);
+                            }
+
+                            if (!securityGroupList.isEmpty()) {
+                                Filter groupFilter = new Filter("group-name", securityGroupList);
+                                describeInstancesRequest.withFilters(groupFilter);
+                            }
+                            //set name value pair for tag filter
+                            List<String> tagList = new ArrayList<String>();
+
+                            //add profile tags to filter list if not manager
+                            if (!Auth.MANAGER.equals(userType)) {
+                                addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
+                            }
+
+                            //add all additional filter tags provided by the user
+                            addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
+
+                            if (!tagList.isEmpty()) {
+                                Filter tagFilter = new Filter("tag-key", tagList);
+                                describeInstancesRequest.withFilters(tagFilter);
+                            }
+
+                            DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
+
+                            for (Reservation res : describeInstancesResult.getReservations()) {
+                                for (Instance instance : res.getInstances()) {
+
+
+                                    HostSystem hostSystem = new HostSystem();
+                                    hostSystem.setInstance(instance.getInstanceId());
+
+                                    // (optionally) use private_ip configured, otherwise
+                                    // check for public dns if doesn't exist set to ip or pvt dns
+                                    if ("true".equals(AppConfig.getProperty("useEC2PvtIP")) && StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
+                                        hostSystem.setHost(instance.getPrivateIpAddress());
+                                    } else if ("true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
+                                        hostSystem.setHost(instance.getPrivateDnsName());
+                                    } else if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                        hostSystem.setHost(instance.getPublicDnsName());
+                                    } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
+                                        hostSystem.setHost(instance.getPublicIpAddress());
+                                    } else {
+                                        hostSystem.setHost(instance.getPrivateIpAddress());
+                                    }
+
+                                    hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
+                                    hostSystem.setEc2Region(ec2Region);
+                                    hostSystem.setState(instance.getState().getName());
+                                    for (Tag tag : instance.getTags()) {
+                                        if ("Name".equals(tag.getKey())) {
+                                            hostSystem.setDisplayNm(tag.getValue());
+                                        } else if (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
+                                            hostSystem.setUser(tag.getValue());
+                                        }
+                                    }
+                                    //if no display name set to host
+                                    if (StringUtils.isEmpty(hostSystem.getDisplayNm())) {
+                                        hostSystem.setDisplayNm(hostSystem.getHost());
+                                    }
+                                    instanceIdList.add(hostSystem.getInstance());
+                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                }
+                            }
+
+                            if (instanceIdList.size() > 0) {
+                                //set instance id list to check permissions when creating sessions
+                                getRequest().getSession().setAttribute("instanceIdList", new ArrayList<>(instanceIdList));
+                                if (showStatus) {
+                                    //make service call 100 instances at a time b/c of AWS limitation
+                                    int i = 0;
+                                    List<String> idCallList = new ArrayList<>();
+                                    while (!instanceIdList.isEmpty()) {
+                                        idCallList.add(instanceIdList.remove(0));
+                                        i++;
+                                        //when i eq 100 make call
+                                        if (i >= 100 || instanceIdList.isEmpty()) {
+
+                                            //get status for host systems
+                                            DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                                            describeInstanceStatusRequest.withInstanceIds(idCallList);
+                                            DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
+
+                                            for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+
+                                                HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                                                hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                                                hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+
+                                                //check and filter by instance or system status
+                                                if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                        ) {
+                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                }
+                                            }
+
+                                            //start over
+                                            i = 0;
+                                            //clear list
+                                            idCallList.clear();
+                                        }
+
+                                    }
+
+
+                                    //check alarms for ec2 instances
+                                    AmazonCloudWatch cloudWatchClient = AmazonCloudWatchClientBuilder.standard()
+                                            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                                            .withClientConfiguration(AWSClientConfig.getClientConfig())
+                                            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region.replace("ec2", "monitoring"), EC2KeyKtrl.ec2RegionMap.get(ec2Region))).build();
+                                    DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
+
+                                    for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
+
+                                        for (Dimension dim : metricAlarm.getDimensions()) {
+
+                                            if (dim.getName().equals("InstanceId")) {
+                                                HostSystem hostSystem = hostSystemList.remove(dim.getValue());
+                                                if (hostSystem != null) {
+                                                    if ("ALARM".equals(metricAlarm.getStateValue())) {
+                                                        hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
+                                                    } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
+                                                        hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
+                                                    } else {
+                                                        hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
+                                                    }
+                                                    //check and filter by alarm state
+                                                    if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))
+                                                            || "ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0
+                                                            || ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0)
+                                                            || ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0)) {
+                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //set ec2 systems
+                SystemDB.setSystems(hostSystemList.values());
+                sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<>(hostSystemList.keySet()));
+
+            }
+        } catch (Exception ex) {
+            log.error(ex.toString(), ex);
+        }
+
+
+        if (script != null && script.getId() != null) {
+            script = ScriptDB.getScript(script.getId(), userId);
+        }
+
+        return "/admin/view_systems.html";
+    }
+
+    private Map<String, List<String>> fetchInputFilterTags(String userType, Map<String, List<String>> profileTagMap) {
+        Map<String, List<String>> filterTags = new HashMap<>();
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_TAG))) {
+            //if manager allow any filter
+            if (Auth.MANAGER.equals(userType)) {
+                filterTags.putAll(parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG))));
+                //check against profile
+            } else {
+                Map<String, List<String>> tmpMap = parseTags(Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_TAG)));
+                for (Map.Entry<String, List<String>> entry : tmpMap.entrySet()) {
+                    String name = entry.getKey();
+                    //if profile tags does not have the filtered tag add to filters and it would be ANDed with profile tags.
+                    if (profileTagMap.get(name) == null && entry.getValue() != null) {
+                        filterTags.put(name, entry.getValue());
+                    }
+
+                    //if profile tags have the filtered tag add to filters only if values are contained in allowed list of the user.
+                    if (profileTagMap.get(name) != null && entry.getValue() != null && profileTagMap.get(name).containsAll(entry.getValue())) {
+                        filterTags.put(name, entry.getValue());
+                    }
+                }
+            }
+        }
+        return filterTags;
+    }
+
+    private void addTagsToDescribeInstanceRequest(Map<String, List<String>> profileTagMap, DescribeInstancesRequest describeInstancesRequest, List<String> tagList) {
+        for (String tag : profileTagMap.keySet()) {
+            if (profileTagMap.get(tag) != null) {
+                Filter tagValueFilter = new Filter("tag:" + tag, profileTagMap.get(tag));
+                describeInstancesRequest.withFilters(tagValueFilter);
+            } else {
+                tagList.add(tag);
+            }
+        }
+    }
+
+    @Kontrol(path = "/admin/saveSystem", method = MethodType.POST)
+    public String saveSystem() {
+
+        String retVal = "redirect:/admin/viewSystems.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
+        if (hostSystem.getId() != null && hostSystem.getPort() != null
+                && hostSystem.getUser() != null && !hostSystem.getUser().trim().equals("")) {
+            SystemDB.updateSystem(hostSystem);
+
+        }
+        if (script != null && script.getId() != null) {
+            retVal = retVal + "&script.id=" + script.getId();
+        }
+        return retVal;
+
+    }
+
+    /**
+     * Parse out tags in format tag-name[=value[,tag-name[=value]]
+     *
+     * @param tags list of unparsed tags
+     * @return map of tags
+     */
+    private Map<String, List<String>> parseTags(List<String> tags) {
+        Map<String, List<String>> tagMap = new HashMap<>();
+        for (String tag : tags) {
+            String[] tagArr1 = tag.split(",");
+            if (tagArr1.length > 0) {
+                for (String tag1 : tagArr1) {
+                    String[] tagArr2 = tag1.split("=");
+                    if (tagArr2.length > 1) {
+                        String tagNm = tag1.split("=")[0];
+                        String tagVal = tag1.split("=")[1];
+                        if (tagMap.get(tagNm) != null && tagMap.get(tagNm).size() > 0) {
+                            tagMap.get(tagNm).add(tagVal);
+                        } else {
+                            tagMap.put(tagNm, new LinkedList<String>());
+                            tagMap.get(tagNm).add(tagVal);
+                        }
+                    } else {
+                        tagMap.put(tag1, null);
+                    }
+                }
+            }
+        }
+        return tagMap;
+    }
+
+
+}
