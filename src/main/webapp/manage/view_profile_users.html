@@ -131,10 +131,10 @@
                         </td>
                         <td th:text="${u.username}"></td>
                         <td th:if="${@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                            <template th:if="${#string.equals(u.authType, 'BASIC')}" th:remove="tag">
+                            <template th:if="${#strings.equals(u.authType, 'BASIC')}" th:remove="tag">
                                 Basic
                             </template>
-                            <template th:if="${#string.equals(u.authType, 'EXTERNAL')}" th:remove="tag">
+                            <template th:if="${#strings.equals(u.authType, 'EXTERNAL')}" th:remove="tag">
                                 External
                             </template>
                         </td>
