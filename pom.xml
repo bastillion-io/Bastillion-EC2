@@ -11,13 +11,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.11.v20180605</jetty-version>
+        <jetty-version>9.4.12.RC0</jetty-version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.11.361</version>
+            <version>1.11.375</version>
         </dependency>
         <dependency>
             <groupId>loophole.mvc</groupId>
