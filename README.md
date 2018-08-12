@@ -11,7 +11,7 @@ terminal sessions and history can be audited.
 
 AMI in the AWS Marketplace
 ------
-The simplest way to get started is to run the AMI from the AWS marketplace.
+The simplest way to get started is to run the AMI from the AWS Marketplace.
 
 http://aws.amazon.com/marketplace/pp/B076D7XMK6
 
@@ -24,9 +24,13 @@ Login with
 
 EC2Box Releases
 ------
-EC2Box releases with Jetty are no longer available on Github. Releases and upgrades are available via subscription through the following link: 
+This software is free for non-commercial use under the AGPL licence!
+
+Commercial users can purchase a license through an annual subscription and access the binary releases. 
 
 https://www.sshkeybox.com/subscription
+
+Also, users can purchase through the AWS Marketplace.
 
 Feel free to try out EC2Box using the build instructions below!
 
