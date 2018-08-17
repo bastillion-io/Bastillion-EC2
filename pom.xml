@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ec2box</groupId>
     <artifactId>ec2box</artifactId>
-    <version>1.01.00</version>
+    <version>1.02.00-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>EC2Box</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.11.v20180605</jetty-version>
+        <jetty-version>9.4.12.RC2</jetty-version>
     </properties>
     <dependencies>
         <dependency>
