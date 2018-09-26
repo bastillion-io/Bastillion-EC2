@@ -62,24 +62,15 @@
                 <tr>
 
                     <td>
-                        <a th:href="'../manage/viewAWSCred.ktrl?_csrf=' + ${session._csrf}">Set AWS Credentials</a>
+                        <a th:href="'../manage/viewIAMRole.ktrl?_csrf=' + ${session._csrf}">Set IAM Role</a>
 
                     </td>
 
 
                     <td>
-                        Set your Amazon Web Service credentials.
+                        Set IAM Role for EC2 access.
                     </td>
 
-                </tr>
-                <tr>
-                    <td>
-                        <a th:href="'../manage/viewEC2Keys.ktrl?_csrf=' + ${session._csrf}">Set EC2 Keys</a>
-
-                    </td>
-                    <td>
-                        Import the private keys used on your EC2 systems.
-                    </td>
                 </tr>
             </template>
 

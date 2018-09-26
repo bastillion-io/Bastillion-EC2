@@ -28,8 +28,7 @@
 package com.ec2box.manage.control;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.DescribeAlarmsResult;
@@ -40,7 +39,10 @@ import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 import com.ec2box.common.util.AppConfig;
 import com.ec2box.common.util.AuthUtil;
-import com.ec2box.manage.db.*;
+import com.ec2box.manage.db.DefaultRegionDB;
+import com.ec2box.manage.db.ScriptDB;
+import com.ec2box.manage.db.SystemDB;
+import com.ec2box.manage.db.UserProfileDB;
 import com.ec2box.manage.model.*;
 import com.ec2box.manage.model.SortedSet;
 import com.ec2box.manage.util.AWSClientConfig;
@@ -75,11 +77,16 @@ public class SystemKtrl extends BaseKontroller {
     static Map<String, String> instanceStatusMap = AppConfig.getMapProperties("instanceStatus");
     @Model(name = "instanceStateMap")
     static Map<String, String> instanceStateMap = AppConfig.getMapProperties("instanceState");
+    @Model(name = "regionMap")
+    static Map<String, String> regionMap = new LinkedHashMap<>();
+
     private static Logger log = LoggerFactory.getLogger(SystemKtrl.class);
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
     @Model(name = "hostSystem")
     HostSystem hostSystem = new HostSystem();
+    @Model(name = "region")
+    String region = DefaultRegionDB.getRegion();
     @Model(name = "showStatus")
     Boolean showStatus = false;
     @Model(name = "script")
@@ -96,7 +103,6 @@ public class SystemKtrl extends BaseKontroller {
         Long userId = AuthUtil.getUserId(getRequest().getSession());
         String userType = AuthUtil.getUserType(getRequest().getSession());
 
-        List<String> ec2RegionList = EC2KeyDB.getEC2Regions();
         List<String> instanceIdList = new ArrayList<>();
 
         //default instance state
@@ -105,6 +111,20 @@ public class SystemKtrl extends BaseKontroller {
         }
 
         try {
+
+            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(AWSClientConfig.getCredentials()))
+                    .withRegion(Regions.DEFAULT_REGION)
+                    .withClientConfiguration(AWSClientConfig.getClientConfig())
+                    .build();
+
+            DescribeRegionsResult regionResponse = service.describeRegions();
+
+            //get regions with application key set
+            for (Region region : regionResponse.getRegions()) {
+                regionMap.put(region.getRegionName(), region.getRegionName().toUpperCase());
+            }
+
             Map<String, HostSystem> hostSystemList = new HashMap<>();
 
             //if user profile has been set or user is a manager
@@ -126,176 +146,157 @@ public class SystemKtrl extends BaseKontroller {
                     securityGroupList = Arrays.asList(sortedSet.getFilterMap().get(FILTER_BY_SECURITY_GROUP).split(","));
                 }
 
-
-                //get AWS credentials from DB
-                for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
-
-                    if (awsCred != null) {
-                        //set  AWS credentials for service
-                        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-
-                        for (String ec2Region : ec2RegionList) {
-                            //create service
-
-                            AmazonEC2 service = AmazonEC2ClientBuilder.standard()
-                                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                                    .withClientConfiguration(AWSClientConfig.getClientConfig())
-                                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region, EC2KeyKtrl.ec2RegionMap.get(ec2Region))).build();
+                // show selected region
+                if (region != null && !region.trim().equals("")) {
+                    DefaultRegionDB.saveRegion(region);
+                    //create service
+                    service = AmazonEC2ClientBuilder.standard()
+                            .withCredentials(new AWSStaticCredentialsProvider(AWSClientConfig.getCredentials()))
+                            .withClientConfiguration(AWSClientConfig.getClientConfig())
+                            .withRegion(Regions.fromName(region))
+                            .build();
 
 
-                            //only return systems that have keys set
-                            List<String> keyValueList = new ArrayList<>();
-                            for (EC2Key ec2Key : EC2KeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-                                keyValueList.add(ec2Key.getKeyNm());
+                    DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
+
+                    //instance state filter
+                    if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE))) {
+                        List<String> instanceStateList = new ArrayList<>();
+                        instanceStateList.add(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE));
+                        Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
+                        describeInstancesRequest.withFilters(instanceStateFilter);
+                    }
+
+                    if (!securityGroupList.isEmpty()) {
+                        Filter groupFilter = new Filter("group-name", securityGroupList);
+                        describeInstancesRequest.withFilters(groupFilter);
+                    }
+                    //set name value pair for tag filter
+                    List<String> tagList = new ArrayList<String>();
+
+                    //add profile tags to filter list if not manager
+                    if (!Auth.MANAGER.equals(userType)) {
+                        addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
+                    }
+
+                    //add all additional filter tags provided by the user
+                    addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
+
+                    if (!tagList.isEmpty()) {
+                        Filter tagFilter = new Filter("tag-key", tagList);
+                        describeInstancesRequest.withFilters(tagFilter);
+                    }
+
+                    DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
+
+                    for (Reservation res : describeInstancesResult.getReservations()) {
+                        for (Instance instance : res.getInstances()) {
+
+                            HostSystem hostSystem = new HostSystem();
+                            hostSystem.setInstance(instance.getInstanceId());
+
+                            // (optionally) use private_ip configured, otherwise
+                            // check for public dns if doesn't exist set to ip or pvt dns
+                            if ("true".equals(AppConfig.getProperty("useEC2PvtIP")) && StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
+                                hostSystem.setHost(instance.getPrivateIpAddress());
+                            } else if ("true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
+                                hostSystem.setHost(instance.getPrivateDnsName());
+                            } else if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+                                hostSystem.setHost(instance.getPublicDnsName());
+                            } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
+                                hostSystem.setHost(instance.getPublicIpAddress());
+                            } else {
+                                hostSystem.setHost(instance.getPrivateIpAddress());
                             }
 
-                            DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
-
-                            Filter keyNmFilter = new Filter("key-name", keyValueList);
-                            describeInstancesRequest.withFilters(keyNmFilter);
-
-                            //instance state filter
-                            if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE))) {
-                                List<String> instanceStateList = new ArrayList<>();
-                                instanceStateList.add(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE));
-                                Filter instanceStateFilter = new Filter("instance-state-name", instanceStateList);
-                                describeInstancesRequest.withFilters(instanceStateFilter);
-                            }
-
-                            if (!securityGroupList.isEmpty()) {
-                                Filter groupFilter = new Filter("group-name", securityGroupList);
-                                describeInstancesRequest.withFilters(groupFilter);
-                            }
-                            //set name value pair for tag filter
-                            List<String> tagList = new ArrayList<String>();
-
-                            //add profile tags to filter list if not manager
-                            if (!Auth.MANAGER.equals(userType)) {
-                                addTagsToDescribeInstanceRequest(profileTagMap, describeInstancesRequest, tagList);
-                            }
-
-                            //add all additional filter tags provided by the user
-                            addTagsToDescribeInstanceRequest(filterTags, describeInstancesRequest, tagList);
-
-                            if (!tagList.isEmpty()) {
-                                Filter tagFilter = new Filter("tag-key", tagList);
-                                describeInstancesRequest.withFilters(tagFilter);
-                            }
-
-                            DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
-
-                            for (Reservation res : describeInstancesResult.getReservations()) {
-                                for (Instance instance : res.getInstances()) {
-
-
-                                    HostSystem hostSystem = new HostSystem();
-                                    hostSystem.setInstance(instance.getInstanceId());
-
-                                    // (optionally) use private_ip configured, otherwise
-                                    // check for public dns if doesn't exist set to ip or pvt dns
-                                    if ("true".equals(AppConfig.getProperty("useEC2PvtIP")) && StringUtils.isNotEmpty(instance.getPrivateIpAddress())) {
-                                        hostSystem.setHost(instance.getPrivateIpAddress());
-                                    } else if ("true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
-                                        hostSystem.setHost(instance.getPrivateDnsName());
-                                    } else if (StringUtils.isNotEmpty(instance.getPublicDnsName())) {
-                                        hostSystem.setHost(instance.getPublicDnsName());
-                                    } else if (StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
-                                        hostSystem.setHost(instance.getPublicIpAddress());
-                                    } else {
-                                        hostSystem.setHost(instance.getPrivateIpAddress());
-                                    }
-
-                                    hostSystem.setKeyId(EC2KeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCred.getId()).getId());
-                                    hostSystem.setEc2Region(ec2Region);
-                                    hostSystem.setState(instance.getState().getName());
-                                    for (Tag tag : instance.getTags()) {
-                                        if ("Name".equals(tag.getKey())) {
-                                            hostSystem.setDisplayNm(tag.getValue());
-                                        } else if (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
-                                            hostSystem.setUser(tag.getValue());
-                                        }
-                                    }
-                                    //if no display name set to host
-                                    if (StringUtils.isEmpty(hostSystem.getDisplayNm())) {
-                                        hostSystem.setDisplayNm(hostSystem.getHost());
-                                    }
-                                    instanceIdList.add(hostSystem.getInstance());
-                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                            hostSystem.setEc2Region(region);
+                            hostSystem.setState(instance.getState().getName());
+                            for (Tag tag : instance.getTags()) {
+                                if ("Name".equals(tag.getKey())) {
+                                    hostSystem.setDisplayNm(tag.getValue());
+                                } else if (AppConfig.getProperty("userTagName").equals(tag.getKey())) {
+                                    hostSystem.setUser(tag.getValue());
                                 }
                             }
+                            //if no display name set to host
+                            if (StringUtils.isEmpty(hostSystem.getDisplayNm())) {
+                                hostSystem.setDisplayNm(hostSystem.getHost());
+                            }
+                            instanceIdList.add(hostSystem.getInstance());
+                            hostSystemList.put(hostSystem.getInstance(), hostSystem);
+                        }
+                    }
 
-                            if (instanceIdList.size() > 0) {
-                                //set instance id list to check permissions when creating sessions
-                                getRequest().getSession().setAttribute("instanceIdList", new ArrayList<>(instanceIdList));
-                                if (showStatus) {
-                                    //make service call 100 instances at a time b/c of AWS limitation
-                                    int i = 0;
-                                    List<String> idCallList = new ArrayList<>();
-                                    while (!instanceIdList.isEmpty()) {
-                                        idCallList.add(instanceIdList.remove(0));
-                                        i++;
-                                        //when i eq 100 make call
-                                        if (i >= 100 || instanceIdList.isEmpty()) {
+                    if (instanceIdList.size() > 0) {
+                        //set instance id list to check permissions when creating sessions
+                        getRequest().getSession().setAttribute("instanceIdList", new ArrayList<>(instanceIdList));
+                        if (showStatus) {
+                            //make service call 100 instances at a time b/c of AWS limitation
+                            int i = 0;
+                            List<String> idCallList = new ArrayList<>();
+                            while (!instanceIdList.isEmpty()) {
+                                idCallList.add(instanceIdList.remove(0));
+                                i++;
+                                //when i eq 100 make call
+                                if (i >= 100 || instanceIdList.isEmpty()) {
 
-                                            //get status for host systems
-                                            DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-                                            describeInstanceStatusRequest.withInstanceIds(idCallList);
-                                            DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
+                                    //get status for host systems
+                                    DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+                                    describeInstanceStatusRequest.withInstanceIds(idCallList);
+                                    DescribeInstanceStatusResult describeInstanceStatusResult = service.describeInstanceStatus(describeInstanceStatusRequest);
 
-                                            for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
+                                    for (InstanceStatus instanceStatus : describeInstanceStatusResult.getInstanceStatuses()) {
 
-                                                HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
-                                                hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
-                                                hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
+                                        HostSystem hostSystem = hostSystemList.remove(instanceStatus.getInstanceId());
+                                        hostSystem.setSystemStatus(instanceStatus.getSystemStatus().getStatus());
+                                        hostSystem.setInstanceStatus(instanceStatus.getInstanceStatus().getStatus());
 
-                                                //check and filter by instance or system status
-                                                if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
-                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
-                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
-                                                        || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
-                                                        ) {
-                                                    hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                }
-                                            }
-
-                                            //start over
-                                            i = 0;
-                                            //clear list
-                                            idCallList.clear();
+                                        //check and filter by instance or system status
+                                        if ((StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)))
+                                                || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                                || (hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_STATUS)) && hostSystem.getInstanceStatus().equals(sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATUS)))
+                                        ) {
+                                            hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                         }
-
                                     }
 
+                                    //start over
+                                    i = 0;
+                                    //clear list
+                                    idCallList.clear();
+                                }
 
-                                    //check alarms for ec2 instances
-                                    AmazonCloudWatch cloudWatchClient = AmazonCloudWatchClientBuilder.standard()
-                                            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                                            .withClientConfiguration(AWSClientConfig.getClientConfig())
-                                            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ec2Region.replace("ec2", "monitoring"), EC2KeyKtrl.ec2RegionMap.get(ec2Region))).build();
-                                    DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
+                            }
 
-                                    for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
 
-                                        for (Dimension dim : metricAlarm.getDimensions()) {
+                            //check alarms for ec2 instances
+                            AmazonCloudWatch cloudWatchClient = AmazonCloudWatchClientBuilder.standard()
+                                    .withCredentials(new AWSStaticCredentialsProvider(AWSClientConfig.getCredentials()))
+                                    .withRegion(Regions.fromName(region))
+                                    .withClientConfiguration(AWSClientConfig.getClientConfig()).build();
+                            DescribeAlarmsResult describeAlarmsResult = cloudWatchClient.describeAlarms();
 
-                                            if (dim.getName().equals("InstanceId")) {
-                                                HostSystem hostSystem = hostSystemList.remove(dim.getValue());
-                                                if (hostSystem != null) {
-                                                    if ("ALARM".equals(metricAlarm.getStateValue())) {
-                                                        hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
-                                                    } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
-                                                        hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
-                                                    } else {
-                                                        hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
-                                                    }
-                                                    //check and filter by alarm state
-                                                    if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))
-                                                            || "ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0
-                                                            || ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0)
-                                                            || ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0)) {
-                                                        hostSystemList.put(hostSystem.getInstance(), hostSystem);
-                                                    }
-                                                }
+                            for (MetricAlarm metricAlarm : describeAlarmsResult.getMetricAlarms()) {
+
+                                for (Dimension dim : metricAlarm.getDimensions()) {
+
+                                    if (dim.getName().equals("InstanceId")) {
+                                        HostSystem hostSystem = hostSystemList.remove(dim.getValue());
+                                        if (hostSystem != null) {
+                                            if ("ALARM".equals(metricAlarm.getStateValue())) {
+                                                hostSystem.setMonitorAlarm(hostSystem.getMonitorAlarm() + 1);
+                                            } else if ("INSUFFICIENT_DATA".equals(metricAlarm.getStateValue())) {
+                                                hostSystem.setMonitorInsufficientData(hostSystem.getMonitorInsufficientData() + 1);
+                                            } else {
+                                                hostSystem.setMonitorOk(hostSystem.getMonitorOk() + 1);
+                                            }
+                                            //check and filter by alarm state
+                                            if (StringUtils.isEmpty(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE))
+                                                    || "ALARM".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorAlarm() > 0
+                                                    || ("INSUFFICIENT_DATA".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorInsufficientData() > 0)
+                                                    || ("OK".equals(sortedSet.getFilterMap().get(FILTER_BY_ALARM_STATE)) && hostSystem.getMonitorOk() > 0 && hostSystem.getMonitorInsufficientData() <= 0 && hostSystem.getMonitorAlarm() <= 0)) {
+                                                hostSystemList.put(hostSystem.getInstance(), hostSystem);
                                             }
                                         }
                                     }

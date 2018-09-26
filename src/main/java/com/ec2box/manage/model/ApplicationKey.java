@@ -28,33 +28,53 @@
 package com.ec2box.manage.model;
 
 /**
- * Value object that contains amazon credentials
+ * Value object for applications ssh keys
  */
-public class AWSCred {
-
-
+public class ApplicationKey {
     Long id;
-    String accessKey;
-    String secretKey;
+    String privateKey;
+    String publicKey;
+    String passphrase;
+    String fingerprint;
 
-    public Long getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
-
-    public String getAccessKey() {
-        return accessKey;
+    public Long getId() {
+        return id;
     }
 
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-
-    public String getSecretKey() {
-        return secretKey;
+    public String getPrivateKey() {
+        return privateKey;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    public void setFingerprint(String fingerprint) {
+        this.fingerprint = fingerprint;
     }
 }

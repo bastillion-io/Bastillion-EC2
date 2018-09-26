@@ -29,6 +29,7 @@ package com.ec2box.manage.control;
 
 import com.ec2box.common.util.AuthUtil;
 import com.ec2box.manage.db.AuthDB;
+import com.ec2box.manage.db.PrivateKeyDB;
 import com.ec2box.manage.db.UserThemeDB;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.model.UserSettings;
@@ -66,6 +67,9 @@ public class UserSettingsKtrl extends BaseKontroller {
             entry("Green on black", "#000000,#00FF00"),
             entry("White on black", "#000000,#FFFFFF")
     ));
+    @Model(name = "publicKey")
+    static String publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
+
     @Model(name = "auth")
     Auth auth;
     @Model(name = "userSettings")

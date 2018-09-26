@@ -58,7 +58,6 @@ public class SystemDB {
     public static final String STATE = "state";
     public static final String INSTANCE_STATUS = "instance_status";
     public static final String SYSTEM_STATUS = "system_status";
-    public static final String KEY_ID = "key_id";
     public static final String M_ALARM = "m_alarm";
     public static final String M_INSUFFICIENT_DATA = "m_insufficient_data";
     public static final String M_OK = "m_ok";
@@ -111,7 +110,6 @@ public class SystemDB {
                     hostSystem.setUser(rs.getString(USER));
                     hostSystem.setHost(rs.getString(HOST));
                     hostSystem.setPort(rs.getInt(PORT));
-                    hostSystem.setKeyId(rs.getLong(KEY_ID));
                     hostSystem.setEc2Region(rs.getString(REGION));
                     hostSystem.setState(rs.getString(STATE));
                     hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
@@ -175,7 +173,6 @@ public class SystemDB {
                     hostSystem.setUser(rs.getString(USER));
                     hostSystem.setHost(rs.getString(HOST));
                     hostSystem.setPort(rs.getInt(PORT));
-                    hostSystem.setKeyId(rs.getLong(KEY_ID));
                     hostSystem.setEc2Region(rs.getString(REGION));
                     hostSystem.setState(rs.getString(STATE));
                     hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
@@ -257,7 +254,6 @@ public class SystemDB {
                 hostSystem.setUser(rs.getString(USER));
                 hostSystem.setHost(rs.getString(HOST));
                 hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setKeyId(rs.getLong(KEY_ID));
                 hostSystem.setEc2Region(rs.getString(REGION));
                 hostSystem.setState(rs.getString(STATE));
                 hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
@@ -329,7 +325,6 @@ public class SystemDB {
                 hostSystem.setUser(rs.getString(USER));
                 hostSystem.setHost(rs.getString(HOST));
                 hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setKeyId(rs.getLong(KEY_ID));
                 hostSystem.setEc2Region(rs.getString(REGION));
                 hostSystem.setState(rs.getString(STATE));
                 hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
@@ -358,20 +353,19 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, key_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, instance_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getInstance());
-            stmt.setLong(6, hostSystem.getKeyId());
-            stmt.setString(7, hostSystem.getEc2Region());
-            stmt.setString(8, hostSystem.getState());
-            stmt.setString(9, hostSystem.getInstanceStatus());
-            stmt.setString(10, hostSystem.getSystemStatus());
-            stmt.setInt(11, hostSystem.getMonitorAlarm());
-            stmt.setInt(12, hostSystem.getMonitorInsufficientData());
-            stmt.setInt(13, hostSystem.getMonitorOk());
+            stmt.setString(6, hostSystem.getEc2Region());
+            stmt.setString(7, hostSystem.getState());
+            stmt.setString(8, hostSystem.getInstanceStatus());
+            stmt.setString(9, hostSystem.getSystemStatus());
+            stmt.setInt(10, hostSystem.getMonitorAlarm());
+            stmt.setInt(11, hostSystem.getMonitorInsufficientData());
+            stmt.setInt(12, hostSystem.getMonitorOk());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -417,21 +411,20 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?, key_id=?, region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, instance_id=?,  region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getInstance());
-            stmt.setLong(6, hostSystem.getKeyId());
-            stmt.setString(7, hostSystem.getEc2Region());
-            stmt.setString(8, hostSystem.getState());
-            stmt.setString(9, hostSystem.getInstanceStatus());
-            stmt.setString(10, hostSystem.getSystemStatus());
-            stmt.setInt(11, hostSystem.getMonitorAlarm());
-            stmt.setInt(12, hostSystem.getMonitorInsufficientData());
-            stmt.setInt(13, hostSystem.getMonitorOk());
-            stmt.setLong(14, hostSystem.getId());
+            stmt.setString(6, hostSystem.getEc2Region());
+            stmt.setString(7, hostSystem.getState());
+            stmt.setString(8, hostSystem.getInstanceStatus());
+            stmt.setString(9, hostSystem.getSystemStatus());
+            stmt.setInt(10, hostSystem.getMonitorAlarm());
+            stmt.setInt(11, hostSystem.getMonitorInsufficientData());
+            stmt.setInt(12, hostSystem.getMonitorOk());
+            stmt.setLong(13, hostSystem.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 

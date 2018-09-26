@@ -136,6 +136,10 @@
         <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
     </form>
 
+    <h3>Public Key</h3>
+    <p>Public SSH Key used for application authentication when provisioning EC2 instances</p>
+    <pre style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
+
 </div>
 
 

@@ -50,7 +50,6 @@ public class HostSystem {
     String user = AppConfig.getProperty("defaultSystemUser");
     String host;
     Integer port = Integer.parseInt(AppConfig.getProperty("defaultSystemPort"));
-    Long keyId;
     String displayLabel;
     String ec2Region;
     String state;
@@ -168,14 +167,6 @@ public class HostSystem {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
-    }
-
-    public Long getKeyId() {
-        return keyId;
-    }
-
-    public void setKeyId(Long keyId) {
-        this.keyId = keyId;
     }
 
     public String getSystemStatus() {

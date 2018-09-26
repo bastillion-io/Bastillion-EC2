@@ -31,6 +31,7 @@ import com.ec2box.common.util.AppConfig;
 import com.ec2box.manage.model.Auth;
 import com.ec2box.manage.util.DBUtils;
 import com.ec2box.manage.util.EncryptionUtil;
+import com.ec2box.manage.util.SSHUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -68,6 +70,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
         Connection connection = null;
         Statement statement = null;
+        //check if reset ssh application key is set
+        boolean resetSSHKey = "true".equals(AppConfig.getProperty("resetApplicationSSHKey"));
 
         //if DB password is empty generate a random
         if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
@@ -110,13 +114,15 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
             ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
+                resetSSHKey = true;
                 statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null unique, password varchar, auth_token varchar, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
                 statement.executeUpdate("create table if not exists user_theme (user_id INTEGER PRIMARY KEY, bg varchar(7), fg varchar(7), d1 varchar(7), d2 varchar(7), d3 varchar(7), d4 varchar(7), d5 varchar(7), d6 varchar(7), d7 varchar(7), d8 varchar(7), b1 varchar(7), b2 varchar(7), b3 varchar(7), b4 varchar(7), b5 varchar(7), b6 varchar(7), b7 varchar(7), b8 varchar(7), foreign key (user_id) references users(id) on delete cascade) ");
-                statement.executeUpdate("create table if not exists aws_credentials (id INTEGER PRIMARY KEY AUTO_INCREMENT, access_key varchar not null, secret_key varchar not null)");
-                statement.executeUpdate("create table if not exists ec2_keys (id INTEGER PRIMARY KEY AUTO_INCREMENT, key_nm varchar not null, ec2_region varchar not null, private_key varchar not null, aws_cred_id INTEGER, foreign key (aws_cred_id) references aws_credentials(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar, instance_id varchar not null, user varchar not null, host varchar, port INTEGER not null, key_id INTEGER, region varchar not null, state varchar, instance_status varchar, system_status varchar, m_alarm INTEGER default 0, m_insufficient_data INTEGER default 0, m_ok INTEGER default 0, foreign key (key_id) references ec2_keys(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists default_region (id INTEGER PRIMARY KEY AUTO_INCREMENT, region varchar not null)");
+                statement.executeUpdate("create table if not exists iam_role (id INTEGER PRIMARY KEY AUTO_INCREMENT, arn varchar not null)");
+                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar, instance_id varchar not null, user varchar not null, host varchar, port INTEGER not null, region varchar not null, state varchar, instance_status varchar, system_status varchar, m_alarm INTEGER default 0, m_insufficient_data INTEGER default 0, m_ok INTEGER default 0)");
                 statement.executeUpdate("create table if not exists profiles (id INTEGER PRIMARY KEY AUTO_INCREMENT, nm varchar not null, tag varchar not null)");
                 statement.executeUpdate("create table if not exists user_map (user_id INTEGER, profile_id INTEGER, foreign key (user_id) references users(id) on delete cascade, foreign key (profile_id) references profiles(id) on delete cascade, primary key (user_id, profile_id))");
+                statement.executeUpdate("create table if not exists application_key (id INTEGER PRIMARY KEY AUTO_INCREMENT, public_key varchar not null, private_key varchar not null, passphrase varchar)");
 
                 statement.executeUpdate("create table if not exists status (id INTEGER, user_id INTEGER, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade, foreign key (user_id) references users(id) on delete cascade)");
                 statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (user_id) references users(id) on delete cascade)");
@@ -141,6 +147,46 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             }
 
             DBUtils.closeRs(rs);
+
+            //if reset ssh application key then generate new key
+            if (resetSSHKey) {
+
+                //delete old key entry
+                PreparedStatement pStmt = connection.prepareStatement("delete from application_key");
+                pStmt.execute();
+                DBUtils.closeStmt(pStmt);
+
+                //generate new key and insert passphrase
+                System.out.println("Setting EC2Box SSH public/private key pair");
+
+                //generate application pub/pvt key and get values
+                String passphrase = SSHUtil.keyGen();
+                String publicKey = SSHUtil.getPublicKey();
+                String privateKey = SSHUtil.getPrivateKey();
+
+                //insert new keys
+                pStmt = connection.prepareStatement("insert into application_key (public_key, private_key, passphrase) values(?,?,?)");
+                pStmt.setString(1, publicKey);
+                pStmt.setString(2, EncryptionUtil.encrypt(privateKey));
+                pStmt.setString(3, EncryptionUtil.encrypt(passphrase));
+                pStmt.execute();
+                DBUtils.closeStmt(pStmt);
+
+                System.out.println("EC2Box Generated Global Public Key:");
+                System.out.println(publicKey);
+
+                //set config to default
+                AppConfig.updateProperty("publicKey", "");
+                AppConfig.updateProperty("privateKey", "");
+                AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
+
+                //set to false
+                AppConfig.updateProperty("resetApplicationSSHKey", "false");
+
+            }
+
+            //delete ssh keys
+            SSHUtil.deletePvtGenSSHKey();
             
 
         } catch (Exception ex) {

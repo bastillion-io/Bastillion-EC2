@@ -1,0 +1,103 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            //submit add form
+            $(".submit_btn").button().click(function () {
+                $(this).find('form').submit();
+            });
+
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            $("#add_dialog").modal();
+
+        });
+        /*]]>*/
+    </script>
+
+    <title>EC2Box - Set AWS Credentials</title>
+
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+
+
+    <h3>Set IAM Profile</h3>
+    <p>To allow EC2Box to access to your instance information, you'll need to create an 3rd party IAM profile with
+        Account ID 652647611965, then set AmazonEC2FullAccess permissions for the role. Finally, set the
+        generated Amazon Resource Name (ARN) below.</p>
+    <div th:replace="_res/inc/errors"></div>
+    <div class="alert alert-success" th:if="${success}" >
+        <strong>Success!</strong>
+        <div><span>Amazon Resource Name has been configured</span></div>
+    </div>
+    <form th:action="@{/manage/saveIAMRole.ktrl}" class="save_aws_form_add" method="post"
+          autocomplete="off">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <table>
+            <tr>
+                <td><strong>ARN</strong></td>
+                <td>
+
+                    <input type="text"  placeholder="arn:aws:iam::xxxxxxxxxxxx:role/EC2BoxRole" name="arn" th:value="${arn}"
+                           title="ARN" size="40"/>
+                    <span class="error" th:text="${fieldErrors.get('arn')}"></span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary submit_btn">Save</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <h3>Public Key</h3>
+    <p>You'll also need to register the SSH key below to allow for application authentication when provisioning EC2
+        instances. Otherwise, you will have to add the key to the instances manually.</p>
+    <pre style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
+
+
+</div>
+</body>
+</html>

@@ -46,6 +46,10 @@
                 $("#script_dialog").modal();
             });
 
+            $("#region").change(function () {
+                $("#viewSystems").submit();
+            });
+
             //submit edit form
             $(".submit_btn").button().click(function () {
                 $(this).parents('.modal').find('form').submit();
@@ -143,53 +147,40 @@
 
 
         <table>
-
             <tr>
-                <td class="align_left"><br/>
-
-                    <form th:action="@{/admin/viewSystems.ktrl}" method="get">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-
-
-                        <input th:if="${script!=null && script.id!=null}" type="hidden" name="script.id"
-                               th:value="${script.id}"/>
-
-                        <input th:if="${showStatus}" type="hidden" name="showStatus" value="false"/>
-                        <input th:if="${showStatus}" type="submit" class="btn btn-danger" value="Disable Status"/>
-
-                        <input th:if="${!showStatus}" type="hidden" name="showStatus" value="true"/>
-                        <input th:if="${!showStatus}" type="submit" class="btn btn-success" value="Show Status"/>
-
-                        <input type="hidden" name="sortedSet.orderByDirection"
-                               th:value="${sortedSet.orderByDirection}"/>
-                        <input type="hidden" name="sortedSet.orderByField"
-                               th:value="${sortedSet.orderByField}"/>
-                    </form>
-                </td>
-                <td><br/> |</td>
-
-
                 <td>
                     <form id="viewSystems" th:action="@{/admin/viewSystems.ktrl}" method="get">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                        <input type="hidden" id="viewSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}"/>
-                        <input type="hidden" id="viewSystems_sortedSet_orderByField" name="sortedSet.orderByField"
-                               th:value="${sortedSet.orderByField}"/>
-                        <input th:if="${script!=null && script.id!=null}" type="hidden" name="script.id"
-                               value="${script.id}"/>
-                        <input type="hidden" name="showStatus" th:value="${showStatus}"/>
                         <table>
                             <tr>
+                                <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                                <input type="hidden" id="viewSystems_sortedSet_orderByDirection"
+                                       name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}"/>
+                                <input type="hidden" id="viewSystems_sortedSet_orderByField"
+                                       name="sortedSet.orderByField"
+                                       th:value="${sortedSet.orderByField}"/>
+                                <input th:if="${script!=null && script.id!=null}" type="hidden" name="script.id"
+                                       value="${script.id}"/>
+                                <input type="hidden" name="showStatus" th:value="${showStatus}"/>
+                                <td class="align_left">
+                                    <label>Region</label><br/>
+                                    <select id="region" th:name="region"
+                                            title="Instance Status">
+                                        <option th:each="i : ${regionMap}"
+                                                th:value="${i.key}" th:text="${i.value}"
+                                                th:selected="${#strings.equals(region, i.key)}"></option>
+                                    </select>
+                                </td>
+                                <td><br/> |</td>
                                 <td>
                                     <label>Tag</label><br/>
 
                                     <input th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_TAG} + ']'"
-                                           title="Tag" placeholder="tag-name[=value[,tag-name[=value]]" size="25"
+                                           title="Tag" placeholder="tag-name[=value[,tag-name[=value]]" size="22"
                                            th:value="${sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_TAG)}"/>
                                 </td>
                                 <td><label>Security Group</label><br/>
                                     <input th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP} + ']'"
-                                           title="Security Group" placeholder="group[,group]" size="10"
+                                           title="Security Group" placeholder="group[,group]" size="12"
                                            th:value="${sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP)}"/>
                                 </td>
                                 <td>
@@ -237,9 +228,34 @@
                                 <td style="padding:20px 5px 0px 5px;">
                                     <input type="submit" class="btn btn-primary" value="Filter"/>
                                 </td>
+
+                                <td><br/> |</td>
                             </tr>
                         </table>
                     </form>
+                </td>
+                <td>
+                    <br/>
+                    <form th:action="@{/admin/viewSystems.ktrl}" method="get">
+                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+
+                        <input th:if="${script!=null && script.id!=null}" type="hidden" name="script.id"
+                               th:value="${script.id}"/>
+
+                        <input th:if="${showStatus}" type="hidden" name="showStatus" value="false"/>
+                        <input th:if="${showStatus}" type="submit" class="btn btn-danger"
+                               value="Disable Status"/>
+
+                        <input th:if="${!showStatus}" type="hidden" name="showStatus" value="true"/>
+                        <input th:if="${!showStatus}" type="submit" class="btn btn-success"
+                               value="Show Status"/>
+
+                        <input type="hidden" name="sortedSet.orderByDirection"
+                               th:value="${sortedSet.orderByDirection}"/>
+                        <input type="hidden" name="sortedSet.orderByField"
+                               th:value="${sortedSet.orderByField}"/>
+                    </form>
+
                 </td>
             </tr>
         </table>
@@ -330,8 +346,8 @@
         <div class="actionMessage" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">
             <p class="error">No instances available. Try changing the filter values above
                 <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-                    or importing the corresponding EC2 Keys (<a
-                        th:href="'../manage/viewEC2Keys.ktrl?_csrf=' + ${session._csrf}">Set EC2 Keys</a>).
+                    or setting the corresponding ARN for the configured IAM Role (<a
+                        th:href="'../manage/viewIAMRole.ktrl?_csrf=' + ${session._csrf}">Set IAM Role</a>).
                 </template>
             </p>
         </div>
@@ -348,7 +364,8 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div th:replace="_res/inc/errors"></div>
-                                <form th:action="@{/admin/saveSystem.ktrl}" method="post" th:id="'save_sys_form_edit_' + ${s.id}">
+                                <form th:action="@{/admin/saveSystem.ktrl}" method="post"
+                                      th:id="'save_sys_form_edit_' + ${s.id}">
                                     <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
 
                                     <table>
@@ -371,7 +388,6 @@
                                     <input type="hidden" name="hostSystem.id" th:value="${s.id}"/>
                                     <input type="hidden" name="hostSystem.displayNm" th:value="${s.displayNm}"/>
                                     <input type="hidden" name="hostSystem.host" th:value="${s.host}"/>
-                                    <input type="hidden" name="hostSystem.keyId" th:value="${s.keyId}"/>
                                     <input type="hidden" name="hostSystem.displayLabel" th:value="${s.displayLabel}"/>
                                     <input type="hidden" name="hostSystem.ec2Region" th:value="${s.ec2Region}"/>
                                     <input type="hidden" name="hostSystem.state" th:value="${s.state}"/>
