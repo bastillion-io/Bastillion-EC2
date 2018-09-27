@@ -55,6 +55,15 @@ public class AWSClientConfig {
     private static String sessionToken;
     private static Calendar time = Calendar.getInstance();;
 
+    static {
+        if (!AppConfig.isPropertyEncrypted("accessKey")) {
+            AppConfig.encryptProperty("accessKey", AppConfig.getProperty("accessKey"));
+        }
+        if (!AppConfig.isPropertyEncrypted("secretKey")) {
+            AppConfig.encryptProperty("secretKey", AppConfig.getProperty("secretKey"));
+        }
+    }
+
     /**
      * set config info based on AppConfig
      */
@@ -121,7 +130,7 @@ public class AWSClientConfig {
 
         if (accessKey == null || time == null || time.before(Calendar.getInstance())) {
 
-            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(AppConfig.getProperty("accessKey"), AppConfig.getProperty("secretKey"));
+            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(AppConfig.decryptProperty("accessKey"), AppConfig.decryptProperty("secretKey"));
 
             AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(longTermCredentials)).build();
 
