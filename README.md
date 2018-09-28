@@ -86,11 +86,20 @@ Login with
 
 Steps:
 
-1. Set your AWS credentials
-2. Import the private key used on your EC2 systems *(Note: The EC2 server will only show if the private key has been imported)*
-3. Start composite-ssh sessions or create and execute a script across multiple sessions
-4. Add instance administrator accounts
-5. Audit sessions for instance administrators
+1. Set your AWS credentials for the following properties in the EC2Box.properties file. 
+	```
+	#AWS IAM access key
+	accessKey=
+	#AWS IAM secret key
+	secretKey=
+	```    
+2. Configure an IAM Role with Account ID 652647611965 and set generated ARN in EC2Box
+3. Import the EC2Box public SSH key to the EC2 AWS console.
+4. Create EC2 instanaces with the imported key.
+5. Start composite-ssh sessions or create and execute a script across multiple sessions
+6. Add instance administrator accounts
+
+More info at https://www.sshkeybox.com/docs/ec2box
 
 Restricting User Access
 ------
