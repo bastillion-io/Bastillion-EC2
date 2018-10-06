@@ -116,6 +116,29 @@ or multiple
 
     tag-name1,tag-name2
     tag-name1=mytag1,tag-name2=mytag2
+    
+Supplying a Custom SSH Key Pair
+------
+EC2Box generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the EC2BoxConfig.properties file.
+
+For example:
+
+	#set to true to regenerate and import SSH keys  --set to true
+	resetApplicationSSHKey=true
+
+	#SSH Key Type 'dsa' or 'rsa'
+	sshKeyType=rsa
+
+	#private key  --set pvt key
+	privateKey=/Users/kavanagh/.ssh/id_rsa
+
+	#public key  --set pub key
+	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
+	
+	#default passphrase  --leave blank if passphrase is empty
+	defaultSSHPassphrase=myPa$$w0rd
+	
+After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
 
 External Authentication
 ------
