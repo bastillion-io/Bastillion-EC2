@@ -93,7 +93,7 @@ Steps:
 	#AWS IAM secret key
 	secretKey=
 	```    
-2. Configure an IAM Role with Account ID 652647611965 and set generated ARN in EC2Box
+2. Configure an IAM Role with Account ID for your user and set generated ARN in EC2Box
 3. Import the EC2Box public SSH key to the EC2 AWS console.
 4. Create EC2 instanaces with the imported key.
 5. Start composite-ssh sessions or create and execute a script across multiple sessions
