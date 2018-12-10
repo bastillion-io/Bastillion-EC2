@@ -72,7 +72,7 @@
         });
     </script>
 
-    <title>EC2Box - Assign Users to Profile</title>
+    <title>Bastillion for EC2 - Assign Users to Profile</title>
 
 </head>
 <body>
@@ -106,19 +106,19 @@
                 <thead>
 
                 <tr>
-                    <th th:id="${@com.ec2box.manage.db.UserDB@PROFILE_ID}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.UserDB@PROFILE_ID}" class="sort">
 
                         <input type="checkbox" id="assignUsersToProfile_userSelectAll" name="userSelectAll"
                                class="userSelect"
                                title="Select All"/>
                     </th>
-                    <th th:id="${@com.ec2box.manage.db.UserDB@USERNAME}" class="sort">Username</th>
-                    <th th:if="${@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}"
-                        th:id="${@com.ec2box.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
+                    <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
+                    <th th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                        th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
                     </th>
-                    <th th:id="${@com.ec2box.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
-                    <th th:id="${@com.ec2box.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
-                    <th th:id="${@com.ec2box.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -130,7 +130,7 @@
 
                         </td>
                         <td th:text="${u.username}"></td>
-                        <td th:if="${@com.ec2box.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                        <td th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                             <template th:if="${#strings.equals(u.authType, 'BASIC')}" th:remove="tag">
                                 Basic
                             </template>

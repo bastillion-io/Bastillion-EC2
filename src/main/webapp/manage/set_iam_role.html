@@ -54,7 +54,7 @@
         /*]]>*/
     </script>
 
-    <title>EC2Box - Set AWS Credentials</title>
+    <title>Bastillion for EC2 - Set AWS Credentials</title>
 
 </head>
 <body>
@@ -65,10 +65,10 @@
 
 
     <h3>Set IAM Role</h3>
-    <p>To allow EC2Box to access to your instance information, you'll need to create an 3rd party IAM role with
+    <p>To allow Bastillion for EC2 to access to your instance information, you'll need to create an 3rd party IAM role with
         Account ID 652647611965, then set AmazonEC2ReadOnlyAccess permissions for the role. Finally, set the
         generated Amazon Resource Name (ARN) below. Detailed instructions can be found <a
-                href="https://www.sshkeybox.com/docs/ec2box/iam_role/">here</a>.</p>
+                href="https://www.bastillion.io/docs/bastillion-ec2/iam_role/">here</a>.</p>
     <div th:replace="_res/inc/errors"></div>
     <div class="alert alert-success" th:if="${success}">
         <strong>Success!</strong>
@@ -82,7 +82,7 @@
                 <td><strong>ARN</strong></td>
                 <td>
 
-                    <input type="text" placeholder="arn:aws:iam::xxxxxxxxxxxx:role/EC2BoxRole" name="arn"
+                    <input type="text" placeholder="arn:aws:iam::xxxxxxxxxxxx:role/Bastillion for EC2Role" name="arn"
                            th:value="${arn}"
                            title="ARN" size="40"/>
                     <span class="error" th:text="${fieldErrors.get('arn')}"></span>
