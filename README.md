@@ -1,38 +1,26 @@
-EC2Box
+![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png) 
+Bastillion for EC2
 ======
 A web-based ssh console to execute commands and manage multiple EC2 instances
-simultaneously running on Amazon Web Services (AWS). EC2Box allows you to share
+simultaneously running on Amazon Web Services (AWS). Bastillion-EC2 allows you to share
 terminal commands and upload files to all your EC2 instances. Once the sessions
 have been opened you can select a single EC2 instance or any combination to run
 your commands.  Also, additional instance administrators can be added and their
 terminal sessions and history can be audited.  
 
-![Terminals](https://www.sshkeybox.com/images/500x300/ec2box.png)
+![Terminals](https://www.bastillion.io/images/500x300/bastillion-ec2.png)
 
-AMI in the AWS Marketplace
+
+Bastillion for EC2 Releases
 ------
-The simplest way to get started is to run the AMI from the AWS Marketplace.
+Commercial users can purchase a license through an annual subscription and access the binary releases.
 
-http://aws.amazon.com/marketplace/pp/B076D7XMK6
+https://www.bastillion.io/subscription
 
-Once the EC2Box instance is up and running, open your browser to https://\<EC2 Instance IP\>:443
+Feel free to try out Bastillion for a limited amount of users(6)!
 
-Login with 
+https://github.com/bastillion-io/Bastillion-EC2/releases
 
-	username:admin 
-	password:<Instance ID>
-
-EC2Box Releases
-------
-This software is free for non-commercial use under the AGPL licence!
-
-Commercial users can purchase a license through an annual subscription and access the binary releases. 
-
-https://www.sshkeybox.com/subscription
-
-Also, users can purchase through the AWS Marketplace.
-
-Feel free to try out EC2Box using the build instructions below!
 
 Prerequisites
 -------------
@@ -50,7 +38,7 @@ Prerequisites
 
 **Loophole MVC**  *(Only needed if building from source)*
 
-> https://github.com/skavanagh/lmvc
+> https://github.com/bastillion-io/lmvc
 
 **Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
@@ -73,7 +61,7 @@ In the directory that contains the pom.xml run
 
 *Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
 
-Using EC2Box
+Using Bastillion-EC2
 ------
 Open browser to https://\<whatever ip\>:8443
 
@@ -86,20 +74,20 @@ Login with
 
 Steps:
 
-1. Set your AWS credentials for the following properties in the EC2Box.properties file. 
+1. Set your AWS credentials for the following properties in the Bastillion-EC2.properties file. 
 	```
 	#AWS IAM access key
 	accessKey=
 	#AWS IAM secret key
 	secretKey=
 	```    
-2. Configure an IAM Role with Account ID for your user and set generated ARN in EC2Box
-3. Import the EC2Box public SSH key to the EC2 AWS console.
+2. Configure an IAM Role with Account ID for your user and set generated ARN in Bastillion-EC2
+3. Import the Bastillion-EC2 public SSH key to the EC2 AWS console.
 4. Create EC2 instanaces with the imported key.
 5. Start composite-ssh sessions or create and execute a script across multiple sessions
 6. Add instance administrator accounts
 
-More info at https://www.sshkeybox.com/docs/ec2box
+More info at https://www.bastillion.io/docs/bastillion
 
 Restricting User Access
 ------
@@ -119,7 +107,7 @@ or multiple
     
 Supplying a Custom SSH Key Pair
 ------
-EC2Box generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the EC2BoxConfig.properties file.
+Bastillion-EC2 generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the Bastillion-EC2Config.properties file.
 
 For example:
 
@@ -142,7 +130,7 @@ After startup and once the key has been registered it can then be removed from t
 
 External Authentication
 ------
-External Authentication can be enabled through the EC2BoxConfig.properties.
+External Authentication can be enabled through the Bastillion-EC2Config.properties.
 
 For example:
 
@@ -153,7 +141,7 @@ Connection details need to be set in the jaas.conf file
 
     ldap-ol {
     	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
-    	userProvider="ldap://hostname:389/ou=example,dc=ec2box,dc=com"
+    	userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
     	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
     	authzIdentity="{cn}"
     	useSSL=false
@@ -163,7 +151,7 @@ Connection details need to be set in the jaas.conf file
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
-User LDAP roles can be mapped to profiles defined in EC2Box through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
+User LDAP roles can be mapped to profiles defined in Bastillion-EC2 through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
 
     ldap-ol-with-roles {
         //openldap auth with roles that can map to profiles
@@ -177,12 +165,12 @@ User LDAP roles can be mapped to profiles defined in EC2Box through the use of t
         bindPassword="<BIND-DN PASSWORD>"
         authenticationMethod="simple"
         forceBindingLogin="true"
-        userBaseDn="ou=users,dc=ec2box,dc=com"
+        userBaseDn="ou=users,dc=bastillion,dc=com"
         userRdnAttribute="uid"
         userIdAttribute="uid"
         userPasswordAttribute="userPassword"
         userObjectClass="inetOrgPerson"
-        roleBaseDn="ou=groups,dc=ec2box,dc=com"
+        roleBaseDn="ou=groups,dc=bastillion,dc=com"
         roleNameAttribute="cn"
         roleMemberAttribute="member"
         roleObjectClass="groupOfNames";
@@ -190,19 +178,6 @@ User LDAP roles can be mapped to profiles defined in EC2Box through the use of t
 
 Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
 
-Screenshots
------------
-![Two-Factor](https://www.sshkeybox.com/images/screenshots/medium/ec2box/two-factor.png)
-
-![Importing Keys](https://www.sshkeybox.com/images/screenshots/medium/ec2box/importing_keys.png)
-
-![Select Instances](https://www.sshkeybox.com/images/screenshots/medium/ec2box/select_instances.png)
-
-![More Terminals](https://www.sshkeybox.com/images/screenshots/medium/ec2box/more_terms.png)
-
-![Upload Files](https://www.sshkeybox.com/images/screenshots/medium/ec2box/upload_files.png)
-
-![Disconnect](https://www.sshkeybox.com/images/screenshots/medium/ec2box/disconnect.png)
 
 Acknowledgments
 ------
@@ -215,11 +190,11 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 Dual License
 -----------
-EC2Box is available for non-commercial use under the Affero General Public License
+Bastillion-EC2 is available for non-commercial use under the Affero General Public License
 
 A commercial license is also available through a subscription
 
-https://www.sshkeybox.com/subscription
+https://www.bastillion.io/subscription
 
 or when running an AMI from the AWS marketplace.
 
