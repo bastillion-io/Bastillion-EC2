@@ -37,7 +37,7 @@
         });
     </script>
 
-    <title>EC2Box - Main Menu</title>
+    <title>Bastillion for EC2 - Main Menu</title>
 
 </head>
 
@@ -117,7 +117,7 @@
                     </td>
                 </tr>
 
-                <tr th:if="${@com.ec2box.manage.util.SessionOutputUtil@enableInternalAudit}">
+                <tr th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit}">
                     <td>
                         <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
                     </td>

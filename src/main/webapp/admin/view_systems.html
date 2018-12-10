@@ -99,7 +99,7 @@
         /*]]>*/
     </script>
 
-    <title>EC2Box - Manage Instances</title>
+    <title>Bastillion for EC2 - Manage Instances</title>
 </head>
 <body>
 
@@ -174,54 +174,54 @@
                                 <td>
                                     <label>Tag</label><br/>
 
-                                    <input th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_TAG} + ']'"
+                                    <input th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_TAG} + ']'"
                                            title="Tag" placeholder="tag-name[=value[,tag-name[=value]]" size="22"
-                                           th:value="${sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_TAG)}"/>
+                                           th:value="${sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_TAG)}"/>
                                 </td>
                                 <td><label>Security Group</label><br/>
-                                    <input th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP} + ']'"
+                                    <input th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP} + ']'"
                                            title="Security Group" placeholder="group[,group]" size="12"
-                                           th:value="${sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP)}"/>
+                                           th:value="${sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP)}"/>
                                 </td>
                                 <td>
                                     <label>Current State</label><br/>
-                                    <select th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATE} + ']'"
+                                    <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATE} + ']'"
                                             title="Current State">
                                         <option value="">-Any-</option>
                                         <option th:each="i : ${instanceStateMap}"
                                                 th:value="${i.key}" th:text="${i.value}"
-                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATE), i.key)}"></option>
+                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATE), i.key)}"></option>
                                     </select>
                                 </td>
                                 <template th:if="${showStatus}" th:remove="tag">
                                     <td>
                                         <label>Instance Status</label><br/>
-                                        <select th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATUS} + ']'"
+                                        <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATUS} + ']'"
                                                 title="Instance Status">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${instanceStatusMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
-                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATUS), i.key)}"></option>
+                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATUS), i.key)}"></option>
                                         </select>
                                     </td>
                                     <td>
                                         <label>System Status</label><br/>
-                                        <select th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SYSTEM_STATUS} + ']'"
+                                        <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SYSTEM_STATUS} + ']'"
                                                 title="System Status">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${systemStatusMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
-                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_SYSTEM_STATUS), i.key)}"></option>
+                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SYSTEM_STATUS), i.key)}"></option>
                                         </select>
                                     </td>
                                     <td>
                                         <label>Alarm State</label><br/>
-                                        <select th:name="'sortedSet.filterMap[' + ${@com.ec2box.manage.control.SystemKtrl@FILTER_BY_ALARM_STATE} + ']'"
+                                        <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_ALARM_STATE} + ']'"
                                                 title="Alarm State">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${alarmStateMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
-                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@com.ec2box.manage.control.SystemKtrl@FILTER_BY_ALARM_STATE), i.key)}"></option>
+                                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_ALARM_STATE), i.key)}"></option>
                                         </select>
                                     </td>
                                 </template>
@@ -273,23 +273,23 @@
                     <tr>
                         <th><input type="checkbox" id="select_frm_systemSelectAll" name="systemSelectAll"
                                    class="systemSelect" title="Select All"/></th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_ID}" class="sort">Instance Id</th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_PORT}" class="sort">Port</th>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_STATE}" class="sort">State</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_INSTANCE_ID}" class="sort">Instance Id</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_PORT}" class="sort">Port</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_STATE}" class="sort">State</th>
 
 
                         <template th:if="${showStatus}" th:remove="tag">
-                            <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS}" class="sort">
+                            <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_INSTANCE_STATUS}" class="sort">
                                 I-Status
                             </th>
-                            <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS}" class="sort">S-Status
+                            <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_SYSTEM_STATUS}" class="sort">S-Status
                             </th>
-                            <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_ALARMS}" class="sort">Alarms</th>
+                            <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_ALARMS}" class="sort">Alarms</th>
                         </template>
-                        <th th:id="${@com.ec2box.manage.db.SystemDB@SORT_BY_REGION}" class="sort">Region</th>
+                        <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_REGION}" class="sort">Region</th>
                     </tr>
                     </thead>
                     <tbody>
