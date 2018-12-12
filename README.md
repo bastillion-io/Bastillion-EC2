@@ -47,6 +47,37 @@ Prerequisites
 | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
 | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
+To Run Bundled with Jetty
+------
+Download keybox-jetty-vXX.XX.tar.gz
+
+https://github.com/bastillion-io/Bastillion-EC2/releases
+
+Export environment variables
+
+for Linux/Unix/OSX
+
+     export JAVA_HOME=/path/to/jdk
+     export PATH=$JAVA_HOME/bin:$PATH
+
+for Windows
+
+     set JAVA_HOME=C:\path\to\jdk
+     set PATH=%JAVA_HOME%\bin;%PATH%
+
+Start Bastillion
+
+for Linux/Unix/OSX
+
+        ./startBastillion-EC2.sh
+
+for Windows
+
+        startBastillion-EC2.bat
+	
+More Documentation at: https://www.bastillion.io/docs/bastillion-ec2/index.html
+	
+	
 Build from Source
 ------
 Export environment variables
