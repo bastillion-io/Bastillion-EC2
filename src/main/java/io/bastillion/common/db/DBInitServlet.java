@@ -28,9 +28,11 @@
 package io.bastillion.common.db;
 
 import io.bastillion.common.util.AppConfig;
+import io.bastillion.manage.db.LicenseDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.EncryptionUtil;
+import io.bastillion.manage.util.LicenseUtil;
 import io.bastillion.manage.util.SSHUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -140,6 +142,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                     if(StringUtils.isNotEmpty(str)) {
                         defaultPassword = EncryptionUtil.hash(str.trim() + salt);
                     }
+                    LicenseDB.saveLicense(LicenseUtil.generateForEC2());
                 }
 
                 //insert default admin user
