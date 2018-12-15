@@ -39,7 +39,7 @@ Prerequisites
 
 To Run Bundled with Jetty
 ------
-Download keybox-jetty-vXX.XX.tar.gz
+Download bastillion-ec2-jetty-vXX.XX.tar.gz
 
 https://github.com/bastillion-io/Bastillion-EC2/releases
 
