@@ -65,7 +65,7 @@ for Windows
 
         startBastillion-EC2.bat
 	
-More Documentation at: https://www.bastillion.io/docs/bastillion-ec2/index.html
+More documentation at: https://www.bastillion.io/docs/bastillion-ec2/index.html
 	
 	
 Build from Source
@@ -118,7 +118,7 @@ Steps:
 5. Start composite-ssh sessions or create and execute a script across multiple sessions
 6. Add instance administrator accounts
 
-More info at https://www.bastillion.io/docs/bastillion
+More info at https://www.bastillion.io/docs/bastillion-ec2/index.html
 
 Restricting User Access
 ------
