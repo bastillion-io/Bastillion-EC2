@@ -198,7 +198,6 @@ div.termwrapper div h6 {
     border-radius: 4px;
     margin-top: 5px;
     float: left;
-    width: 50%;
 }
 
 .term {
@@ -222,19 +221,19 @@ div.termwrapper div h6 {
 }
 
 .output {
+    margin: 5px;
     z-index: 100;
 }
 
 .terminal {
-    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 12px;
     color: #000;
-    background: #f0f0f0;
     line-height: 1.231;
 }
 
 .terminal pre {
-    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 12px;
     border: none;
     line-height: 1.231;
@@ -363,4 +362,7 @@ table.floatThead-table {
 }
 .invisible {
     visibility: hidden;
+}
+.xterm-viewport {
+    overflow: hidden !important;
 }
