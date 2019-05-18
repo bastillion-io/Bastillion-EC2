@@ -32,6 +32,7 @@ import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
@@ -131,7 +132,7 @@ public class AWSClientConfig {
 
             BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(AppConfig.decryptProperty("accessKey"), AppConfig.decryptProperty("secretKey"));
 
-            AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(longTermCredentials)).build();
+            AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).withCredentials(new AWSStaticCredentialsProvider(longTermCredentials)).build();
 
             AssumeRoleRequest assumeRequest = new AssumeRoleRequest()
                     .withRoleArn(arn)
