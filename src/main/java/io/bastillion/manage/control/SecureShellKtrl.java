@@ -31,9 +31,7 @@ import com.jcraft.jsch.ChannelShell;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.*;
 import io.bastillion.manage.model.*;
-import io.bastillion.manage.model.*;
 import io.bastillion.manage.util.SSHUtil;
-import io.bastillion.manage.db.*;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
@@ -165,7 +163,6 @@ public class SecureShellKtrl extends BaseKontroller {
             setSystemList(userId, AuthUtil.getSessionId(getRequest().getSession()));
         }
 
-
         return "/admin/secure_shell.html";
     }
 
@@ -258,11 +255,10 @@ public class SecureShellKtrl extends BaseKontroller {
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
                 ChannelShell channel = (ChannelShell) schSession.getChannel();
-                channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 7.2981), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
+                channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 8.0000), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
                 schSession.setChannel(channel);
 
             }
-
 
         }
 
