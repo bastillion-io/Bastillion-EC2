@@ -13,13 +13,13 @@ terminal sessions and history can be audited.
 
 Bastillion for EC2 Releases
 ------
-Feel free to try out Bastillion for a limited amount of users(6)!
+Bastillion-EC2 is available for free use under the Affero General Public License
 
 https://github.com/bastillion-io/Bastillion-EC2/releases
 
-or purchase a subscription
+or purchase from the AWS marketplace
 
-https://www.bastillion.io/subscription
+https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion-for-EC2/B076D7XMK6
 
 Prerequisites
 -------------
@@ -220,7 +220,7 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 AGPL License
 -----------
-Bastillion-EC2 is available for non-commercial use under the Affero General Public License
+Bastillion-EC2 is available use under the Affero General Public License
 
 Author
 ------
