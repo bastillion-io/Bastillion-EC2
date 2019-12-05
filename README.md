@@ -208,6 +208,16 @@ User LDAP roles can be mapped to profiles defined in Bastillion-EC2 through the 
 
 Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
 
+Auditing
+------
+Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
+
+> https://github.com/bastillion-io/Bastillion-EC2/blob/master/src/main/resources/log4j2.xml#L19-L22
+	
+Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
+
+	#enable audit  --set to true to enable
+	enableInternalAudit=true
 
 Acknowledgments
 ------
