@@ -33,12 +33,12 @@ import io.bastillion.manage.db.UserDB;
 import io.bastillion.manage.db.UserProfileDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
+import io.bastillion.common.jaas.BastillionLdapLoginModule;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.jetty.jaas.callback.ObjectCallback;
-import org.eclipse.jetty.jaas.spi.LdapLoginModule;
 import org.eclipse.jetty.jaas.spi.UserInfo;
 
 import javax.naming.NamingEnumeration;
@@ -140,7 +140,7 @@ public class ExternalAuthUtil {
                     field.setAccessible(true);
                     AppConfigurationEntry appEntry = (AppConfigurationEntry) field.get(entry);
 
-                    if (module instanceof LdapLoginModule) {
+                    if (module instanceof BastillionLdapLoginModule) {
 
                         //get callback handler
                         field = LoginContext.class.getDeclaredField("callbackHandler");
@@ -152,37 +152,20 @@ public class ExternalAuthUtil {
                         field.setAccessible(true);
                         Map state = (Map) field.get(loginContext);
 
-                        LdapLoginModule loginModule = (LdapLoginModule) module;
+                        BastillionLdapLoginModule loginModule = (BastillionLdapLoginModule) module;
                         loginModule.initialize(loginContext.getSubject(), callbackHandler, state, appEntry.getOptions());
                         UserInfo userInfo = loginModule.getUserInfo(auth.getUsername());
 
                         //fetch assigned roles
                         userInfo.fetchRoles();
 
-                        //dir context context
-                        field = loginModule.getClass().getDeclaredField("_rootContext");
-                        field.setAccessible(true);
-                        DirContext dirContext = (DirContext) field.get(loginModule);
-
-                        //role name attribute
-                        field = loginModule.getClass().getDeclaredField("_roleNameAttribute");
-                        field.setAccessible(true);
-                        String roleNameAttribute = (String) field.get(loginModule);
-
-                        //base dn for role
-                        field = loginModule.getClass().getDeclaredField("_roleBaseDn");
-                        field.setAccessible(true);
-                        String roleBaseDn = (String) field.get(loginModule);
-
-                        //role object class
-                        field = loginModule.getClass().getDeclaredField("_roleObjectClass");
-                        field.setAccessible(true);
-                        String roleObjectClass = (String) field.get(loginModule);
+                        DirContext dirContext = loginModule.getRootContext();
+                        String roleNameAttribute = loginModule.getOption("roleNameAttribute");
+                        String roleBaseDn = loginModule.getOption("roleBaseDn");
+                        String roleObjectClass = loginModule.getOption("roleObjectClass");
 
                         //all attributes for user
-                        field = LdapLoginModule.LDAPUserInfo.class.getDeclaredField("attributes");
-                        field.setAccessible(true);
-                        Attributes userAttributes = (Attributes) field.get(userInfo);
+                        Attributes userAttributes = loginModule.getUserAttributes(auth.getUsername());
 
                         List<String> allRoles = getAllRoles(dirContext, roleBaseDn, roleNameAttribute, roleObjectClass);
 
@@ -225,7 +208,7 @@ public class ExternalAuthUtil {
                         }
 
                         //assign profiles for user
-                        UserProfileDB.assignProfilesToUser(con, user.getId(), allRoles, userInfo.getRoleNames());
+                        UserProfileDB.assignProfilesToUser(con, user.getId(), allRoles, allRoles);
 
                         dirContext.close();
                         loginModule.commit();
@@ -288,7 +271,7 @@ public class ExternalAuthUtil {
      * @return all roles under base dn
      */
     private static List<String> getAllRoles(DirContext dirContext, String roleBaseDn, String roleNameAttribute, String roleObjectClass) throws NamingException {
-        List<String> allRoles = new ArrayList<String>();
+        List<String> allRoles = new ArrayList<>();
         SearchControls ctls = new SearchControls();
         ctls.setDerefLinkFlag(true);
         ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
