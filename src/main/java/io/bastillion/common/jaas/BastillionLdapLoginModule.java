@@ -1,6 +1,9 @@
 package io.bastillion.common.jaas;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -21,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author whbog
+ * Bastillion login module.
+ * @author <a href="mailto:wilson@engeweb.com.br">Wilson Horstmeyer Bogado</a>
  */
 public class BastillionLdapLoginModule extends LdapLoginModule {
     private static final Logger log = LoggerFactory.getLogger(BastillionLdapLoginModule.class);
@@ -31,8 +34,15 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
     private String userObjectClass = "inetOrgPerson";
     private String userIdAttribute = "cn";
     private final String userPasswordAttribute = "userPassword";
+    private String roleBaseDn;
+    private String roleObjectClass = "groupOfUniqueNames";
+    private String roleMemberAttribute = "uniqueMember";
+    private String roleNameAttribute = "roleName";
+    private boolean forceBindingLogin = false;
 
     private Map<String, ?> options;
+    private BastillionPrincipal principal;
+    private BastillionLdapPrincipal ldapPrincipal;
     
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState, Map<String, ?> options) {
@@ -44,8 +54,13 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         }
         this.options = options;
         this.userBaseDn = getOption("userBaseDn", null);
-        this.userObjectClass = getOption("userObjectClass", userObjectClass);
-        this.userIdAttribute = getOption("userIdAttribute", userIdAttribute);
+        this.roleBaseDn = getOption("roleBaseDn", this.roleBaseDn);
+        this.roleObjectClass = getOption("roleObjectClass", this.roleObjectClass);
+        this.roleMemberAttribute = getOption("roleMemberAttribute", this.roleMemberAttribute);
+        this.roleNameAttribute = getOption("roleNameAttribute", this.roleNameAttribute);
+        this.userObjectClass = getOption("userObjectClass", this.userObjectClass);
+        this.userIdAttribute = getOption("userIdAttribute", this.userIdAttribute);
+        this.forceBindingLogin = Boolean.valueOf(getOption("forceBindingLogin", "false"));
     }
     
     public String getOption(String key, String defaultValue) {
@@ -141,6 +156,88 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         }
 
         return searchResult;
+    }
+
+    private List<String> getUserRoles(DirContext dirContext, String roleMemberValue) throws NamingException {
+        List<String> roleList = new ArrayList<>();
+
+        if (dirContext == null || roleBaseDn == null || roleMemberAttribute == null || roleObjectClass == null) {
+            return roleList;
+        }
+
+        SearchControls ctls = new SearchControls();
+        ctls.setDerefLinkFlag(true);
+        ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        ctls.setReturningAttributes(new String[]{roleNameAttribute});
+
+        String filter = "(&(objectClass={0})({1}={2}))";
+        Object[] filterArguments = {roleObjectClass, roleMemberAttribute, roleMemberValue};
+        NamingEnumeration<SearchResult> results = dirContext.search(roleBaseDn, filter, filterArguments, ctls);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Found user roles?: " + results.hasMoreElements());
+        }
+
+        while (results.hasMoreElements()) {
+            SearchResult result = results.nextElement();
+
+            Attributes attributes = result.getAttributes();
+
+            if (attributes == null) {
+                continue;
+            }
+
+            Attribute roleAttribute = attributes.get(roleNameAttribute);
+
+            if (roleAttribute == null) {
+                continue;
+            }
+
+            NamingEnumeration<?> roles = roleAttribute.getAll();
+            while (roles.hasMore()) {
+                roleList.add(roles.next().toString());
+            }
+        }
+
+        return roleList;
+    }
+    
+    @Override
+    public boolean login() throws LoginException {
+        boolean authd = super.login();
+        if (authd) {
+            String username = getCurrentUser().getUserName();
+            SearchResult sr = findUser(username);
+            String dn = sr.getNameInNamespace();
+            Attributes attrs = sr.getAttributes();
+            principal = new BastillionPrincipal(username);
+            List<String> roles;
+            try {
+                String roleAttrValue = "memberUid".equals(roleMemberAttribute) ? username : dn;
+                roles = getUserRoles(rootContext, roleAttrValue);
+            } catch (NamingException ex) {
+                LoginException le = new LoginException("Could not get principal's roles");
+                le.initCause(ex);
+                throw le;
+            }
+            ldapPrincipal = new BastillionLdapPrincipal(dn, attrs, roles);
+        }
+        return authd;
+    }
+
+    @Override
+    public boolean commit() throws LoginException {
+        boolean commited = super.commit();
+        if (commited) {
+            getSubject().getPrincipals().add(principal);
+            getSubject().getPrincipals().add(ldapPrincipal);
+        }
+        try {
+            rootContext.close();
+        } catch (NamingException ex) {
+            log.warn("Could not close root context", ex);
+        }
+        return commited;
     }
 
 }
