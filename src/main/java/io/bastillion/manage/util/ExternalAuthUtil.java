@@ -34,20 +34,15 @@ import io.bastillion.manage.db.UserDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
 import io.bastillion.common.jaas.BastillionLdapPrincipal;
-import io.bastillion.common.jaas.BastillionPrincipal;
 import io.bastillion.manage.db.UserProfileDB;
+import java.security.Principal;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -55,6 +50,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
 
 
 /**
@@ -79,30 +76,46 @@ public class ExternalAuthUtil {
 
     }
     
-    private static BastillionPrincipal getPrincipal(Subject subject) throws LoginException {
-        BastillionPrincipal p = null;
-        for (BastillionPrincipal principal: subject.getPrincipals(BastillionPrincipal.class)) {
-            if (p == null && principal.getClass() == BastillionPrincipal.class) {
-                p = principal;
-            } else if (p != null && principal.getClass() == BastillionPrincipal.class) {
-                throw new LoginException("More than 1 principal found");
+    /**
+     * Searches the principals associated with the subject for a suitable LDAP
+     * principal. 
+     * If we find a BastillionLdapPrincipal, return it, else we return the
+     * first principal that contains a syntactically valid DN.
+     * @param subject The subject
+     * @return An appropriate LDAP principal
+     */
+    private static Principal searchSuitablePrincipal(Subject subject) {
+        Principal principal = null;
+        for (Principal p: subject.getPrincipals()) {
+            if (p instanceof BastillionLdapPrincipal) {
+                principal = p;
+                break;
+            } else if (p != null) {
+                try { // is this a valid RDN?
+                    new LdapName(p.getName());
+                    principal = p;
+                } catch (InvalidNameException e) {
+                    // Not a valid RDN
+                }
             }
         }
-        return p;
+        return principal;
     }
     
-    private static User createUser(Subject subject) throws LoginException, NamingException {
+    private static User createUser(Auth auth, Subject subject) throws LoginException, NamingException {
         User user = new User();
+        user.setUsername(auth.getUsername());
         user.setUserType(User.ADMINISTRATOR);
-        user.setUsername(getPrincipal(subject).getName());
-
+        
+        Principal principal = searchSuitablePrincipal(subject);
         String givenName = null;
         String sn = null;
         String displayName = null;
         String cn = null;
         String email = null;
-        for (BastillionLdapPrincipal principal: subject.getPrincipals(BastillionLdapPrincipal.class)) {
-            Attributes attrs = principal.getAttributes();
+        if (principal instanceof BastillionLdapPrincipal) {
+            BastillionLdapPrincipal p = (BastillionLdapPrincipal) principal;
+            Attributes attrs = p.getAttributes();
             if (givenName == null) givenName = (String) attrs.get("givenName").get();
             if (sn == null) sn = (String) attrs.get("sn").get();
             if (displayName == null) displayName = (String) attrs.get("displayName").get();
@@ -166,7 +179,7 @@ public class ExternalAuthUtil {
                 con = DBUtils.getConn();
                 User user = AuthDB.getUserByUID(con, auth.getUsername());
                 if (user == null) {
-                    user = createUser(subject);
+                    user = createUser(auth, subject);
                     user.setId(UserDB.insertUser(con, user));
                 }
                 authToken = UUID.randomUUID().toString();
@@ -188,43 +201,4 @@ public class ExternalAuthUtil {
         return authToken;
     }
 
-    /**
-     * returns all possible roles for a user
-     *
-     * @param dirContext        ldap directory context
-     * @param roleBaseDn        base dn for roles
-     * @param roleNameAttribute role name
-     * @param roleObjectClass   role object class
-     * @return all roles under base dn
-     */
-    private static List<String> getAllRoles(DirContext dirContext, String roleBaseDn, String roleNameAttribute, String roleObjectClass) throws NamingException {
-        List<String> allRoles = new ArrayList<>();
-        SearchControls ctls = new SearchControls();
-        ctls.setDerefLinkFlag(true);
-        ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        ctls.setReturningAttributes(new String[]{roleNameAttribute});
-
-        String filter = "(objectClass={0})";
-        Object[] filterArguments = {roleObjectClass};
-        NamingEnumeration<SearchResult> results = dirContext.search(roleBaseDn, filter, filterArguments, ctls);
-
-        while (results.hasMoreElements()) {
-            SearchResult result = results.nextElement();
-
-            Attributes attributes = result.getAttributes();
-
-            if (attributes != null) {
-                Attribute roleAttribute = attributes.get(roleNameAttribute);
-
-                if (roleAttribute != null) {
-
-                    NamingEnumeration<?> roles = roleAttribute.getAll();
-                    while (roles.hasMore()) {
-                        allRoles.add(roles.next().toString());
-                    }
-                }
-            }
-        }
-        return allRoles;
-    }
 }
