@@ -1,3 +1,30 @@
+/**
+ *    Copyright (C) 2020 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */
 package io.bastillion.common.jaas;
 
 import java.util.ArrayList;
@@ -62,19 +89,40 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         this.forceBindingLogin = Boolean.valueOf(getOption("forceBindingLogin", "false"));
     }
     
+    /**
+     * Returns a value from the options map passed to this login module.
+     * @param key The option's key
+     * @param defaultValue A default value to be returned if the key doesn't exist.
+     * @return The option's value
+     */
     public String getOption(String key, String defaultValue) {
         Object value = options.get(key);
         return value == null ? defaultValue : value.toString();
     }
 
+    /**
+     * Returns a value from the options map passed to this login module.
+     * @param key The option's key
+     * @return The option's value or {@code null} if not found
+     */
     public String getOption(String key) {
         return getOption(key, null);
     }
     
+    /**
+     * Return the LDAP root context.
+     * @return The LDAP root context
+     */
     public DirContext getRootContext() {
         return rootContext;
     }
 
+    /**
+     * Returns the user password.
+     * @param attributes The user attributes.
+     * @return The user password
+     * @throws LoginException If {@code attributes} doesn't include the user password attribute
+     */
     private String getUserCredentials(Attributes attributes) throws LoginException {
         String ldapCredential = null;
 
@@ -107,12 +155,24 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         return new LDAPUserInfo(username, credential, attributes);
     }
 
+    /**
+     * Returns the user attributes from LDAP.
+     * @param username The authenticated user name 
+     * @return The user attributes
+     * @throws LoginException If a LDAP operation fails
+     */
     public Attributes getUserAttributes(String username) throws LoginException {
         SearchResult result = findUser(username);
         Attributes attributes = result.getAttributes();
         return attributes;
     }
     
+    /**
+     * Finds the LDAP user entry.
+     * @param username The user name to search for
+     * @return The LDAP user entry
+     * @throws LoginException If a LDAP operation fails
+     */
     private SearchResult findUser(String username) throws LoginException {
         String filter = "(&(objectClass={0})({1}={2}))";
 
@@ -129,6 +189,14 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         return findUser(rootContext, filter, filterArguments);
     }
 
+    /**
+     * Applies the login module configured filter to find the LDAP user entry.
+     * @param dirContext The LDAP context
+     * @param filter The LDAP search filter
+     * @param filterArguments The search filter argumentes
+     * @return The user entry
+     * @throws LoginException If user not found, more than one entry found or a LDAP operation fails 
+     */
     private SearchResult findUser(DirContext dirContext, String filter, Object[] filterArguments) throws LoginException {
         SearchControls ctls = new SearchControls();
         ctls.setDerefLinkFlag(true);
@@ -157,6 +225,13 @@ public class BastillionLdapLoginModule extends LdapLoginModule {
         return searchResult;
     }
 
+    /**
+     * Returns a list of user roles from LDAP.
+     * @param dirContext LDAP connection context
+     * @param roleMemberValue Role member attribute value
+     * @return The list of user roles
+     * @throws NamingException If an LDAP operation fails
+     */
     private List<String> getUserRoles(DirContext dirContext, String roleMemberValue) throws NamingException {
         List<String> roleList = new ArrayList<>();
 
