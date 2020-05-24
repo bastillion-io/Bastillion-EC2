@@ -188,7 +188,7 @@ public class ExternalAuthUtil {
                 //set auth token
                 AuthDB.updateLogin(con, user);
                 List<String> userRoles = getUserRoles(subject);
-                UserProfileDB.assignProfilesToUser(con, user.getId(), userRoles, userRoles);
+                UserProfileDB.assignProfilesToUser(con, user.getId(), userRoles);
 
             } catch (LoginException le) {
                 log.debug(le.toString(), le);

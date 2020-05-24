@@ -33,8 +33,10 @@ import io.bastillion.manage.util.DBUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -228,4 +230,44 @@ public class UserProfileDB {
         }
     }
 
+    /**
+     * Assigns profiles to given user
+     *
+     * @param con The database connection
+     * @param userId User ID
+     * @param profiles Profiles to assign
+     */
+    public static void assignProfilesToUser(Connection con, Long userId, List<String> profiles) {
+        profiles.stream().filter(p -> StringUtils.isNotEmpty(p)).forEach(p -> {
+            Long profileId;
+            ResultSet profilesRS = null, userRS = null;
+            PreparedStatement profilesStmt = null, userStmt = null, insertStmt = null;
+            try {
+                profilesStmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
+                profilesStmt.setString(1, p.toLowerCase());
+                profilesRS = profilesStmt.executeQuery();
+                if (profilesRS.next()) { // profile exists in database
+                    profileId = profilesRS.getLong("id");
+                    userStmt = con.prepareStatement("select user_id from  user_map where lower(p.nm) like ? and user_id = ?");
+                    userStmt.setLong(1, profileId);
+                    userStmt.setLong(2, userId);
+                    userRS = userStmt.executeQuery();
+                    if (!userRS.next()) { // user not assigned, so assign
+                        insertStmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
+                        insertStmt.setLong(1, profileId);
+                        insertStmt.setLong(2, userId);
+                        insertStmt.execute();
+                    }
+                }
+            } catch (SQLException e) {
+                log.error(e.toString(), e);
+            } finally {
+                DBUtils.closeRs(profilesRS);
+                DBUtils.closeStmt(profilesStmt);
+                DBUtils.closeRs(userRS);
+                DBUtils.closeStmt(userStmt);
+                DBUtils.closeStmt(insertStmt);
+            }
+        });
+    }
 }
