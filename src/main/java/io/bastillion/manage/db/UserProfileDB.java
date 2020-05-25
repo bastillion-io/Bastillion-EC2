@@ -231,6 +231,50 @@ public class UserProfileDB {
     }
 
     /**
+     * assigns profiles to given user
+     *
+     * @param userId                 user id
+     * @param profileNm              profile name
+     */
+    public static void assignProfileToUser(Connection con, Long userId, String profileNm) {
+
+        PreparedStatement stmt = null;
+
+        try {
+
+            if (StringUtils.isNotEmpty(profileNm)) {
+
+                Long profileId = null;
+                stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
+                stmt.setString(1, profileNm.toLowerCase());
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                        profileId = rs.getLong("id");
+                }
+                DBUtils.closeRs(rs);
+                DBUtils.closeStmt(stmt);
+
+                if (profileId != null) {
+                    stmt = con.prepareStatement("delete from user_map where profile_id=?");
+                    stmt.setLong(1, profileId);
+                    stmt.execute();
+                    DBUtils.closeStmt(stmt);
+
+                    stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
+                    stmt.setLong(1, profileId);
+                    stmt.setLong(2, userId);
+                    stmt.execute();
+                    DBUtils.closeStmt(stmt);
+
+                }
+            }
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+    }
+
+    /**
      * Assigns profiles to given user
      *
      * @param con The database connection
@@ -248,7 +292,7 @@ public class UserProfileDB {
                 profilesRS = profilesStmt.executeQuery();
                 if (profilesRS.next()) { // profile exists in database
                     profileId = profilesRS.getLong("id");
-                    userStmt = con.prepareStatement("select user_id from  user_map where lower(p.nm) like ? and user_id = ?");
+                    userStmt = con.prepareStatement("select user_id from user_map where profile_id = ? and user_id = ?");
                     userStmt.setLong(1, profileId);
                     userStmt.setLong(2, userId);
                     userRS = userStmt.executeQuery();

@@ -4,25 +4,25 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion-ec2</artifactId>
-    <version>1.71.01-SNAPSHOT</version>
+    <version>1.72.00</version>
     <packaging>war</packaging>
     <name>Bastillion for EC2</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.28.v20200408</jetty-version>
+        <jetty-version>9.4.29.v20200521</jetty-version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.11.666</version>
+            <version>1.11.789</version>
         </dependency>
         <dependency>
             <groupId>loophole.mvc</groupId>
             <artifactId>lmvc</artifactId>
-            <version>1.05.00</version>
+            <version>1.06.00</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -115,18 +115,7 @@
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.0.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>4.0.2</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+
         </plugins>
     </build>
 
