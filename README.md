@@ -13,7 +13,7 @@ terminal sessions and history can be audited.
 
 Bastillion for EC2 Releases
 ------
-Bastillion-EC2 is available for free use under the Affero General Public License
+Bastillion-EC2 is available for free use under the Prosperity Public License
 
 https://github.com/bastillion-io/Bastillion-EC2/releases
 
@@ -228,9 +228,9 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
-AGPL License
+The Prosperity Public License
 -----------
-Bastillion-EC2 is available use under the Affero General Public License
+Bastillion-EC2 is available for free use under the Prosperity Public License
 
 Author
 ------
