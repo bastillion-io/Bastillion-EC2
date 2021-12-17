@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion-ec2</artifactId>
-    <version>1.74.01</version>
+    <version>1.75.00-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Bastillion for EC2</name>
     <properties>
