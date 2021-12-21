@@ -1,5 +1,4 @@
-![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png) 
-Bastillion for EC2
+![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png) Bastillion for EC2
 ======
 A web-based ssh console to execute commands and manage multiple EC2 instances
 simultaneously running on Amazon Web Services (AWS). Bastillion-EC2 allows you to share

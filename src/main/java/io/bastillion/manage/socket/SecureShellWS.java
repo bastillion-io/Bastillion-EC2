@@ -1,15 +1,11 @@
-/**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
- */
 package io.bastillion.manage.socket;
 
-import io.bastillion.manage.db.UserDB;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.control.SecureShellKtrl;
+import io.bastillion.manage.db.UserDB;
 import io.bastillion.manage.model.SchSession;
 import io.bastillion.manage.model.UserSchSessions;
 import io.bastillion.manage.task.SentOutputTask;
@@ -35,8 +31,8 @@ public class SecureShellWS {
 
     private static Logger log = LoggerFactory.getLogger(SecureShellWS.class);
 
-    private HttpSession httpSession;
-    private Session session;
+    private HttpSession httpSession = null;
+    private Session session = null;
     private Long sessionId = null;
 
 
@@ -52,7 +48,9 @@ public class SecureShellWS {
             session.setMaxIdleTimeout(0);
         }
 
-        this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        if (this.httpSession == null) {
+            this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        }
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
 
@@ -62,48 +60,53 @@ public class SecureShellWS {
 
     }
 
+
     @OnMessage
     public void onMessage(String message) {
 
-        if (session.isOpen() && StringUtils.isNotEmpty(message)) {
+        if (session.isOpen() && StringUtils.isNotEmpty(message) && !"heartbeat".equals(message)) {
 
-            Map jsonRoot = new Gson().fromJson(message, Map.class);
+            try {
+                Map jsonRoot = new Gson().fromJson(message, Map.class);
 
-            String command = (String) jsonRoot.get("command");
+                String command = (String) jsonRoot.get("command");
 
-            Integer keyCode = null;
-            Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
-            if (keyCodeDbl != null) {
-                keyCode = keyCodeDbl.intValue();
-            }
-
-            for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
-                Integer id = Integer.parseInt(idStr);
-
-                //get servletRequest.getSession() for user
-                UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
-                if (userSchSessions != null) {
-                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
-                    if (keyCode != null) {
-                        if (keyMap.containsKey(keyCode)) {
-                            try {
-                                schSession.getCommander().write(keyMap.get(keyCode));
-                            } catch (IOException ex) {
-                                log.error(ex.toString(), ex);
-                            }
-                        }
-                    } else {
-                        schSession.getCommander().print(command);
-                    }
+                Integer keyCode = null;
+                Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
+                if (keyCodeDbl != null) {
+                    keyCode = keyCodeDbl.intValue();
                 }
 
+                for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
+                    Integer id = Integer.parseInt(idStr);
+
+                    //get servletRequest.getSession() for user
+                    UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
+                    if (userSchSessions != null) {
+                        SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                        if (keyCode != null) {
+                            if (keyMap.containsKey(keyCode)) {
+                                schSession.getCommander().write(keyMap.get(keyCode));
+                            }
+                        } else {
+                            schSession.getCommander().print(command);
+                        }
+                    }
+
+                }
+                //update timeout
+                AuthUtil.setTimeout(httpSession);
+            } catch (IllegalStateException | JsonSyntaxException | IOException ex) {
+                log.error(ex.toString(), ex);
             }
-            //update timeout
-            AuthUtil.setTimeout(httpSession);
         }
-
-
     }
+
+    @OnError
+    public void onError(Session session, Throwable t) {
+        log.error(t.toString(), t);
+    }
+
 
     @OnClose
     public void onClose() {
@@ -113,9 +116,9 @@ public class SecureShellWS {
             if (userSchSessions != null) {
                 Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-                  for (Map.Entry<Integer, SchSession> entry : schSessionMap.entrySet()) {
-                    Integer sessionKey = entry.getKey();
-                    SchSession schSession = entry.getValue();
+                for (Integer sessionKey : schSessionMap.keySet()) {
+
+                    SchSession schSession = schSessionMap.get(sessionKey);
 
                     //disconnect ssh session
                     schSession.getChannel().disconnect();
@@ -125,6 +128,7 @@ public class SecureShellWS {
                     schSession.setInputToChannel(null);
                     schSession.setCommander(null);
                     schSession.setOutFromChannel(null);
+                    schSession = null;
                     //remove from map
                     schSessionMap.remove(sessionKey);
                 }

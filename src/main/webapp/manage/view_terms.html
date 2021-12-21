@@ -8,9 +8,6 @@
 <head>
 
     <meta th:replace="_res/inc/header"/>
-    <script th:src="@{/_res/js/jquery-ui.js}"></script>
-    <link rel="stylesheet" type="text/css" th:href="@{/_res/css/jquery-ui/jquery-ui.css}"/>
-
     <script th:inline="javascript">
         /*<![CDATA[*/
         $(document).ready(function () {
@@ -116,18 +113,18 @@
 
     </style>
 
-    <title>Bastillion for EC2 - Session Terms</title>
+    <title>Bastillion - Session Terms</title>
 
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
 
         <div class="navbar-header">
             <div class="navbar-brand">
                 <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
                 </div>
-                Bastillion for EC2
+                Bastillion
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -146,8 +143,8 @@
 
                 <div class="align-right">
                     <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left"/>
-                    <div class="btn btn-primary submit_btn spacer spacer-middle">Filter</div>
-                    <div class="btn btn-primary clear_btn spacer spacer-right">Clear</div>
+                    <div class="btn btn-default submit_btn spacer spacer-middle">Filter</div>
+                    <div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
                 </div>
                 <div class="align-right" style="padding-top: 15px">
                     <label>

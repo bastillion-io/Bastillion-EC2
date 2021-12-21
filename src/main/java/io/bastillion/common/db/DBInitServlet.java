@@ -7,14 +7,7 @@ package io.bastillion.common.db;
 
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.model.Auth;
-import io.bastillion.manage.util.DBUtils;
-import io.bastillion.manage.util.EncryptionUtil;
-import io.bastillion.manage.util.SSHUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.bastillion.manage.util.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -26,22 +19,29 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Initial startup task.  Creates an H2 DB.
+ * Initial startup task.  Creates an H2 DB and generates
+ * the system public/private key pair if none exists
  */
 @WebServlet(name = "DBInitServlet",
 		urlPatterns = {"/config"},
 		loadOnStartup = 1)
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(DBInitServlet.class);
-    /**
-     * task init method that created DB
-     *
-     * @param config task config
-     * @throws ServletException
-     */
-    public void init(ServletConfig config) throws ServletException {
+	private static Logger log = LoggerFactory.getLogger(DBInitServlet.class);
+
+	/**
+	 * task init method that created DB and generated public/private keys
+	 *
+	 * @param config task config
+	 */
+	public void init(ServletConfig config) throws ServletException {
 
 		super.init(config);
 
@@ -96,7 +96,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists user_theme (user_id INTEGER PRIMARY KEY, bg varchar(7), fg varchar(7), d1 varchar(7), d2 varchar(7), d3 varchar(7), d4 varchar(7), d5 varchar(7), d6 varchar(7), d7 varchar(7), d8 varchar(7), b1 varchar(7), b2 varchar(7), b3 varchar(7), b4 varchar(7), b5 varchar(7), b6 varchar(7), b7 varchar(7), b8 varchar(7), foreign key (user_id) references users(id) on delete cascade) ");
                 statement.executeUpdate("create table if not exists default_region (id INTEGER PRIMARY KEY AUTO_INCREMENT, region varchar not null)");
                 statement.executeUpdate("create table if not exists iam_role (id INTEGER PRIMARY KEY AUTO_INCREMENT, arn varchar not null)");
-                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar, instance_id varchar not null, user varchar not null, host varchar, port INTEGER not null, region varchar not null, state varchar, instance_status varchar, system_status varchar, m_alarm INTEGER default 0, m_insufficient_data INTEGER default 0, m_ok INTEGER default 0)");
+                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar, instance_id varchar not null, \"user\" varchar not null, host varchar, port INTEGER not null, region varchar not null, state varchar, instance_status varchar, system_status varchar, m_alarm INTEGER default 0, m_insufficient_data INTEGER default 0, m_ok INTEGER default 0)");
                 statement.executeUpdate("create table if not exists profiles (id INTEGER PRIMARY KEY AUTO_INCREMENT, nm varchar not null, tag varchar not null)");
                 statement.executeUpdate("create table if not exists user_map (user_id INTEGER, profile_id INTEGER, foreign key (user_id) references users(id) on delete cascade, foreign key (profile_id) references profiles(id) on delete cascade, primary key (user_id, profile_id))");
                 statement.executeUpdate("create table if not exists application_key (id INTEGER PRIMARY KEY AUTO_INCREMENT, public_key varchar not null, private_key varchar not null, passphrase varchar)");
@@ -105,7 +105,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, display_nm varchar not null, script varchar not null, foreign key (user_id) references users(id) on delete cascade)");
 
                 statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, session_tm timestamp default CURRENT_TIMESTAMP, first_nm varchar, last_nm varchar, username varchar not null, ip_address varchar)");
-                statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, \"user\" varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
 
 				//if exists readfile to set default password
 				String salt = EncryptionUtil.generateSalt();
@@ -120,11 +120,17 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 					}
 				}
 
-                //insert default admin user
-                statement.executeUpdate("insert into users (username, password, user_type, salt) values('admin', '" + defaultPassword + "','"+ Auth.MANAGER+"','"+ salt+"')");
-            }
+				//insert default admin user
+				PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");
+				pStmt.setString(1, "admin");
+				pStmt.setString(2, defaultPassword);
+				pStmt.setString(3, Auth.MANAGER);
+				pStmt.setString(4, salt);
+				pStmt.execute();
+				DBUtils.closeStmt(pStmt);
 
-            DBUtils.closeRs(rs);
+			}
+			DBUtils.closeRs(rs);
 
 			//if reset ssh application key then generate new key
 			if (resetSSHKey) {

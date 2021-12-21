@@ -8,7 +8,6 @@ package io.bastillion.manage.db;
 
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.model.*;
-import io.bastillion.manage.model.*;
 import io.bastillion.manage.util.DBUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -229,7 +228,7 @@ public class SessionAuditDB {
 
             if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().toString().equals("")) {
                 //insert
-                PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, display_nm, user, host, port, output) values(?,?,?,?,?,?,?)");
+                PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, display_nm, \"user\", host, port, output) values(?,?,?,?,?,?,?)");
                 stmt.setLong(1, sessionOutput.getSessionId());
                 stmt.setLong(2, sessionOutput.getInstanceId());
                 stmt.setString(3, sessionOutput.getDisplayNm());
@@ -332,7 +331,7 @@ public class SessionAuditDB {
 
         List<HostSystem> hostSystemList = new ArrayList<>();
         try {
-            PreparedStatement stmt = con.prepareStatement("select distinct instance_id, display_nm, user, host, port from terminal_log where session_id=?");
+            PreparedStatement stmt = con.prepareStatement("select distinct instance_id, display_nm, \"user\", host, port from terminal_log where session_id=?");
             stmt.setLong(1, sessionId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
