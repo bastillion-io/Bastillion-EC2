@@ -28,7 +28,7 @@ public class SystemDB {
     private static Logger log = LoggerFactory.getLogger(SystemDB.class);
 
     public static final String DISPLAY_NM = "display_nm";
-    public static final String USER = "user";
+    public static final String USER = "username";
     public static final String HOST = "host";
     public static final String PORT = "port";
     public static final String INSTANCE_ID = "instance_id";
@@ -331,7 +331,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, \"user\", host, port, instance_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, username, host, port, instance_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -389,7 +389,7 @@ public class SystemDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, \"user\"=?, host=?, port=?, instance_id=?,  region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, username=?, host=?, port=?, instance_id=?,  region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
