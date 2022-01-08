@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion-ec2</artifactId>
-    <version>1.76.00</version>
+    <version>1.76.01-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Bastillion for EC2</name>
     <properties>
@@ -20,9 +20,9 @@
             <version>[1.12, 1.13)</version>
         </dependency>
         <dependency>
-            <groupId>loophole.mvc</groupId>
+            <groupId>io.bastillion</groupId>
             <artifactId>lmvc</artifactId>
-            <version>1.09.01</version>
+            <version>1.10.00</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
