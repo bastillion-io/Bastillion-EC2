@@ -1,4 +1,4 @@
-name: Bastillion for EC2
+name: Build
 
 on: [push]
 
