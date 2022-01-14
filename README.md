@@ -1,5 +1,6 @@
 ![Build](https://github.com/bastillion-io/Bastillion-EC2/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion-EC2/actions/workflows/codeql-analysis.yml/badge.svg)
+
 ![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png) Bastillion for EC2
 ======
 A web-based ssh console to execute commands and manage multiple EC2 instances
