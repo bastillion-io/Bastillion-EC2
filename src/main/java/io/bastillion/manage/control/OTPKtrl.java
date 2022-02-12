@@ -1,12 +1,13 @@
 /**
- *    Copyright (C) 2014 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2014 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import io.bastillion.common.util.AppConfig;
@@ -22,21 +23,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Hashtable;
 
 public class OTPKtrl extends BaseKontroller {
 
+    private static final Logger log = LoggerFactory.getLogger(OTPKtrl.class);
+
     public final static boolean requireOTP = "required".equals(AppConfig.getProperty("oneTimePassword"));
     //QR image size
     private static final int QR_IMAGE_WIDTH = 325;
     private static final int QR_IMAGE_HEIGHT = 325;
-    private static Logger log = LoggerFactory.getLogger(OTPKtrl.class);
     @Model(name = "qrImage")
     String qrImage;
     @Model(name = "sharedSecret")
@@ -47,13 +53,18 @@ public class OTPKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/admin/viewOTP", method = MethodType.GET)
-    public String viewOTP() {
+    public String viewOTP() throws ServletException {
 
         sharedSecret = OTPUtil.generateSecret();
 
-        AuthUtil.setOTPSecret(getRequest().getSession(), sharedSecret);
+        try {
+            AuthUtil.setOTPSecret(getRequest().getSession(), sharedSecret);
+        } catch (GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
 
-        qrImage = Long.toString(new Date().getTime()) + ".png";
+        qrImage = new Date().getTime() + ".png";
 
         return "/admin/two-factor_otp.html";
 
@@ -61,9 +72,14 @@ public class OTPKtrl extends BaseKontroller {
 
 
     @Kontrol(path = "/admin/otpSubmit", method = MethodType.POST)
-    public String otpSubmit() {
+    public String otpSubmit() throws ServletException {
 
-        AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(getRequest().getSession()));
+        try {
+            AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(getRequest().getSession()));
+        } catch (GeneralSecurityException | SQLException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
 
         if (requireOTP) {
             AuthUtil.deleteAllSession(getRequest().getSession());
@@ -74,15 +90,14 @@ public class OTPKtrl extends BaseKontroller {
 
 
     @Kontrol(path = "/admin/qrImage", method = MethodType.GET)
-    public String qrImage() {
-
-        String username = UserDB.getUser(AuthUtil.getUserId(getRequest().getSession())).getUsername();
-
-        String secret = AuthUtil.getOTPSecret(getRequest().getSession());
-
-        AuthUtil.setOTPSecret(getRequest().getSession(), null);
+    public String qrImage() throws ServletException {
 
         try {
+            String username = UserDB.getUser(AuthUtil.getUserId(getRequest().getSession())).getUsername();
+
+            String secret = AuthUtil.getOTPSecret(getRequest().getSession());
+
+            AuthUtil.setOTPSecret(getRequest().getSession(), null);
 
             String qrCodeText = "otpauth://totp/Bastillion-EC2%20%28" + URLEncoder.encode(getRequest().getHeader("host").replaceAll("\\:.*$", ""), "utf-8") + "%29:" + username + "?secret=" + secret;
 
@@ -90,7 +105,6 @@ public class OTPKtrl extends BaseKontroller {
 
             Hashtable<EncodeHintType, String> hints = new Hashtable<>();
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-
 
             BitMatrix matrix = qrWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, QR_IMAGE_WIDTH, QR_IMAGE_HEIGHT, hints);
             getResponse().setContentType("image/png");
@@ -114,9 +128,11 @@ public class OTPKtrl extends BaseKontroller {
             getResponse().getOutputStream().flush();
             getResponse().getOutputStream().close();
 
-        } catch (Exception ex) {
+        } catch (GeneralSecurityException | SQLException | IOException | WriterException ex) {
             log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
+
 
         return null;
 

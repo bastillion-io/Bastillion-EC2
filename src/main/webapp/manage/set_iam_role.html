@@ -26,7 +26,7 @@
         /*<![CDATA[*/
         $(document).ready(function () {
 
-            $("#add_dialog").modal();
+            new bootstrap.Modal($("#add_dialog")).show();
 
         });
         /*]]>*/
@@ -49,7 +49,7 @@
                 href="https://www.bastillion.io/docs/bastillion-ec2/iam_role/">here</a>.</p>
     <div th:replace="_res/inc/errors"></div>
     <div class="alert alert-success" th:if="${success}">
-        <strong>Success!</strong>
+        Success!
         <div><span>Amazon Resource Name has been configured</span></div>
     </div>
     <form th:action="@{/manage/saveIAMRole.ktrl}" class="save_aws_form_add" method="post"
@@ -57,10 +57,10 @@
         <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
         <table>
             <tr>
-                <td><strong>ARN</strong></td>
+                <td>ARN</td>
                 <td>
 
-                    <input type="text" placeholder="arn:aws:iam::xxxxxxxxxxxx:role/Bastillion for EC2Role" name="arn"
+                    <input type="text" class="form-control" placeholder="arn:aws:iam::xxxxxxxxxxxx:role/Bastillion for EC2Role" name="arn"
                            th:value="${arn}"
                            title="ARN" size="40"/>
                     <span class="error" th:text="${fieldErrors.get('arn')}"></span>
@@ -75,7 +75,7 @@
     <h3>Public Key</h3>
     <p>You'll also need to register the SSH key below to allow for application authentication when provisioning EC2
         instances. Otherwise, you will have to add the key to the instances manually.</p>
-    <pre style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
+    <pre style="white-space:pre-wrap;" class="form-control" th:text="${publicKey}"></pre>
 
 
 </div>

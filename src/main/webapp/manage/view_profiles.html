@@ -49,11 +49,11 @@
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${profile.id > 0}"]
-                $('#edit_dialog_' + [[${profile.id}]]).modal();
+                new bootstrap.Modal('#edit_dialog_' + [[${profile.id}]]).show();
             [/]
 
             [# th:if= "${profile.id <= 0}"]
-                $("#add_dialog").modal();
+                new bootstrap.Modal($("#add_dialog")).show();
             [/]
         });
         /*]]>*/
@@ -103,12 +103,12 @@
                     <td th:text="${p.nm}"></td>
 
                     <td>
-                        <div style="width:240px">
+                        <div>
                             <a th:href="'viewProfileUsers.ktrl?profile.id=' + ${p.id}+'&_csrf=' + ${session._csrf}">
                                 <button th:id="'user_assign_btn_' + ${p.id}"
                                         class="btn btn-primary edit_btn spacer spacer-left">Assign Users</button></a>
-                            <button class="btn btn-primary spacer spacer-middle" data-toggle="modal"
-                                    th:attr="data-target='#edit_dialog_' + ${p.id}">Edit</button>
+                            <button class="btn btn-primary spacer spacer-middle" data-bs-toggle="modal"
+                                    th:attr="data-bs-target='#edit_dialog_' + ${p.id}">Edit</button>
                             <button th:id="'del_btn_' + ${p.id}"
                                     class="btn btn-primary del_btn spacer spacer-right">Delete</button>
                             <div style="clear:both"/>
@@ -123,15 +123,15 @@
     </div>
 
 
-    <button class="btn btn-primary add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add
+    <button class="btn btn-primary add_btn spacer spacer-bottom" data-bs-toggle="modal" data-bs-target="#add_dialog">Add
         Profile
     </button>
     <div id="add_dialog" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                    <h4 class="modal-title">Add Profile</h4>
+                    <h5 class="modal-title">Add Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
@@ -140,17 +140,17 @@
                         <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
                         <table>
                             <tr>
-                                <td><strong>Name</strong></td>
+                                <td>Name</td>
                                 <td>
-                                    <input type="text" name="profile.nm" th:value="${profile.nm}" title="Name"
+                                    <input type="text" name="profile.nm" class="form-control"  th:value="${profile.nm}" title="Name"
                                            size="15"/>
                                     <span class="error" th:text="${fieldErrors.get('profile.nm')}"></span>
                                 </td>
                             </tr>
                             <tr>
-                                <td><strong>Tag</strong></td>
+                                <td>Tag</td>
                                 <td>
-                                    <input type="text" name="profile.tag" th:value="${profile.tag}" title="Tag"
+                                    <input type="text" name="profile.tag" class="form-control" th:value="${profile.tag}" title="Tag"
                                            placeholder="tag-name[=value[,tag-name[=value]]" size="25"/>
                                     <span class="error" th:text="${fieldErrors.get('profile.tag')}"></span>
                                 </td>
@@ -163,7 +163,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary cancel_btn" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary submit_btn">Submit</button>
                 </div>
             </div>
@@ -175,8 +175,8 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Edit Profile</h4>
+                        <h5 class="modal-title">Edit Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -187,16 +187,16 @@
                                 <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
                                 <table>
                                     <tr>
-                                        <td><strong>Name</strong></td>
+                                        <td>Name</td>
                                         <td>
-                                            <input type="text" name="profile.nm" th:value="${p.nm}" title="Name"
+                                            <input type="text" name="profile.nm" class="form-control" th:value="${p.nm}" title="Name"
                                                    size="15"/>
                                             <span class="error" th:text="${fieldErrors.get('profile.nm')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Tag</strong></td>
-                                        <td><input type="text" name="profile.tag" th:value="${p.tag}" title="Tag"
+                                        <td>Tag</td>
+                                        <td><input type="text" name="profile.tag" class="form-control" th:value="${p.tag}" title="Tag"
                                                    placeholder="tag-name[=value[,tag-name[=value]]" size="25"/>
                                             <span class="error" th:text="${fieldErrors.get('profile.tag')}"></span>
                                         </td>
@@ -210,7 +210,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel
+                            <button type="button" class="btn btn-primary cancel_btn" data-bs-dismiss="modal">Cancel
                             </button>
                             <button type="button" class="btn btn-primary submit_btn">Submit</button>
                         </div>

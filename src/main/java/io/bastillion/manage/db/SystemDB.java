@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.db;
 
@@ -11,9 +11,11 @@ import io.bastillion.manage.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,9 +25,6 @@ import java.util.List;
  * DAO used to manage systems
  */
 public class SystemDB {
-
-
-    private static Logger log = LoggerFactory.getLogger(SystemDB.class);
 
     public static final String DISPLAY_NM = "display_nm";
     public static final String USER = "username";
@@ -49,7 +48,7 @@ public class SystemDB {
     public static final String SORT_BY_STATE = STATE;
     public static final String SORT_BY_INSTANCE_STATUS = INSTANCE_STATUS;
     public static final String SORT_BY_SYSTEM_STATUS = SYSTEM_STATUS;
-    public static final String SORT_BY_ALARMS= "alarms";
+    public static final String SORT_BY_ALARMS = "alarms";
     public static final String SORT_BY_REGION = REGION;
 
     private SystemDB() {
@@ -62,52 +61,41 @@ public class SystemDB {
      * @param sortedSet      sorted set object
      * @return sortedSet with list of host systems
      */
-    public static SortedSet getSystemSet(SortedSet sortedSet) {
+    public static SortedSet getSystemSet(SortedSet sortedSet) throws SQLException, GeneralSecurityException {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+        }
+        StringBuilder sqlBuilder = new StringBuilder("select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system");
+        sqlBuilder.append(orderBy);
 
-            String orderBy = "";
-            if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-                orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-            }
-            StringBuilder sqlBuilder = new StringBuilder("select *, CONCAT_WS('-',m_alarm,m_insufficient_data,m_ok) as alarms from  system");
-            sqlBuilder.append(orderBy);
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            HostSystem hostSystem = new HostSystem();
+            hostSystem.setId(rs.getLong(ID));
+            hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+            hostSystem.setInstance(rs.getString(INSTANCE_ID));
+            hostSystem.setUser(rs.getString(USER));
+            hostSystem.setHost(rs.getString(HOST));
+            hostSystem.setPort(rs.getInt(PORT));
+            hostSystem.setEc2Region(rs.getString(REGION));
+            hostSystem.setState(rs.getString(STATE));
+            hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
+            hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
+            hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+            hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+            hostSystem.setMonitorOk(rs.getInt(M_OK));
+            hostSystemList.add(hostSystem);
+        }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
-            Connection con = null;
-            try {
-                con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
-
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    HostSystem hostSystem = new HostSystem();
-                    hostSystem.setId(rs.getLong(ID));
-                    hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-                    hostSystem.setInstance(rs.getString(INSTANCE_ID));
-                    hostSystem.setUser(rs.getString(USER));
-                    hostSystem.setHost(rs.getString(HOST));
-                    hostSystem.setPort(rs.getInt(PORT));
-                    hostSystem.setEc2Region(rs.getString(REGION));
-                    hostSystem.setState(rs.getString(STATE));
-                    hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
-                    hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
-                    hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
-                    hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
-                    hostSystem.setMonitorOk(rs.getInt(M_OK));
-                    hostSystemList.add(hostSystem);
-                }
-                DBUtils.closeRs(rs);
-                DBUtils.closeStmt(stmt);
-
-            } catch (Exception e) {
-                log.error(e.toString(), e);
-            }
-            finally {
-                DBUtils.closeConn(con);
-            }
-
-            sortedSet.setItemList(hostSystemList);
+        sortedSet.setItemList(hostSystemList);
         return sortedSet;
 
     }
@@ -119,7 +107,7 @@ public class SystemDB {
      * @param instanceIdList instance ids to select
      * @return sortedSet with list of host systems
      */
-    public static SortedSet getSystemSet(SortedSet sortedSet, List<String> instanceIdList) {
+    public static SortedSet getSystemSet(SortedSet sortedSet, List<String> instanceIdList) throws SQLException, GeneralSecurityException {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
         if (instanceIdList != null && !instanceIdList.isEmpty()) {
@@ -136,39 +124,29 @@ public class SystemDB {
 
             sqlBuilder.append(orderBy);
 
-            Connection con = null;
-            try {
-                con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
-
-                ResultSet rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    HostSystem hostSystem = new HostSystem();
-                    hostSystem.setId(rs.getLong(ID));
-                    hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-                    hostSystem.setInstance(rs.getString(INSTANCE_ID));
-                    hostSystem.setUser(rs.getString(USER));
-                    hostSystem.setHost(rs.getString(HOST));
-                    hostSystem.setPort(rs.getInt(PORT));
-                    hostSystem.setEc2Region(rs.getString(REGION));
-                    hostSystem.setState(rs.getString(STATE));
-                    hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
-                    hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
-                    hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
-                    hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
-                    hostSystem.setMonitorOk(rs.getInt(M_OK));
-                    hostSystemList.add(hostSystem);
-                }
-                DBUtils.closeRs(rs);
-                DBUtils.closeStmt(stmt);
-
-            } catch (Exception e) {
-                log.error(e.toString(), e);
+            Connection con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                HostSystem hostSystem = new HostSystem();
+                hostSystem.setId(rs.getLong(ID));
+                hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+                hostSystem.setInstance(rs.getString(INSTANCE_ID));
+                hostSystem.setUser(rs.getString(USER));
+                hostSystem.setHost(rs.getString(HOST));
+                hostSystem.setPort(rs.getInt(PORT));
+                hostSystem.setEc2Region(rs.getString(REGION));
+                hostSystem.setState(rs.getString(STATE));
+                hostSystem.setInstanceStatus(rs.getString(INSTANCE_STATUS));
+                hostSystem.setSystemStatus(rs.getString(SYSTEM_STATUS));
+                hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+                hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+                hostSystem.setMonitorOk(rs.getInt(M_OK));
+                hostSystemList.add(hostSystem);
             }
-            finally {
-                DBUtils.closeConn(con);
-            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+            DBUtils.closeConn(con);
 
             sortedSet.setItemList(hostSystemList);
         }
@@ -183,24 +161,11 @@ public class SystemDB {
      * @param id system id
      * @return system
      */
-    public static HostSystem getSystem(Long id) {
+    public static HostSystem getSystem(Long id) throws SQLException, GeneralSecurityException {
 
-        HostSystem hostSystem = null;
-
-        Connection con = null;
-
-        try {
-            con = DBUtils.getConn();
-
-            getSystem(con, id);
-
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        HostSystem hostSystem = getSystem(con, id);
+        DBUtils.closeConn(con);
 
         return hostSystem;
     }
@@ -213,38 +178,29 @@ public class SystemDB {
      * @param id  system id
      * @return system
      */
-    public static HostSystem getSystem(Connection con, Long id) {
+    public static HostSystem getSystem(Connection con, Long id) throws SQLException {
 
         HostSystem hostSystem = null;
 
-
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("select * from  system where id=?");
-            stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                hostSystem = new HostSystem();
-                hostSystem.setId(rs.getLong(ID));
-                hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-                hostSystem.setInstance(rs.getString(INSTANCE_ID));
-                hostSystem.setUser(rs.getString(USER));
-                hostSystem.setHost(rs.getString(HOST));
-                hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setEc2Region(rs.getString(REGION));
-                hostSystem.setState(rs.getString(STATE));
-                hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
-                hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
-                hostSystem.setMonitorOk(rs.getInt(M_OK));
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        PreparedStatement stmt = con.prepareStatement("select * from  system where id=?");
+        stmt.setLong(1, id);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            hostSystem = new HostSystem();
+            hostSystem.setId(rs.getLong(ID));
+            hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+            hostSystem.setInstance(rs.getString(INSTANCE_ID));
+            hostSystem.setUser(rs.getString(USER));
+            hostSystem.setHost(rs.getString(HOST));
+            hostSystem.setPort(rs.getInt(PORT));
+            hostSystem.setEc2Region(rs.getString(REGION));
+            hostSystem.setState(rs.getString(STATE));
+            hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+            hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+            hostSystem.setMonitorOk(rs.getInt(M_OK));
         }
-
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
 
         return hostSystem;
     }
@@ -256,23 +212,11 @@ public class SystemDB {
      * @param instanceId system instance id
      * @return system
      */
-    public static HostSystem getSystem(String instanceId) {
+    public static HostSystem getSystem(String instanceId) throws SQLException, GeneralSecurityException {
 
-        HostSystem hostSystem = null;
-
-        Connection con = null;
-
-        try {
-            con = DBUtils.getConn();
-
-            hostSystem = getSystem(con, instanceId);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        HostSystem hostSystem = getSystem(con, instanceId);
+        DBUtils.closeConn(con);
 
         return hostSystem;
     }
@@ -284,37 +228,29 @@ public class SystemDB {
      * @param instanceId system instance id
      * @return system
      */
-    public static HostSystem getSystem(Connection con, String instanceId) {
+    public static HostSystem getSystem(Connection con, String instanceId) throws SQLException {
 
         HostSystem hostSystem = null;
 
-
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("select * from  system where instance_id like ?");
-            stmt.setString(1, instanceId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                hostSystem = new HostSystem();
-                hostSystem.setId(rs.getLong(ID));
-                hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-                hostSystem.setInstance(rs.getString(INSTANCE_ID));
-                hostSystem.setUser(rs.getString(USER));
-                hostSystem.setHost(rs.getString(HOST));
-                hostSystem.setPort(rs.getInt(PORT));
-                hostSystem.setEc2Region(rs.getString(REGION));
-                hostSystem.setState(rs.getString(STATE));
-                hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
-                hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
-                hostSystem.setMonitorOk(rs.getInt(M_OK));
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        PreparedStatement stmt = con.prepareStatement("select * from  system where instance_id like ?");
+        stmt.setString(1, instanceId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            hostSystem = new HostSystem();
+            hostSystem.setId(rs.getLong(ID));
+            hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+            hostSystem.setInstance(rs.getString(INSTANCE_ID));
+            hostSystem.setUser(rs.getString(USER));
+            hostSystem.setHost(rs.getString(HOST));
+            hostSystem.setPort(rs.getInt(PORT));
+            hostSystem.setEc2Region(rs.getString(REGION));
+            hostSystem.setState(rs.getString(STATE));
+            hostSystem.setMonitorAlarm(rs.getInt(M_ALARM));
+            hostSystem.setMonitorInsufficientData(rs.getInt(M_INSUFFICIENT_DATA));
+            hostSystem.setMonitorOk(rs.getInt(M_OK));
         }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
 
 
         return hostSystem;
@@ -327,29 +263,23 @@ public class SystemDB {
      * @param con        DB connection object
      * @param hostSystem host system object
      */
-    public static void insertSystem(Connection con, HostSystem hostSystem) {
+    public static void insertSystem(Connection con, HostSystem hostSystem) throws SQLException {
 
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, username, host, port, instance_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?)");
-            stmt.setString(1, hostSystem.getDisplayNm());
-            stmt.setString(2, hostSystem.getUser());
-            stmt.setString(3, hostSystem.getHost());
-            stmt.setInt(4, hostSystem.getPort());
-            stmt.setString(5, hostSystem.getInstance());
-            stmt.setString(6, hostSystem.getEc2Region());
-            stmt.setString(7, hostSystem.getState());
-            stmt.setString(8, hostSystem.getInstanceStatus());
-            stmt.setString(9, hostSystem.getSystemStatus());
-            stmt.setInt(10, hostSystem.getMonitorAlarm());
-            stmt.setInt(11, hostSystem.getMonitorInsufficientData());
-            stmt.setInt(12, hostSystem.getMonitorOk());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
+        PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, username, host, port, instance_id, region, state, instance_status, system_status, m_alarm, m_insufficient_data, m_ok) values (?,?,?,?,?,?,?,?,?,?,?,?)");
+        stmt.setString(1, hostSystem.getDisplayNm());
+        stmt.setString(2, hostSystem.getUser());
+        stmt.setString(3, hostSystem.getHost());
+        stmt.setInt(4, hostSystem.getPort());
+        stmt.setString(5, hostSystem.getInstance());
+        stmt.setString(6, hostSystem.getEc2Region());
+        stmt.setString(7, hostSystem.getState());
+        stmt.setString(8, hostSystem.getInstanceStatus());
+        stmt.setString(9, hostSystem.getSystemStatus());
+        stmt.setInt(10, hostSystem.getMonitorAlarm());
+        stmt.setInt(11, hostSystem.getMonitorInsufficientData());
+        stmt.setInt(12, hostSystem.getMonitorOk());
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
 
     }
 
@@ -358,24 +288,11 @@ public class SystemDB {
      *
      * @param hostSystem host system object
      */
-    public static void updateSystem(HostSystem hostSystem) {
+    public static void updateSystem(HostSystem hostSystem) throws SQLException, GeneralSecurityException {
 
-
-        Connection con = null;
-
-        try {
-            con = DBUtils.getConn();
-
-            updateSystem(con, hostSystem);
-
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
-
+        Connection con = DBUtils.getConn();
+        updateSystem(con, hostSystem);
+        DBUtils.closeConn(con);
     }
 
     /**
@@ -384,31 +301,24 @@ public class SystemDB {
      * @param con        DB connection object
      * @param hostSystem host system object
      */
-    public static void updateSystem(Connection con, HostSystem hostSystem) {
+    public static void updateSystem(Connection con, HostSystem hostSystem) throws SQLException {
 
-
-        try {
-
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, username=?, host=?, port=?, instance_id=?,  region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
-            stmt.setString(1, hostSystem.getDisplayNm());
-            stmt.setString(2, hostSystem.getUser());
-            stmt.setString(3, hostSystem.getHost());
-            stmt.setInt(4, hostSystem.getPort());
-            stmt.setString(5, hostSystem.getInstance());
-            stmt.setString(6, hostSystem.getEc2Region());
-            stmt.setString(7, hostSystem.getState());
-            stmt.setString(8, hostSystem.getInstanceStatus());
-            stmt.setString(9, hostSystem.getSystemStatus());
-            stmt.setInt(10, hostSystem.getMonitorAlarm());
-            stmt.setInt(11, hostSystem.getMonitorInsufficientData());
-            stmt.setInt(12, hostSystem.getMonitorOk());
-            stmt.setLong(13, hostSystem.getId());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
+        PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, username=?, host=?, port=?, instance_id=?,  region=?, state=?, instance_status=?, system_status=?, m_alarm=?, m_insufficient_data=?, m_ok=?  where id=?");
+        stmt.setString(1, hostSystem.getDisplayNm());
+        stmt.setString(2, hostSystem.getUser());
+        stmt.setString(3, hostSystem.getHost());
+        stmt.setInt(4, hostSystem.getPort());
+        stmt.setString(5, hostSystem.getInstance());
+        stmt.setString(6, hostSystem.getEc2Region());
+        stmt.setString(7, hostSystem.getState());
+        stmt.setString(8, hostSystem.getInstanceStatus());
+        stmt.setString(9, hostSystem.getSystemStatus());
+        stmt.setInt(10, hostSystem.getMonitorAlarm());
+        stmt.setInt(11, hostSystem.getMonitorInsufficientData());
+        stmt.setInt(12, hostSystem.getMonitorOk());
+        stmt.setLong(13, hostSystem.getId());
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
 
     }
 
@@ -418,31 +328,22 @@ public class SystemDB {
      *
      * @param hostSystemList list of host system object
      */
-    public static void setSystems(Collection<HostSystem> hostSystemList) {
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
+    public static void setSystems(Collection<HostSystem> hostSystemList) throws SQLException, GeneralSecurityException {
+        Connection con = DBUtils.getConn();
 
-            //insert new host systems
-            for (HostSystem hostSystem : hostSystemList) {
-                HostSystem hostSystemTmp = getSystem(con, hostSystem.getInstance());
-                if (hostSystemTmp == null) {
-                    insertSystem(con, hostSystem);
-                } else {
-                    hostSystem.setId(hostSystemTmp.getId());
-                    hostSystem.setUser(hostSystemTmp.getUser());
-                    hostSystem.setPort(hostSystemTmp.getPort());
-                    updateSystem(con, hostSystem);
-                }
+        //insert new host systems
+        for (HostSystem hostSystem : hostSystemList) {
+            HostSystem hostSystemTmp = getSystem(con, hostSystem.getInstance());
+            if (hostSystemTmp == null) {
+                insertSystem(con, hostSystem);
+            } else {
+                hostSystem.setId(hostSystemTmp.getId());
+                hostSystem.setUser(hostSystemTmp.getUser());
+                hostSystem.setPort(hostSystemTmp.getPort());
+                updateSystem(con, hostSystem);
             }
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
-
+        DBUtils.closeConn(con);
     }
 
 
@@ -452,34 +353,19 @@ public class SystemDB {
      * @param instanceIdList system instance id
      * @return system
      */
-    public static List<HostSystem> getSystems(List<String> instanceIdList) {
-
-        Connection con = null;
+    public static List<HostSystem> getSystems(List<String> instanceIdList) throws SQLException, GeneralSecurityException {
 
         List<HostSystem> hostSystemList = new ArrayList<>();
-        if(instanceIdList != null) {
+        if (instanceIdList != null) {
             for (String instanceId : instanceIdList) {
-
-                try {
-                    con = DBUtils.getConn();
-
-                    hostSystemList.add(getSystem(con, instanceId));
-
-
-                } catch (Exception e) {
-                    log.error(e.toString(), e);
-                } finally {
-                    DBUtils.closeConn(con);
-                }
-
+                Connection con = DBUtils.getConn();
+                hostSystemList.add(getSystem(con, instanceId));
+                DBUtils.closeConn(con);
             }
         }
 
         return hostSystemList;
     }
-
-
-
 
 
 }

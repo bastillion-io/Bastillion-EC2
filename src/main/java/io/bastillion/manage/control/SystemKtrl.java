@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -15,6 +15,7 @@ import com.amazonaws.services.cloudwatch.model.MetricAlarm;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
+import com.amazonaws.services.securitytoken.model.AWSSecurityTokenServiceException;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.DefaultRegionDB;
@@ -33,14 +34,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
  * Action to manage systems
  */
 public class SystemKtrl extends BaseKontroller {
+
+    private static final Logger log = LoggerFactory.getLogger(SystemKtrl.class);
 
     public static final String FILTER_BY_ALARM_STATE = "alarm_state";
     public static final String FILTER_BY_INSTANCE_STATUS = "instance_status";
@@ -58,39 +65,44 @@ public class SystemKtrl extends BaseKontroller {
     static Map<String, String> instanceStateMap = AppConfig.getMapProperties("instanceState");
     @Model(name = "regionMap")
     static Map<String, String> regionMap = new LinkedHashMap<>();
+    @Model(name = "region")
+    static String region;
 
-    private static Logger log = LoggerFactory.getLogger(SystemKtrl.class);
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
     @Model(name = "hostSystem")
     HostSystem hostSystem = new HostSystem();
-    @Model(name = "region")
-    String region = DefaultRegionDB.getRegion();
     @Model(name = "showStatus")
     Boolean showStatus = false;
     @Model(name = "script")
     Script script = new Script();
 
+
+    static {
+        try {
+            region = DefaultRegionDB.getRegion();
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+        }
+    }
     public SystemKtrl(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
     }
 
 
     @Kontrol(path = "/admin/viewSystems", method = MethodType.GET)
-    public String viewSystems() {
-
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
-        String userType = AuthUtil.getUserType(getRequest().getSession());
-
-        List<String> instanceIdList = new ArrayList<>();
-
-        //default instance state
-        if (sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null) {
-            sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE, AppConfig.getProperty("defaultInstanceState"));
-        }
+    public String viewSystems() throws ServletException {
 
         try {
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
+            String userType = AuthUtil.getUserType(getRequest().getSession());
 
+            List<String> instanceIdList = new ArrayList<>();
+
+            //default instance state
+            if (sortedSet.getFilterMap().get(FILTER_BY_INSTANCE_STATE) == null) {
+                sortedSet.getFilterMap().put(FILTER_BY_INSTANCE_STATE, AppConfig.getProperty("defaultInstanceState"));
+            }
             AmazonEC2 service = AmazonEC2ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(AWSClientConfig.getCredentials()))
                     .withRegion(Regions.DEFAULT_REGION)
@@ -290,13 +302,16 @@ public class SystemKtrl extends BaseKontroller {
                 sortedSet = SystemDB.getSystemSet(sortedSet, new ArrayList<>(hostSystemList.keySet()));
 
             }
-        } catch (Exception ex) {
+
+            if (script != null && script.getId() != null) {
+                script = ScriptDB.getScript(script.getId(), userId);
+            }
+        } catch (AWSSecurityTokenServiceException ex) {
             log.error(ex.toString(), ex);
-        }
-
-
-        if (script != null && script.getId() != null) {
-            script = ScriptDB.getScript(script.getId(), userId);
+            return "redirect:/manage/viewIAMRole.ktrl";
+        } catch(SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
 
         return "/admin/view_systems.html";
@@ -340,12 +355,17 @@ public class SystemKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/admin/saveSystem", method = MethodType.POST)
-    public String saveSystem() {
+    public String saveSystem() throws ServletException {
 
         String retVal = "redirect:/admin/viewSystems.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
         if (hostSystem.getId() != null && hostSystem.getPort() != null
                 && hostSystem.getUser() != null && !hostSystem.getUser().trim().equals("")) {
-            SystemDB.updateSystem(hostSystem);
+            try {
+                SystemDB.updateSystem(hostSystem);
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
 
         }
         if (script != null && script.getId() != null) {

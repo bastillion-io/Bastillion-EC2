@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2014 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2014 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.util;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class OTPUtil {
 
-    private static Logger log = LoggerFactory.getLogger(OTPUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(OTPUtil.class);
 
     //sizes to generate OTP secret
     private static final int SECRET_SIZE = 10;
@@ -114,7 +114,7 @@ public class OTPUtil {
         }
 
 
-        return calculated != -1 && calculated == token;
+        return (calculated != -1 && calculated == token);
 
 
     }

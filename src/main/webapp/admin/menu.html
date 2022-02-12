@@ -8,111 +8,91 @@
 <head>
     <meta th:replace="_res/inc/header"/>
 
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("table").css("background-color", "#ffffff");
-            $("table tr:even").css("background-color", "#e0e0e0");
-        });
-    </script>
-
     <title>Bastillion for EC2 - Main Menu</title>
 
 </head>
 
-
 <body>
 <div th:replace="_res/inc/navigation"></div>
-
-
 <div class="container">
-    <div class="template">
-
-        <table class="table-striped">
-            <thead>
-            <tr>
-                <th colspan="2">Main Menu</th>
-            </tr>
-            </thead>
-
-            <tbody>
+    <h3>Main Menu</h3>
+    <div class="row featurette">
+        <div class="list-group">
+            <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
+                <a th:href="'../manage/viewIAMRole.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-primary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Set IAM Role</h5>
+                    </div>
+                    <p class="mb-1">Set IAM Role for EC2 access.</p>
+                </a>
+            </template>
+            <a th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}"
+               class="list-group-item list-group-item-action list-group-item-light">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Terms</h5>
+                </div>
+                <p class="mb-1">Execute multiple-simultaneous web-terminals on selected systems.</p>
+            </a>
+            <a th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}"
+               class="list-group-item list-group-item-action list-group-item-primary">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Scripts</h5>
+                </div>
+                <p class="mb-1">Create scripts to be executed on selected systems simultaneously through a
+                    web-terminal.</p>
+            </a>
 
             <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-                <tr>
-
-                    <td>
-                        <a th:href="'../manage/viewIAMRole.ktrl?_csrf=' + ${session._csrf}">Set IAM Role</a>
-
-                    </td>
-
-
-                    <td>
-                        Set IAM Role for EC2 access.
-                    </td>
-
-                </tr>
+                <a th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Profiles</h5>
+                    </div>
+                    <p class="mb-1">Create profiles based on instance tags.</p>
+                </a>
+                <a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-primary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Users</h5>
+                    </div>
+                    <p class="mb-1">Manage user accounts and assign profiles so that users will be granted access based
+                        on instance
+                        tags</p>
+                </a>
             </template>
-
-
-            <tr>
-                <td>
-                    <a th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}">Composite SSH Terms</a>
-
-                </td>
-                <td>
-                    Execute multiple-simultaneous web-terminals on selected systems.
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <a th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}">Composite Scripts</a>
-
-                </td>
-                <td>
-                    Create scripts to be executed on selected systems simultaneously through a web-terminal
-                </td>
-            </tr>
-
-
-            <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-
-                <tr>
-                    <td>
-                        <a th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}">Profiles</a>
-                    </td>
-                    <td>
-                        Create profiles based on instance tags
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}">Users</a>
-
-                    </td>
-                    <td>
-                        Manage user accounts and assign profiles so that users will be granted access based on instance
-                        tags
-                    </td>
-                </tr>
-
-                <tr th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit}">
-                    <td>
-                        <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
-                    </td>
-                    <td>
-                        Audit administrator's sessions and terminal history.
-                    </td>
-                </tr>
+            <template
+                    th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}"
+                    th:remove="tag">
+                <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Audit Sessions</h5>
+                    </div>
+                    <p class="mb-1">Audit administrator's sessions and terminal history.</p>
+                </a>
+                <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-primary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Settings</h5>
+                    </div>
+                    <p class="mb-1">Administrative settings.</p>
+                </a>
             </template>
-            <tr>
-                <td>
-                    <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}">Settings</a>
-                </td>
-                <td>Change administrative login and settings</td>
-            </tr>
-            </tbody>
-        </table>
+            <template
+                    th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit == false ||  #strings.equals(session.userType,'A')}"
+                    th:remove="tag">
+                <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Settings</h5>
+                    </div>
+                    <p class="mb-1">Administrative settings.</p>
+                </a>
+            </template>
+        </div>
     </div>
 </div>
 </body>
+
 </html>

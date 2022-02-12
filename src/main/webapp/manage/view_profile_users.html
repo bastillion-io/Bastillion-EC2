@@ -87,7 +87,7 @@
                     <th th:id="${@io.bastillion.manage.db.UserDB@PROFILE_ID}" class="sort">
 
                         <input type="checkbox" id="assignUsersToProfile_userSelectAll" name="userSelectAll"
-                               class="userSelect"
+                               class="userSelect  form-check-input"
                                title="Select All"/>
                     </th>
                     <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
@@ -104,7 +104,7 @@
                     <tr>
                         <td>
                             <input type="checkbox" th:id="'userSelectId_'+ ${u.id}" name="userSelectId"
-                                   class="userSelect" th:value="${u.id}" th:checked="${u.checked}"/>
+                                   class="userSelect  form-check-input" th:value="${u.id}" th:checked="${u.checked}"/>
 
                         </td>
                         <td th:text="${u.username}"></td>

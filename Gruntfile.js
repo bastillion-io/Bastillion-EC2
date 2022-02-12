@@ -11,9 +11,9 @@ module.exports = function(grunt) {
         },
         mkdir: {
             all: {
-              options: {
-                create: ['<%= destCss %>/jquery-ui/images', '<%= destJs %>/jquery-ui/widgets']
-              },
+                options: {
+                    create: ['<%= destCss %>/jquery-ui/images', '<%= destJs %>/jquery-ui/widgets']
+                },
             },
         },
         copy: {
@@ -22,9 +22,9 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         flatten: true,
-                        src: ['<%= node %>/bootstrap/dist/css/*',
-                              '<%= node %>/xterm/css/xterm.*'
-                             ],
+                        src: ['<%= node %>/bootstrap/dist/css/bootstrap*min*',
+                            '<%= node %>/xterm/css/xterm.*'
+                        ],
                         dest: '<%= destCss %>/',
                         filter: 'isFile'
                     },
@@ -46,12 +46,13 @@ module.exports = function(grunt) {
                         expand: true,
                         flatten: true,
                         src: ['<%= node %>/jquery/dist/jquery.min.*',
-                              '<%= node %>/@popperjs/core/dist/umd/popper.min.*',
-                              '<%= node %>/bootstrap/dist/js/bootstrap.min.*',
-                              '<%= node %>/floatthead/dist/jquery.floatThead.min.*',
-                              '<%= node %>/xterm/lib/xterm.*',
-                              '<%= node %>/xterm-addon-fit/lib/xterm-addon-fit.*'
-                              ],
+                            '<%= node %>/@popperjs/core/dist/umd/popper.min.js',
+                            '<%= node %>/@popperjs/core/dist/umd/popper.min.js.map',
+                            '<%= node %>/bootstrap/dist/js/bootstrap.min.*',
+                            '<%= node %>/floatthead/dist/jquery.floatThead.min.*',
+                            '<%= node %>/xterm/lib/xterm.*',
+                            '<%= node %>/xterm-addon-fit/lib/xterm-addon-fit.*'
+                        ],
                         dest: '<%= destJs %>/',
                         filter: 'isFile'
                     },
@@ -66,12 +67,12 @@ module.exports = function(grunt) {
                         expand: true,
                         flatten: true,
                         src: ['<%= node %>/jquery-ui/ui/widgets/draggable.*',
-                              '<%= node %>/jquery-ui/ui/widgets/droppable.*',
-                              '<%= node %>/jquery-ui/ui/widgets/resizable.*',
-                              '<%= node %>/jquery-ui/ui/widgets/selectable.*',
-                              '<%= node %>/jquery-ui/ui/widgets/sortable.*',
-                              '<%= node %>/jquery-ui/ui/widgets/mouse.*'
-                             ],
+                            '<%= node %>/jquery-ui/ui/widgets/droppable.*',
+                            '<%= node %>/jquery-ui/ui/widgets/resizable.*',
+                            '<%= node %>/jquery-ui/ui/widgets/selectable.*',
+                            '<%= node %>/jquery-ui/ui/widgets/sortable.*',
+                            '<%= node %>/jquery-ui/ui/widgets/mouse.*'
+                        ],
                         dest: '<%= destJs %>/jquery-ui/widgets',
                         filter: 'isFile'
                     }

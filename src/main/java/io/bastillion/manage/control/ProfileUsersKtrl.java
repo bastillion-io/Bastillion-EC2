@@ -14,9 +14,14 @@ import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +30,7 @@ import java.util.List;
  */
 public class ProfileUsersKtrl extends BaseKontroller {
 
+    private static final Logger log = LoggerFactory.getLogger(ProfileUsersKtrl.class);
 
     @Model(name = "profile")
     Profile profile;
@@ -38,19 +44,29 @@ public class ProfileUsersKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/manage/viewProfileUsers", method = MethodType.GET)
-    public String viewProfileUsers() {
+    public String viewProfileUsers() throws ServletException {
         if (profile != null && profile.getId() != null) {
+            try {
             profile = ProfileDB.getProfile(profile.getId());
             sortedSet = UserDB.getAdminUserSet(sortedSet, profile.getId());
+            } catch (GeneralSecurityException | SQLException ex ){
+                log.error(ex.toString(),ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
         return "/manage/view_profile_users.html";
     }
 
     @Kontrol(path = "/manage/assignUsersToProfile", method = MethodType.POST)
-    public String assignSystemsToProfile() {
+    public String assignSystemsToProfile() throws ServletException {
 
         if (userSelectId != null) {
-            UserProfileDB.setUsersForProfile(profile.getId(), userSelectId);
+            try {
+                UserProfileDB.setUsersForProfile(profile.getId(), userSelectId);
+            } catch (GeneralSecurityException | SQLException ex ){
+                log.error(ex.toString(),ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
         return "redirect:/manage/viewProfiles.ktrl";
     }

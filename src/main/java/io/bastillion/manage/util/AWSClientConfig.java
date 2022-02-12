@@ -17,8 +17,13 @@ import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
 import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.db.IAMRoleDB;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.Calendar;
 
 /**
@@ -26,21 +31,14 @@ import java.util.Calendar;
  */
 public class AWSClientConfig {
 
-    private static ClientConfiguration config = new ClientConfiguration();
+    private static final Logger log = LoggerFactory.getLogger(AWSClientConfig.class);
+
+    private static final ClientConfiguration config = new ClientConfiguration();
 
     private static String accessKey;
     private static String secretKey;
     private static String sessionToken;
-    private static Calendar time = Calendar.getInstance();;
-
-    static {
-        if (!AppConfig.isPropertyEncrypted("accessKey")) {
-            AppConfig.encryptProperty("accessKey", AppConfig.getProperty("accessKey"));
-        }
-        if (!AppConfig.isPropertyEncrypted("secretKey")) {
-            AppConfig.encryptProperty("secretKey", AppConfig.getProperty("secretKey"));
-        }
-    }
+    private static Calendar time = Calendar.getInstance();
 
     /**
      * set config info based on AppConfig
@@ -91,7 +89,7 @@ public class AWSClientConfig {
      *
      * @return BasicSessionCredentials
      */
-    public static BasicSessionCredentials getCredentials() {
+    public static BasicSessionCredentials getCredentials() throws GeneralSecurityException, SQLException {
         return getCredentials(null);
     }
 
@@ -101,14 +99,15 @@ public class AWSClientConfig {
      * @param arn Amazon Resource Name
      * @return BasicSessionCredentials
      */
-    public static BasicSessionCredentials getCredentials(String arn) {
+    public static BasicSessionCredentials getCredentials(String arn) throws GeneralSecurityException, SQLException {
         if (arn == null || arn.trim().equals("")) {
             arn = IAMRoleDB.getIAMRole();
         }
 
         if (accessKey == null || time == null || time.before(Calendar.getInstance())) {
 
-            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(AppConfig.decryptProperty("accessKey"), AppConfig.decryptProperty("secretKey"));
+            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(EncryptionUtil.decryptStatic(AppConfig.getProperty("accessKey")),
+                    EncryptionUtil.decryptStatic(AppConfig.getProperty("secretKey")));
 
             AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).withCredentials(new AWSStaticCredentialsProvider(longTermCredentials)).build();
 
@@ -128,9 +127,7 @@ public class AWSClientConfig {
             time.add(Calendar.MINUTE,10);
 
         }
-        BasicSessionCredentials awsCredentials =
-                new BasicSessionCredentials(accessKey, secretKey, sessionToken);
 
-        return awsCredentials;
+        return new BasicSessionCredentials(accessKey, secretKey, sessionToken);
     }
 }

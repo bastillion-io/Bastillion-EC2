@@ -17,11 +17,11 @@
             $(".edit_btn").click(function () {
                 //get dialog id to open
                 var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).modal();
+                new bootstrap.Modal($("#edit_dialog_" + id)).show();
 
             });
             $("#script_btn").click(function () {
-                $("#script_dialog").modal();
+                new bootstrap.Modal($("#script_dialog")).show();
             });
 
             $("#region").change(function () {
@@ -71,7 +71,7 @@
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${hostSystem.id > 0}"]
-                $('#edit_dialog_' + [[${hostSystem.id}]]).modal();
+                new bootstrap.Modal($('#edit_dialog_' + [[${hostSystem.id}]])).show()
             [/]
         });
         /*]]>*/
@@ -91,17 +91,15 @@
 
         <template th:if="${script != null && script.id != null }" th:remove="tag">
             <h3>Execute Script on Systems</h3>
-            <p>Run <b> <a data-toggle="modal" data-target="#script_dialog" th:text="${script.displayNm}"></a></b> on the
+            <p>Run <b> <a data-bs-toggle="modal" data-bs-target="#script_dialog" th:text="${script.displayNm}"></a></b> on the
                 selected systems below</p>
 
             <div id="script_dialog" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                            <h4 class="modal-title" th:text="'View Script: ' + ${script.displayNm}"></h4>
-
-
+                            <h5 class="modal-title" th:text="'View Script: ' + ${script.displayNm}"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -109,7 +107,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary cancel_btn" data-bs-dismiss="modal">Close</button>
 
                         </div>
                     </div>
@@ -117,8 +115,8 @@
             </div>
         </template>
         <template th:if="${script == null || script.id == null}" th:remove="tag">
-            <h3>Composite SSH Terminals</h3>
-            <div>Select the instances below to generate composite SSH sessions in multiple terminals<br/>
+            <h3>Terminals</h3>
+            <div>Select the instances below to generate SSH sessions in multiple terminals<br/>
                 <span class="note">(Select on the user field to change the instance username and other properties)</span>
             </div>
         </template>
@@ -140,31 +138,31 @@
                                        value="${script.id}"/>
                                 <input type="hidden" name="showStatus" th:value="${showStatus}"/>
                                 <td class="align_left">
-                                    <label>Region</label><br/>
-                                    <select id="region" th:name="region"
+                                    <label>Region</label>
+                                    <select id="region" th:name="region" class="form-select"
                                             title="Instance Status">
                                         <option th:each="i : ${regionMap}"
                                                 th:value="${i.key}" th:text="${i.value}"
                                                 th:selected="${#strings.equals(region, i.key)}"></option>
                                     </select>
                                 </td>
-                                <td><br/> |</td>
+                                <td style="padding:20px 5px 0 5px;">|</td>
                                 <td>
-                                    <label>Tag</label><br/>
+                                    <label>Tag</label>
 
-                                    <input th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_TAG} + ']'"
-                                           title="Tag" placeholder="tag-name[=value[,tag-name[=value]]" size="22"
+                                    <input type="text" th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_TAG} + ']'"
+                                           class="form-control" title="Tag" placeholder="tag-name[=value[,tag-name[=value]]" size="22"
                                            th:value="${sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_TAG)}"/>
                                 </td>
-                                <td><label>Security Group</label><br/>
-                                    <input th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP} + ']'"
-                                           title="Security Group" placeholder="group[,group]" size="12"
+                                <td><label>Security Group</label>
+                                    <input type="text" th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP} + ']'"
+                                           class="form-control" title="Security Group" placeholder="group[,group]" size="12"
                                            th:value="${sortedSet.filterMap.get(@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SECURITY_GROUP)}"/>
                                 </td>
                                 <td>
-                                    <label>Current State</label><br/>
+                                    <label>Current State</label>
                                     <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATE} + ']'"
-                                            title="Current State">
+                                            class="form-select" title="Current State">
                                         <option value="">-Any-</option>
                                         <option th:each="i : ${instanceStateMap}"
                                                 th:value="${i.key}" th:text="${i.value}"
@@ -173,9 +171,9 @@
                                 </td>
                                 <template th:if="${showStatus}" th:remove="tag">
                                     <td>
-                                        <label>Instance Status</label><br/>
+                                        <label>Instance Status</label>
                                         <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_INSTANCE_STATUS} + ']'"
-                                                title="Instance Status">
+                                                class="form-select" title="Instance Status">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${instanceStatusMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
@@ -183,9 +181,9 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <label>System Status</label><br/>
+                                        <label>System Status</label>
                                         <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_SYSTEM_STATUS} + ']'"
-                                                title="System Status">
+                                                class="form-select" title="System Status">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${systemStatusMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
@@ -193,9 +191,9 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <label>Alarm State</label><br/>
+                                        <label>Alarm State</label>
                                         <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.control.SystemKtrl@FILTER_BY_ALARM_STATE} + ']'"
-                                                title="Alarm State">
+                                                class="form-select" title="Alarm State">
                                             <option value="">-Any-</option>
                                             <option th:each="i : ${alarmStateMap}"
                                                     th:value="${i.key}" th:text="${i.value}"
@@ -203,17 +201,16 @@
                                         </select>
                                     </td>
                                 </template>
-                                <td style="padding:20px 5px 0px 5px;">
+                                <td style="padding:20px 5px 0 5px;">
                                     <input type="submit" class="btn btn-primary" value="Filter"/>
                                 </td>
 
-                                <td><br/> |</td>
+                                <td style="padding:20px 5px 0 5px;"> |</td>
                             </tr>
                         </table>
                     </form>
                 </td>
-                <td>
-                    <br/>
+                <td style="padding: 5px 5px 0 5px;">
                     <form th:action="@{/admin/viewSystems.ktrl}" method="get">
                         <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
 
@@ -233,7 +230,6 @@
                         <input type="hidden" name="sortedSet.orderByField"
                                th:value="${sortedSet.orderByField}"/>
                     </form>
-
                 </td>
             </tr>
         </table>
@@ -246,11 +242,11 @@
                 <input type="hidden" name="script.id" th:if="${script != null && script.id != null}"
                        th:value="${script.id}"/>
                 <input type="hidden" name="showStatus" th:value="${showStatus}"/>
-                <table class="table-striped scrollableTable" style="min-width:100%;table-layout: auto">
+                <table class="table-striped scrollableTable ec2-instance" style="min-width:100%;table-layout: auto">
                     <thead>
                     <tr>
                         <th><input type="checkbox" id="select_frm_systemSelectAll" name="systemSelectAll"
-                                   class="systemSelect" title="Select All"/></th>
+                                   class="systemSelect form-check-input" title="Select All"/></th>
                         <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
                         <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_INSTANCE_ID}" class="sort">Instance Id</th>
                         <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
@@ -277,7 +273,7 @@
 
                                 <input th:if="${#strings.equals(s.state, 'running') && !#strings.equals(s.host,'')}"
                                        type="checkbox" name="systemSelectId" th:value="${s.id}"
-                                       class="systemSelect" th:title="${s.displayNm}"/>
+                                       class="systemSelect  form-check-input" th:title="${s.displayNm}"/>
                             </td>
 
                             <td th:text="${s.displayNm}"></td>
@@ -285,7 +281,7 @@
                             <td>
 
                                 <a th:id="'edit_btn_' + ${s.id}" title="Update System Properties"
-                                   class="edit_btn" href="#" th:text="${s.user}">
+                                   class="edit_btn" href="#" style="text-decoration:underline" th:text="${s.user}">
                                 </a>
                             </td>
                             <td th:text="${s.host}">
@@ -336,8 +332,8 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                            <h4 class="modal-title" th:text="'Set Properties: ' + ${s.displayLabel}"></h4>
+                            <h6 class="modal-title" th:text="'Set Properties: ' + ${s.displayLabel}"></h6>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -348,17 +344,17 @@
 
                                     <table>
                                         <tr>
-                                            <td><strong>System User</strong></td>
+                                            <td>System User</td>
                                             <td>
-                                                <input type="text" name="hostSystem.user" th:value="${s.user}"
+                                                <input type="text" name="hostSystem.user" class="form-control" th:value="${s.user}"
                                                        title="System User"
                                                        size="10"/>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Port</strong></td>
+                                            <td>Port</td>
                                             <td>
-                                                <input type="text" name="hostSystem.port" th:value="${s.port}"
+                                                <input type="text" name="hostSystem.port" class="form-control"  th:value="${s.port}"
                                                        title="Port" size="2"/>
                                             </td>
                                         </tr>
@@ -387,7 +383,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary cancel_btn" data-dismiss="modal">Cancel
+                            <button type="button" class="btn btn-primary cancel_btn" data-bs-dismiss="modal">Cancel
                             </button>
                             <button type="button" class="btn btn-primary submit_btn">Submit</button>
                         </div>

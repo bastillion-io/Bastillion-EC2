@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.util;
 
@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
@@ -20,10 +23,18 @@ import java.security.SecureRandom;
  */
 public class EncryptionUtil {
 
-    private static Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     //secret key
-    private static final byte[] key = KeyStoreUtil.getSecretBytes(KeyStoreUtil.ENCRYPTION_KEY_ALIAS);
+    private static byte[] key = new byte[0];
+
+    static {
+        try {
+            key = KeyStoreUtil.getSecretBytes(KeyStoreUtil.ENCRYPTION_KEY_ALIAS);
+        } catch (GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+        }
+    }
 
     public static final String CRYPT_ALGORITHM = "AES";
     public static final String HASH_ALGORITHM = "SHA-256";
@@ -50,18 +61,15 @@ public class EncryptionUtil {
      * @param salt salt for hash
      * @return hash value of string
      */
-    public static String hash(String str, String salt) {
+    public static String hash(String str, String salt) throws NoSuchAlgorithmException {
         String hash = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-            if (StringUtils.isNotEmpty(salt)) {
-                md.update(Base64.decodeBase64(salt.getBytes()));
-            }
-            md.update(str.getBytes("UTF-8"));
-            hash = new String(Base64.encodeBase64(md.digest()));
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+        if (StringUtils.isNotEmpty(salt)) {
+            md.update(Base64.decodeBase64(salt.getBytes()));
         }
+        md.update(str.getBytes(StandardCharsets.UTF_8));
+        hash = new String(Base64.encodeBase64(md.digest()));
+
         return hash;
     }
 
@@ -71,7 +79,7 @@ public class EncryptionUtil {
      * @param str unhashed string
      * @return hash value of string
      */
-    public static String hash(String str) {
+    public static String hash(String str) throws NoSuchAlgorithmException {
         return hash(str, null);
     }
 
@@ -82,18 +90,15 @@ public class EncryptionUtil {
      * @param str unencrypted string
      * @return encrypted string
      */
-    public static String encrypt(byte[] key, String str) {
+    public static String encrypt(byte[] key, String str) throws GeneralSecurityException {
 
         String retVal = null;
         if (str != null && str.length() > 0) {
-            try {
-                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
-                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
-                byte[] encVal = c.doFinal(str.getBytes());
-                retVal = new String(Base64.encodeBase64(encVal));
-            } catch (Exception ex) {
-                log.error(ex.toString(), ex);
-            }
+            Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+            c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
+            byte[] encVal = c.doFinal(str.getBytes());
+            retVal = new String(Base64.encodeBase64(encVal));
+
 
         }
         return retVal;
@@ -106,18 +111,13 @@ public class EncryptionUtil {
      * @param str encrypted string
      * @return decrypted string
      */
-    public static String decrypt(byte[] key, String str) {
+    public static String decrypt(byte[] key, String str) throws GeneralSecurityException {
         String retVal = null;
         if (str != null && str.length() > 0) {
-            try {
-                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
-                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
-                byte[] decodedVal = Base64.decodeBase64(str.getBytes());
-                retVal = new String(c.doFinal(decodedVal));
-            } catch (Exception ex) {
-                log.error(ex.toString(), ex);
-            }
-
+            Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+            c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
+            byte[] decodedVal = Base64.decodeBase64(str.getBytes());
+            retVal = new String(c.doFinal(decodedVal));
         }
         return retVal;
     }
@@ -128,7 +128,7 @@ public class EncryptionUtil {
      * @param str unencrypted string
      * @return encrypted string
      */
-    public static String encrypt(String str) {
+    public static String encrypt(String str) throws GeneralSecurityException {
         return encrypt(key, str);
     }
 
@@ -138,9 +138,32 @@ public class EncryptionUtil {
      * @param str encrypted string
      * @return decrypted string
      */
-    public static String decrypt(String str) {
+    public static String decrypt(String str) throws GeneralSecurityException {
         return decrypt(key, str);
     }
 
+
+    /**
+     * return encrypted value of string with static key
+     *
+     * @param str unencrypted string
+     * @return encrypted string
+     */
+    public static String encryptStatic(String str) throws GeneralSecurityException {
+        return encrypt(staticKey, str);
+    }
+
+    /**
+     * return decrypted value of encrypted string with static key
+     *
+     * @param str encrypted string
+     * @return decrypted string
+     */
+    public static String decryptStatic(String str) throws GeneralSecurityException {
+        return decrypt(staticKey, str);
+    }
+
+    private static final byte[] staticKey = { 12, 49, -63, 87, 42, -77, 126, -64, -32, -58, -126, 54, 35, 1, -113, 82,
+            -10, 12, -90, 12, 17, 127, -91, 93, -43, 46, -7, -100, -96, 12, 108, -101 };
 
 }

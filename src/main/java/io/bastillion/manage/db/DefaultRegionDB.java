@@ -1,25 +1,22 @@
 /**
  * Copyright (C) 2018 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.db;
 
 import io.bastillion.manage.util.DBUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * DAO to set default region
  */
 public class DefaultRegionDB {
-
-    private static Logger log = LoggerFactory.getLogger(DefaultRegionDB.class);
-
 
     private DefaultRegionDB() {
     }
@@ -30,30 +27,20 @@ public class DefaultRegionDB {
      *
      * @return region default region
      */
-    public static String getRegion() {
-
+    public static String getRegion() throws SQLException, GeneralSecurityException {
 
         String region = null;
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("select * from default_region");
+        ResultSet rs = stmt.executeQuery();
 
-            PreparedStatement stmt = con.prepareStatement("select * from default_region");
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                region = rs.getString("region");
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-
-        } catch (Exception ex) {
-            log.error(ex.toString(), ex);
-        } finally {
-            DBUtils.closeConn(con);
+        while (rs.next()) {
+            region = rs.getString("region");
         }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         return region;
 
@@ -64,24 +51,18 @@ public class DefaultRegionDB {
      *
      * @param region default region
      */
-    public static void updateRegion(String region) {
+    public static void updateRegion(String region) throws SQLException, GeneralSecurityException {
 
         //get db connection
         Connection con = DBUtils.getConn();
 
-        try {
-            //update
-            PreparedStatement stmt = con.prepareStatement("update default_region set region = ?");
-            stmt.setString(1, region);
-            stmt.execute();
+        //update
+        PreparedStatement stmt = con.prepareStatement("update default_region set region = ?");
+        stmt.setString(1, region);
+        stmt.execute();
 
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        } finally {
-            DBUtils.closeConn(con);
-        }
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
     }
 
@@ -90,24 +71,17 @@ public class DefaultRegionDB {
      *
      * @param region default region
      */
-    public static void insertRegion(String region) {
+    public static void insertRegion(String region) throws SQLException, GeneralSecurityException {
 
         //get db connection
         Connection con = DBUtils.getConn();
+        //insert
+        PreparedStatement stmt = con.prepareStatement("insert into default_region (region) values(?)");
+        stmt.setString(1, region);
+        stmt.execute();
 
-        try {
-            //insert
-            PreparedStatement stmt = con.prepareStatement("insert into default_region (region) values(?)");
-            stmt.setString(1, region);
-            stmt.execute();
-
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        } finally {
-            DBUtils.closeConn(con);
-        }
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
     /**
@@ -115,7 +89,7 @@ public class DefaultRegionDB {
      *
      * @param region default region
      */
-    public static void saveRegion(String region) {
+    public static void saveRegion(String region) throws SQLException, GeneralSecurityException {
 
         String regionTmp = getRegion();
         if (regionTmp != null) {
@@ -123,7 +97,6 @@ public class DefaultRegionDB {
         } else {
             insertRegion(region);
         }
-
     }
 
 }
