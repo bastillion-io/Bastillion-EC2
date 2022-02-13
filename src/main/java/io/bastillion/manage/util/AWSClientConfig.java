@@ -35,8 +35,8 @@ public class AWSClientConfig {
 
     private static final ClientConfiguration config = new ClientConfiguration();
 
-    private static String accessKey;
-    private static String secretKey;
+    private static String accessKey = "5ij8Zolfv+cZbgBRWop8cklIaqPxO4G/xb2PoM1zydo=";
+    private static String secretKey = "tMbPt2cQEwNvy90Dn/I55r/ajVAO+otM7+g4yImM3qBpkYyy5uvNXXZeuWXNm2ok";
     private static String sessionToken;
     private static Calendar time = Calendar.getInstance();
 
@@ -106,8 +106,8 @@ public class AWSClientConfig {
 
         if (accessKey == null || time == null || time.before(Calendar.getInstance())) {
 
-            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(EncryptionUtil.decryptStatic(AppConfig.getProperty("accessKey")),
-                    EncryptionUtil.decryptStatic(AppConfig.getProperty("secretKey")));
+            BasicAWSCredentials longTermCredentials = new BasicAWSCredentials(EncryptionUtil.decryptStatic(accessKey),
+                    EncryptionUtil.decryptStatic(secretKey));
 
             AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).withCredentials(new AWSStaticCredentialsProvider(longTermCredentials)).build();
 
