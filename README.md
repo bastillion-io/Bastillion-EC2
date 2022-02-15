@@ -101,19 +101,11 @@ Login with
 *Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
 
 Steps:
-
-1. Set your AWS credentials for the following properties in the Bastillion-EC2.properties file. 
-	```
-	#AWS IAM access key
-	accessKey=
-	#AWS IAM secret key
-	secretKey=
-	```    
-2. Configure an IAM Role with Account ID for your user and set generated ARN in Bastillion-EC2
-3. Import the Bastillion-EC2 public SSH key to the EC2 AWS console.
-4. Create EC2 instanaces with the imported key.
-5. Start composite-ssh sessions or create and execute a script across multiple sessions
-6. Add instance administrator accounts
+1. Configure an IAM Role with Account ID for your user and set generated ARN in Bastillion-EC2
+2. Import the Bastillion-EC2 public SSH key to the EC2 AWS console.
+3. Create EC2 instanaces with the imported key.
+4. Start composite-ssh sessions or create and execute a script across multiple sessions
+5. Add instance administrator accounts
 
 More info at https://www.bastillion.io/docs/bastillion-ec2/index.html
 
