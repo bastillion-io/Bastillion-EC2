@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion-ec2</artifactId>
-    <version>1.77.1-SNAPSHOT</version>
+    <version>1.78.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Bastillion for EC2</name>
     <licenses>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>io.bastillion</groupId>
             <artifactId>lmvc</artifactId>
-            <version>1.10.7</version>
+            <version>1.12.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
