@@ -71,7 +71,7 @@
                     }
                 });
 
-                $("form input, form select").keydown(function (event) {
+                $("form input, form select, .btn").keydown(function (event) {
                     if (event.keyCode === 13) {
                         event.preventDefault();
                         $(this).closest("form").submit();
@@ -110,7 +110,7 @@
 
         //break if loaded in frame
         [# th:if="${isFrame == null || !isFrame}"]
-        if (top !== self) top.location.replace(self.location.href);
+            if (top !== self) top.location.replace(self.location.href);
         [/]
         /*]]>*/
     </script>

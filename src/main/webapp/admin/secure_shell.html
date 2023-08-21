@@ -40,18 +40,18 @@
             //submit
             $(".submit_btn").button().click(function () {
                 [# th:if= "${pendingSystemStatus != null && pendingSystemStatus.id != null}"]
-                $(this).parents('.modal').find('form').submit();
+                    $(this).parents('.modal').find('form').submit();
                 [/]
-                    $(this).parents('.modal').modal('hide');
+                $(this).parents('.modal').modal('hide');
             });
 
             //close all forms
             $(".cancel_btn").button().click(function () {
                 window.location = 'getNextPendingSystemForTerms.ktrl?pendingSystemStatus.id=' + /*[[${pendingSystemStatus.id}]]*/ ''
                     [# th:if= "${script != null && script.id > 0}"]
-                +'&script.id=' + /*[[${script.id}]]*/ ''
+                        +'&script.id=' + /*[[${script.id}]]*/ ''
                     [/]
-                + '&_csrf=' + [[${session._csrf}]];
+                    + '&_csrf=' + [[${session._csrf}]];
             });
 
             //disconnect terminals and remove from view
@@ -98,23 +98,23 @@
             });
 
             [# th:if= "${currentSystemStatus != null && (#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') || #strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL'))}"]
-            new bootstrap.Modal($("#error_dialog")).show();
+                new bootstrap.Modal($("#error_dialog")).show();
             [/]
-                [# th:if= "${pendingSystemStatus != null && pendingSystemStatus.id != null && (currentSystemStatus == null || (!#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') && !#strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL')) )}"]
-            [# th:if= "${ #strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL')}"]
-            new bootstrap.Modal($("#set_password_dialog")).show();
-            [/]
-
-                [# th:if= "${#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')}"]
-            new bootstrap.Modal($("#set_passphrase_dialog")).show();
-            [/]
-
-                [# th:if= "${currentSystemStatus == null || (!#strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL') && !#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')&& !#strings.equals(pendingSystemStatus.statusCd, 'GENERICFAIL'))}"]
-            $("#composite_terms_frm").submit();
-            [/]
+            [# th:if= "${pendingSystemStatus != null && pendingSystemStatus.id != null && (currentSystemStatus == null || (!#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') && !#strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL')) )}"]
+                [# th:if= "${ #strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL')}"]
+                    new bootstrap.Modal($("#set_password_dialog")).show();
                 [/]
 
-                [# th:if= "${pendingSystemStatus == null || pendingSystemStatus.id == null}"]
+                [# th:if= "${#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')}"]
+                    new bootstrap.Modal($("#set_passphrase_dialog")).show();
+                [/]
+
+                [# th:if= "${currentSystemStatus == null || (!#strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL') && !#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')&& !#strings.equals(pendingSystemStatus.statusCd, 'GENERICFAIL'))}"]
+                    $("#composite_terms_frm").submit();
+                [/]
+            [/]
+
+            [# th:if= "${pendingSystemStatus == null || pendingSystemStatus.id == null}"]
 
             $('#dummy').focus();
             var keys = {};
@@ -277,45 +277,48 @@
 
             function createTermMap(id, output) {
 
+                var  CUSTOM_THEME =
+                    {
+                    [# th:if= "${userSettings != null && userSettings.bg != null}"]
+                        background: [[${userSettings.bg}]],
+                    [/]
+                    [# th:if= "${userSettings != null && userSettings.bg != null}"]
+                        foreground: [[${userSettings.fg}]],
+                        cursor: [[${userSettings.fg}]],
+                        cursorAccent: [[${userSettings.fg}]],
+                    [/]
+                    [# th:if= "${userSettings !=null && userSettings.colors != null && userSettings.colors.length == 16}"]
+                        black: [[${userSettings.colors[0]}]],
+                        red: [[${userSettings.colors[1]}]],
+                        green: [[${userSettings.colors[2]}]],
+                        yellow: [[${userSettings.colors[3]}]],
+                        blue: [[${userSettings.colors[4]}]],
+                        magenta: [[${userSettings.colors[5]}]],
+                        cyan: [[${userSettings.colors[6]}]],
+                        white: [[${userSettings.colors[7]}]],
+                        brightBlack: [[${userSettings.colors[8]}]],
+                        brightRed: [[${userSettings.colors[9]}]],
+                        brightGreen: [[${userSettings.colors[10]}]],
+                        brightYellow: [[${userSettings.colors[11]}]],
+                        brightBlue: [[${userSettings.colors[12]}]],
+                        brightMagenta: [[${userSettings.colors[13]}]],
+                        brightCyan: [[${userSettings.colors[14]}]],
+                        brightWhite: [[${userSettings.colors[15]}]]
+                    [/]
+                    };
+
                 termMap[id] = new Terminal({
                     fontSize: 14,
+                    'theme': CUSTOM_THEME,
+                    'cursorStyle' : 'bar',
+                    'cursorWidth' : '10',
+                    'cursorInactiveStyle' : 'bar',
                     fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
                 });
 
                 fitMap[id] = new FitAddon.FitAddon()
                 termMap[id].loadAddon(fitMap[id])
 
-                var  CUSTOM_THEME =
-                    {
-                        [# th:if= "${userSettings != null && userSettings.bg != null}"]
-                background: [[${userSettings.bg}]],
-                    [/]
-                        [# th:if= "${userSettings != null && userSettings.bg != null}"]
-                foreground: [[${userSettings.fg}]],
-                    cursor: [[${userSettings.fg}]],
-                    cursorAccent: [[${userSettings.fg}]],
-                    [/]
-                        [# th:if= "${userSettings !=null && userSettings.colors != null && userSettings.colors.length == 16}"]
-                black: [[${userSettings.colors[0]}]],
-                    red: [[${userSettings.colors[1]}]],
-                    green: [[${userSettings.colors[2]}]],
-                    yellow: [[${userSettings.colors[3]}]],
-                    blue: [[${userSettings.colors[4]}]],
-                    magenta: [[${userSettings.colors[5]}]],
-                    cyan: [[${userSettings.colors[6]}]],
-                    white: [[${userSettings.colors[7]}]],
-                    brightBlack: [[${userSettings.colors[8]}]],
-                    brightRed: [[${userSettings.colors[9]}]],
-                    brightGreen: [[${userSettings.colors[10]}]],
-                    brightYellow: [[${userSettings.colors[11]}]],
-                    brightBlue: [[${userSettings.colors[12]}]],
-                    brightMagenta: [[${userSettings.colors[13]}]],
-                    brightCyan: [[${userSettings.colors[14]}]],
-                    brightWhite: [[${userSettings.colors[15]}]]
-                    [/]
-            };
-
-                termMap[id].setOption('theme', CUSTOM_THEME);
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
 
 
@@ -437,8 +440,8 @@
 
             //set connected systems
             [# th:each = "s : ${systemList}" ]
-            $(createTermElement([[${s.instanceId}]], [[${s.id}]], [[${s.displayLabel}]])).appendTo(".termwrapper");
-            setTerminalEvents($("#run_cmd_" + [[${s.instanceId}]]));
+                $(createTermElement([[${s.instanceId}]], [[${s.id}]], [[${s.displayLabel}]])).appendTo(".termwrapper");
+                setTerminalEvents($("#run_cmd_" + [[${s.instanceId}]]));
             [/]
 
             var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
@@ -562,9 +565,9 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <button type="button" class="close cancel_btn" data-bs-dismiss="modal" aria-hidden="true">x</button>
                 <h6 class="modal-title"
                     th:text="'Enter password for ' + ${pendingSystemStatus.displayLabel}"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -598,9 +601,9 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <button type="button" class="close cancel_btn" data-bs-dismiss="modal" aria-hidden="true">x</button>
                 <h6 class="modal-title"
                     th:text="'Enter passphrase for ' + ${pendingSystemStatus.displayLabel}"></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
