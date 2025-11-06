@@ -25,7 +25,7 @@ It enables secure access, auditing, and centralized key management across all yo
 
 ## Installation Options
 **Free:** https://github.com/bastillion-io/Bastillion-EC2/releases  
-**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion-for-EC2/B076D7XMK6
+**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/prodview-e2pbdearyxwuk
 
 ---
 
