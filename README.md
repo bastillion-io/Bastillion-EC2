@@ -120,26 +120,33 @@ tag1=value1,tag2=value2
 
 ---
 
-## Supplying a Custom SSH Key Pair
-Bastillion-EC2 generates its own public/private SSH key at startup.  
-To use a custom pair, update `Bastillion-EC2Config.properties`:
+## Custom SSH Key Pair
+
+Specify a custom SSH key pair or let Bastillion E2 generate its own on startup:
 
 ```properties
 # Regenerate and import SSH keys
 resetApplicationSSHKey=true
 
 # SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
+# Supported options:
+#   rsa    - Classic, widely compatible (configurable length, default 4096)
+#   ecdsa  - Faster, smaller keys (P-256/384/521 curves)
+#   ed25519 - Default and recommended (≈ RSA-4096, secure and fast)
+#   ed448  - Extra-strong (≈ RSA-8192, slower and less supported)
 sshKeyType=ed25519
 
-# Private/public key paths
+# Private key
 privateKey=/Users/you/.ssh/id_rsa
+
+# Public key
 publicKey=/Users/you/.ssh/id_rsa.pub
 
-# Passphrase (blank if none)
+# Passphrase (leave blank if none)
 defaultSSHPassphrase=myPa$$w0rd
 ```
 
-After startup and registration, keys can be removed from the host.
+Once registered, you can remove the key files and passphrase from the configuration.
 
 ---
 
