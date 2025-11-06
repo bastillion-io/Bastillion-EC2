@@ -11,7 +11,7 @@ import io.bastillion.manage.model.HostSystem;
 import io.bastillion.manage.model.SortedSet;
 import io.bastillion.manage.util.DBUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
