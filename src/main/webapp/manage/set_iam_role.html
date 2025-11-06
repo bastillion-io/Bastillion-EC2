@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="~{_res/inc/header}"/>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -37,7 +37,7 @@
 </head>
 <body>
 
-<div th:replace="_res/inc/navigation"></div>
+<div th:replace="~{_res/inc/navigation}"></div>
 
 <div class="container">
 
@@ -47,7 +47,7 @@
         Account ID 652647611965, then set AmazonEC2ReadOnlyAccess permissions for the role. Finally, set the
         generated Amazon Resource Name (ARN) below. Detailed instructions can be found <a
                 href="https://www.bastillion.io/docs/bastillion-ec2/iam_role/">here</a>.</p>
-    <div th:replace="_res/inc/errors"></div>
+    <div th:replace="~{_res/inc/errors}"></div>
     <div class="alert alert-success" th:if="${success}">
         Success!
         <div><span>Amazon Resource Name has been configured</span></div>

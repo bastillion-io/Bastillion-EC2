@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="~{_res/inc/header}"/>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -81,7 +81,7 @@
 </head>
 <body>
 
-<div th:replace="_res/inc/navigation"></div>
+<div th:replace="~{_res/inc/navigation}"></div>
 
 <div class="container">
 
@@ -337,7 +337,7 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div th:replace="_res/inc/errors"></div>
+                                <div th:replace="~{_res/inc/errors}"></div>
                                 <form th:action="@{/admin/saveSystem.ktrl}" method="post"
                                       th:id="'save_sys_form_edit_' + ${s.id}">
                                     <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
