@@ -1,230 +1,227 @@
 ![Build](https://github.com/bastillion-io/Bastillion-EC2/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion-EC2/actions/workflows/codeql-analysis.yml/badge.svg)
 
-![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png) Bastillion for EC2
-======
-A web-based ssh console to execute commands and manage multiple EC2 instances
-simultaneously running on Amazon Web Services (AWS). Bastillion-EC2 allows you to share
-terminal commands and upload files to all your EC2 instances. Once the sessions
-have been opened you can select a single EC2 instance or any combination to run
-your commands.  Also, additional instance administrators can be added and their
-terminal sessions and history can be audited.  
+![Bastillion for EC2](https://www.bastillion.io/images/bastillion_40x40.png)
+
+# Bastillion for EC2
+
+**A modern, web-based SSH console and key management tool for Amazon EC2.**
+
+Bastillion for EC2 provides a browser-based SSH management platform designed specifically for AWS environments.  
+It enables secure access, auditing, and centralized key management across all your EC2 instances—built on the same foundation as Bastillion and now updated for **Java 21 / Jakarta EE 11**.
 
 ![Terminals](https://www.bastillion.io/images/500x300/bastillion-ec2.png)
 
+---
 
-Bastillion for EC2 Releases
-------
-Bastillion-EC2 is available for free use under the Prosperity Public License
+## 🚀 What’s New
+- Upgraded to **Java 21** and **Jakarta EE 11**
+- Full support for **Ed25519** (default) and **Ed448** SSH keys
+- New **daemon mode** for Jetty startup (`--daemon`)
+- Updated dependencies for improved security and performance
+- Clarified AWS IAM and EC2 integration steps
 
-https://github.com/bastillion-io/Bastillion-EC2/releases
+---
 
-or purchase from the AWS marketplace
+## Installation Options
+**Free:** https://github.com/bastillion-io/Bastillion-EC2/releases  
+**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion-for-EC2/B076D7XMK6
 
-https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion-for-EC2/B076D7XMK6
+---
 
-Prerequisites
--------------
-**Open-JDK / Oracle-JDK - 1.9 or greater**
+## Prerequisites
 
-*apt-get install openjdk-9-jdk*
+### Java 21 (OpenJDK or Oracle JDK)
+```bash
+apt-get install openjdk-21-jdk
+```
+> Oracle JDK download: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-> http://www.oracle.com/technetwork/java/javase/downloads/index.html
+### Authenticator (for 2FA)
 
-**Install [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
+| Application | Android | iOS |
+|--------------|----------|-----|
+| **Authy** | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy) | [iTunes](https://itunes.apple.com/us/app/authy/id494168017) |
+| **Google Authenticator** | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
-| Application          | Android                                                                                             | iOS                                                                        |             
-|----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| Authy                | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy)                        | [iTunes](https://itunes.apple.com/us/app/authy/id494168017)                |
-| Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
+---
 
-To Run Bundled with Jetty
-------
-Download bastillion-ec2-jetty-vXX.XX.tar.gz
+## Run with Jetty (Bundled)
 
-https://github.com/bastillion-io/Bastillion-EC2/releases
+Download: https://github.com/bastillion-io/Bastillion-EC2/releases
 
-Export environment variables
+### Set Environment Variables
+**Linux / macOS**
+```bash
+export JAVA_HOME=/path/to/jdk
+export PATH=$JAVA_HOME/bin:$PATH
+```
+**Windows**
+```cmd
+set JAVA_HOME=C:\path\to\jdk
+set PATH=%JAVA_HOME%\bin;%PATH%
+```
 
-for Linux/Unix/OSX
+### Start Bastillion for EC2
+Foreground (interactive):
+```bash
+./startBastillion-EC2.sh
+```
 
-     export JAVA_HOME=/path/to/jdk
-     export PATH=$JAVA_HOME/bin:$PATH
+Daemon (background):
+```bash
+./startBastillion-EC2.sh --daemon
+```
+Logs are stored in `jetty/logs/YYYY_MM_DD.jetty.log`.
 
-for Windows
+Enable debug output:
+```bash
+./startBastillion-EC2.sh -d
+```
 
-     set JAVA_HOME=C:\path\to\jdk
-     set PATH=%JAVA_HOME%\bin;%PATH%
+Stop:
+```bash
+./stopBastillion-EC2.sh
+```
 
-Start Bastillion
+Access in browser:  
+`https://<server-ip>:8443` (or for AMI instances: `https://<instance-ip>:443`)
 
-for Linux/Unix/OSX
+Default credentials:
+```
+username: admin
+password: changeme
+```
+*(For AMI, the password defaults to the EC2 Instance ID.)*
 
-        ./startBastillion-EC2.sh
+---
 
-for Windows
+## AWS Integration Steps
+1. Configure an **IAM Role** with your Account ID and set the generated ARN in Bastillion-EC2.
+2. Import the **Bastillion-EC2 public SSH key** into the AWS EC2 console.
+3. Launch EC2 instances using that key pair.
+4. Start composite SSH sessions or run scripts across multiple instances.
+5. Add instance administrator accounts as needed.
 
-        startBastillion-EC2.bat
-	
-More documentation at: https://www.bastillion.io/docs/bastillion-ec2/index.html
-	
-	
-Build from Source
-------
-Install Maven 3 or greater
+More info: https://www.bastillion.io/docs/bastillion-ec2/index.html
 
-*apt-get install maven*
+---
 
-> http://maven.apache.org 
+## Restricting User Access
+Administrative access can be restricted through tags defined in a user’s profile.  
+Profile tags must match the EC2 instance tags set in AWS.
 
-Export environment variables
+Examples:
+```
+tag-name
+tag-name=mytag
+tag1=value1,tag2=value2
+```
 
-    export JAVA_HOME=/path/to/jdk
-    export M2_HOME=/path/to/maven
-    export PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
+---
 
-In the directory that contains the pom.xml run
+## Supplying a Custom SSH Key Pair
+Bastillion-EC2 generates its own public/private SSH key at startup.  
+To use a custom pair, update `Bastillion-EC2Config.properties`:
 
-	mvn package jetty:run
+```properties
+# Regenerate and import SSH keys
+resetApplicationSSHKey=true
 
-*Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+# SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
+sshKeyType=ed25519
 
-Using Bastillion-EC2
-------
-Open browser to https://\<whatever ip\>:8443
+# Private/public key paths
+privateKey=/Users/you/.ssh/id_rsa
+publicKey=/Users/you/.ssh/id_rsa.pub
 
-Login with 
+# Passphrase (blank if none)
+defaultSSHPassphrase=myPa$$w0rd
+```
 
-	username:admin 
-	password:changeme
-	
-*Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
+After startup and registration, keys can be removed from the host.
 
-Steps:
-1. Configure an IAM Role with Account ID for your user and set generated ARN in Bastillion-EC2
-2. Import the Bastillion-EC2 public SSH key to the EC2 AWS console.
-3. Create EC2 instanaces with the imported key.
-4. Start composite-ssh sessions or create and execute a script across multiple sessions
-5. Add instance administrator accounts
+---
 
-More info at https://www.bastillion.io/docs/bastillion-ec2/index.html
+## External Authentication (LDAP / AD)
+Enable in `Bastillion-EC2Config.properties`:
+```properties
+jaasModule=ldap-ol
+```
 
-Restricting User Access
-------
-Administrative access can be restricted through the use of tags defined in a user's profile. Profile tags must correspond to the instance tags that have been set through the AWS console.
+Configure `jaas.conf`:
+```
+ldap-ol {
+    com.sun.security.auth.module.LdapLoginModule SUFFICIENT
+    userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
+    userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
+    authzIdentity="{cn}"
+    useSSL=false
+    debug=false;
+};
+```
 
-Tags work on a name or name/value pair.
+Map LDAP roles to Bastillion profiles:
+```
+ldap-ol-with-roles {
+    org.eclipse.jetty.jaas.spi.LdapLoginModule required
+    debug="false"
+    useLdaps="false"
+    contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
+    hostname="<SERVER>"
+    port="389"
+    bindDn="<BIND-DN>"
+    bindPassword="<BIND-DN PASSWORD>"
+    authenticationMethod="simple"
+    forceBindingLogin="true"
+    userBaseDn="ou=users,dc=bastillion,dc=com"
+    userRdnAttribute="uid"
+    userIdAttribute="uid"
+    userPasswordAttribute="userPassword"
+    userObjectClass="inetOrgPerson"
+    roleBaseDn="ou=groups,dc=bastillion,dc=com"
+    roleNameAttribute="cn"
+    roleMemberAttribute="member"
+    roleObjectClass="groupOfNames";
+};
+```
 
-for example
+Users are added/removed as they authenticate when their role matches a Bastillion profile.
 
-    tag-name
-    tag-name=mytag
+---
 
-or multiple
-
-    tag-name1,tag-name2
-    tag-name1=mytag1,tag-name2=mytag2
-    
-Supplying a Custom SSH Key Pair
-------
-Bastillion-EC2 generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the Bastillion-EC2Config.properties file.
-
-For example:
-
-	#set to true to regenerate and import SSH keys  --set to true
-	resetApplicationSSHKey=true
-
-	#SSH Key Type 'dsa' or 'rsa'
-	sshKeyType=rsa
-
-	#private key  --set pvt key
-	privateKey=/Users/kavanagh/.ssh/id_rsa
-
-	#public key  --set pub key
-	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
-	
-	#default passphrase  --leave blank if passphrase is empty
-	defaultSSHPassphrase=myPa$$w0rd
-	
-After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
-
-External Authentication
-------
-External Authentication can be enabled through the Bastillion-EC2Config.properties.
-
-For example:
-
-	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
-	jaasModule=ldap-ol
-    
-Connection details need to be set in the jaas.conf file
-
-    ldap-ol {
-    	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
-    	userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
-    	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
-    	authzIdentity="{cn}"
-    	useSSL=false
-    	debug=false;
-    };
-    
-
-Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
-
-User LDAP roles can be mapped to profiles defined in Bastillion-EC2 through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
-
-    ldap-ol-with-roles {
-        //openldap auth with roles that can map to profiles
-        org.eclipse.jetty.jaas.spi.LdapLoginModule required
-        debug="false"
-        useLdaps="false"
-        contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
-        hostname="<SERVER>"
-        port="389"
-        bindDn="<BIND-DN>"
-        bindPassword="<BIND-DN PASSWORD>"
-        authenticationMethod="simple"
-        forceBindingLogin="true"
-        userBaseDn="ou=users,dc=bastillion,dc=com"
-        userRdnAttribute="uid"
-        userIdAttribute="uid"
-        userPasswordAttribute="userPassword"
-        userObjectClass="inetOrgPerson"
-        roleBaseDn="ou=groups,dc=bastillion,dc=com"
-        roleNameAttribute="cn"
-        roleMemberAttribute="member"
-        roleObjectClass="groupOfNames";
-    };
-
-Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
-
-Auditing
-------
-Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
+## Auditing
+Auditing is disabled by default.  
+Enable in **log4j2.xml** by uncommenting:
+- `io.bastillion.manage.util.SystemAudit`
+- `audit-appender`
 
 > https://github.com/bastillion-io/Bastillion-EC2/blob/master/src/main/resources/log4j2.xml#L19-L22
-	
-Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
 
-	#enable audit  --set to true to enable
-	enableInternalAudit=true
+Then set in `Bastillion-EC2Config.properties`:
+```properties
+enableInternalAudit=true
+```
 
-Acknowledgments
-------
-Special thanks goes to these amazing projects which makes this (and other great projects) possible.
+---
 
-+ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
-+ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
+## Acknowledgments
+Special thanks to these projects that make Bastillion possible:
 
-Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
+- [JSch](http://www.jcraft.com/jsch) (Java Secure Channel) by [ymnk](https://github.com/ymnk)
+- [term.js](https://github.com/chjj/term.js) (A JavaScript terminal) by [chjj](https://github.com/chjj)
 
-The Prosperity Public License
------------
-Bastillion-EC2 is available for free use under the Prosperity Public License
+Third-party dependencies are listed in [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
-Author
-------
-**Loophole, LLC - Sean Kavanagh**
+---
 
-+ sean.p.kavanagh6@gmail.com
-+ https://twitter.com/spkavanagh6
+## License
+Bastillion-EC2 is distributed under the **Prosperity Public License**.
+
+---
+
+## Author
+
+**Loophole, LLC — Sean Kavanagh**  
+Email: [sean.p.kavanagh6@gmail.com](mailto:sean.p.kavanagh6@gmail.com)  
+Instagram: [@spkavanagh6](https://www.instagram.com/spkavanagh6/)
